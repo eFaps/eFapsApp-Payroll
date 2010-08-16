@@ -28,7 +28,7 @@
            xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
 
     <uuid>ddd7a622-1723-44d8-86e7-15624c6b42c9</uuid>
-    <file-application>eFaps-ERP-Payroll</file-application>
+    <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
 
     <definition>

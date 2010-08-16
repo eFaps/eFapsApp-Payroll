@@ -24,7 +24,7 @@
 -->
 <install xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <application>eFaps-ERP-Payroll</application>
+    <application>eFapsApp-Payroll</application>
     <dependencies>
         <dependency order="0">
             <groupId>org.efaps</groupId>
@@ -37,18 +37,18 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency order="2">
-            <groupId>org.efaps.module</groupId>
-            <artifactId>efaps-crm-contacts</artifactId>
+            <groupId>org.efaps.apps</groupId>
+            <artifactId>contacts</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency order="3">
-            <groupId>org.efaps.module</groupId>
-            <artifactId>efaps-erp-commons</artifactId>
+            <groupId>org.efaps.apps</groupId>
+            <artifactId>commons</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency order="4">
-            <groupId>org.efaps.module</groupId>
-            <artifactId>efaps-erp-humanresource</artifactId>
+            <groupId>org.efaps.apps</groupId>
+            <artifactId>humanresource</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
@@ -66,7 +66,7 @@
             import java.net.URL
             import java.io.File;
 
-            EFAPS_LOGGER.info("Checking for import of JaasKeys for eFaps-ERP-Payroll");
+            EFAPS_LOGGER.info("Checking for import of JaasKeys for eFapsApp-Payroll");
 
             SearchQuery query = new SearchQuery();
             query.setQueryTypes("Admin_User_JAASKey");
@@ -78,12 +78,12 @@
                 RunLevel.init("shell");
                 RunLevel.execute();
 
-                EFAPS_LOGGER.info("    Importing JaasKeys for eFaps-ERP-Payroll");
+                EFAPS_LOGGER.info("    Importing JaasKeys for eFapsApp-Payroll");
                 URL url = new URL(EFAPS_ROOTURL, "Data/IMPORT_UserJAASKey.xml");
                 DataImport imp = DataImport.readFile(url);
                 imp.updateInDB();
 
-                EFAPS_LOGGER.info("    Importing Date for eFaps-ERP-Payroll");
+                EFAPS_LOGGER.info("    Importing Date for eFapsApp-Payroll");
                 URL url2 = new URL(EFAPS_ROOTURL, "Data/IMPORT_Currency.xml");
                 DataImport imp2 = DataImport.readFile(url2);
                 imp2.updateInDB();
