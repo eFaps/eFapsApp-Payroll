@@ -202,6 +202,7 @@
             <property name="ModeCreate">READONLY</property>
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">NONE</property>
+            <property name="Label">Payroll_PayslipForm.Sums.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
          <field name="positionHeading" character="Heading">
