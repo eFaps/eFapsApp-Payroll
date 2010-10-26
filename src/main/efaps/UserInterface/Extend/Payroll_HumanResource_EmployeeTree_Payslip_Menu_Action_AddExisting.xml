@@ -34,6 +34,10 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_HumanResource_EmployeeTree_Payslip_Menu_Action_AddExisting</name>
+        <access>
+            <role>Payroll_Admin</role>
+            <role>Payroll_Modifier</role>
+        </access>
         <!-- target definition -->
         <target>
             <search>Payroll_HumanResource_EmployeeTree_Payslip_Menu_Action_AddExisting_Search</search>
