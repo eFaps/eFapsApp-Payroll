@@ -35,18 +35,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.ui.FieldValue;
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Parameter.ParameterValues;
+import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
 import org.efaps.admin.program.esjp.EFapsClassLoader;
 import org.efaps.admin.program.esjp.EFapsRevision;
@@ -577,23 +577,25 @@ public abstract class Payslip_Base
             final String[] posDed = _parameter.getParameterValues("casePosition_" + _postfix);
             final String[] amountDed = _parameter.getParameterValues("amount_" + _postfix);
             final DecimalFormat formater = getFormater(2, 2);
-            for (int i = 0; i < posDed.length; i++) {
-                if (posDed[i] != null && !posDed[i].isEmpty()) {
-                    final Instance inst = Instance.get(posDed[i]);
-                    if (inst.isValid()) {
-                        BigDecimal amount = BigDecimal.ZERO;
-                        if (amountDed[i] != null && !amountDed[i].isEmpty()) {
-                            amount = (BigDecimal) formater.parse(amountDed[i]);
-                        }
-                        if (inst.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                            amount = amount.negate();
-                        }
-                        if (_values.containsKey(inst)) {
-                            _values.get(inst).add(amount, i);
-                        } else {
-                            _values.put(inst, new TablePos(amount, i, _postfix));
-                        }
+            if (posDed != null) {
+                for (int i = 0; i < posDed.length; i++) {
+                    if (posDed[i] != null && !posDed[i].isEmpty()) {
+                        final Instance inst = Instance.get(posDed[i]);
+                        if (inst.isValid()) {
+                            BigDecimal amount = BigDecimal.ZERO;
+                            if (amountDed[i] != null && !amountDed[i].isEmpty()) {
+                                amount = (BigDecimal) formater.parse(amountDed[i]);
+                            }
+                            if (inst.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
+                                amount = amount.negate();
+                            }
+                            if (_values.containsKey(inst)) {
+                                _values.get(inst).add(amount, i);
+                            } else {
+                                _values.put(inst, new TablePos(amount, i, _postfix));
+                            }
 
+                        }
                     }
                 }
             }
