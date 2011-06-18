@@ -35,8 +35,8 @@
         <!-- childs -->
         <childs>
             <child>Payroll_PayslipMyDesk_Menu_Action_Create</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_Delete</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_CreateMassive</child>
+            <child>Payroll_PayslipMyDesk_Menu_Action_Delete</child>
         </childs>
     </definition>
 </ui-menu>
