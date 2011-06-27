@@ -94,6 +94,9 @@
             update.add2Menu("cf354312-fb84-4cf7-9d57-81a8426420e1", "87001cc3-c45c-44de-b8f1-776df507f268", 1);
             <!-- connect the Payroll_HumanResource_EmployeeTree_Payslip to the main menu from HumanResource_EmployeeTree -->
             update.add2Menu("e8cbbebe-2a81-4979-bcb3-e8cb6f6b3ecd", "136a5437-7642-4e09-8182-23fc97fedbab", 0);
+            <!-- Payroll_Payroll, Admin_Help_MainMenu -->
+            update.add2Help("68acacc0-cf4f-4260-bf16-2a0dfb2edbe0", "dead549e-5cc6-49f9-9a79-8e33aa139f6d", -1);
+
         </script>
     </version>
 </install>

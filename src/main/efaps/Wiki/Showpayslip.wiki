@@ -1,0 +1,35 @@
+<wiki:comment>
+@eFapsPackage  org.efaps.wiki.payroll
+@eFapsUUID     ff526851-0d8e-4f12-bdb7-fd114bcc54e0
+@eFapsRevision $Rev: 6527 $
+</wiki:comment>
+
+
+
+
+#summary Acceso a una boleta de pago
+<wiki:toc max_depth="3"/>
+
+----
+
+Para ingresar a una boleta debe hacerlo por la palabra mas resaltada, en este caso ingresamos por la palabra boletaPa. También puede ingresar a los datos del empleado por su nombre,  ejemplo 636-Peralta.
+
+|| *Tipo* || *Nombre* || *Empleado* || *Horas laboradas* || *Pago* || *Costo* || *Moneda* ||
+|| Boleta de pago || *boletaPa* || *636-Perarlta* || 8 || 650 || 800 || Nuevos soles ||
+
+Cuando usted ingresa a una boleta de pago podrá visualizar el contenido de su información, además tendrá las siguientes opciones:
+
+  # Editar
+  # Posiciones
+  # Exportar
+
+Editar
+Ingrese a acción y seleccione editar, inmediatamente le aparecerá la ventana editar boleta de pago en donde podrá editar todos los campos y actualizar al terminar la acción.
+
+Posiciones
+Es el contenido detallado de la boleta.
+
+==2.4 Exportar==
+Le sirve para poder imprimir una o varias hojas con todos los datos que se encuentran en el menú, en dos tipos
+de formatos PDF o XLS.
+
