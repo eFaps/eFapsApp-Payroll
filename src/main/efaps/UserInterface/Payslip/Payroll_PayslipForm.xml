@@ -69,10 +69,10 @@
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_PayslipForm.number.Label</property>
-            <property name="Select">linkto[EmployeeAbstractLink].attribute[Number]</property>
+            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeEdit">NONE</property>
-            <property name="ModeView">NONE</property>
+            <property name="ModeView">READONLY</property>
             <property name="Required">true</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"
                 method="autoComplete4Employee"
