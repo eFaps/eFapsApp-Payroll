@@ -56,6 +56,7 @@
         <field name="amount">
             <property name="Attribute">Amount</property>
             <property name="Label">Payroll_PositionAbstract/Amount.Label</property>
+            <property name="Align">right</property>
         </field>
         <field name="currencyLink">
             <property name="Select">linkto[CurrencyLink].attribute[Symbol]</property>

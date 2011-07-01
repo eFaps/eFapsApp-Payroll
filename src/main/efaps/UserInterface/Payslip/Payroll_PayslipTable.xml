@@ -61,16 +61,19 @@
             <property name="Attribute">LaborTime</property>
             <property name="Label">Payroll_Payslip/LaborTime.Label</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
         </field>
         <field name="amount2Pay">
             <property name="Attribute">Amount2Pay</property>
             <property name="Label">Payroll_Payslip/Amount2Pay.Label</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
         </field>
         <field name="amountCost">
             <property name="Attribute">AmountCost</property>
             <property name="Label">Payroll_Payslip/AmountCost.Label</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
         </field>
         <field name="currencyLink">
             <property name="Attribute">CurrencyLink</property>
