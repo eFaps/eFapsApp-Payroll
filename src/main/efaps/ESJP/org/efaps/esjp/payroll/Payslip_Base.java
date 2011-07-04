@@ -43,6 +43,7 @@ import java.util.UUID;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.Status;
+import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.datamodel.ui.FieldValue;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
@@ -52,7 +53,6 @@ import org.efaps.admin.program.esjp.EFapsClassLoader;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
-import org.efaps.ci.CIType;
 import org.efaps.db.Context;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
@@ -60,8 +60,10 @@ import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
@@ -170,14 +172,14 @@ public abstract class Payslip_Base
     public Return create(final Parameter _parameter)
         throws EFapsException
     {
-        final Return ret = new Return();
-        final String name = _parameter.getParameterValue("name");
+        Return ret = new Return();
+        final String name = getDocName4Create(_parameter);
         final String date = _parameter.getParameterValue("date");
         final String dueDate = _parameter.getParameterValue("dueDate");
         final Long employeeid = Instance.get(_parameter.getParameterValue("number")).getId();
         final String laborTimes = _parameter.getParameterValue("laborTime");
         final String laborTimeUoMs = _parameter.getParameterValue("laborTimeUoM");
-        final String amount2Pays = _parameter.getParameterValue("amount2Pay");
+        final String amount2Pay = _parameter.getParameterValue("amount2Pay");
         final String amountCosts = _parameter.getParameterValue("amountCost");
         final String currencyLinks = _parameter.getParameterValue("currencyLink");
         final DecimalFormat formater = getFormater(2, 2);
@@ -189,8 +191,8 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
             insert.add(CIPayroll.Payslip.StatusAbstract,
                             ((Long) Status.find(CIPayroll.PayslipStatus.uuid, "Open").getId()).toString());
-            final BigDecimal pay = amount2Pays != null && !amount2Pays.isEmpty()
-                                                        ? (BigDecimal) formater.parse(amount2Pays)
+            final BigDecimal pay = amount2Pay != null && !amount2Pay.isEmpty()
+                                                        ? (BigDecimal) formater.parse(amount2Pay)
                                                         : BigDecimal.ZERO;
             final BigDecimal cost = amountCosts != null && !amountCosts.isEmpty()
                                                         ? (BigDecimal) formater.parse(amountCosts)
@@ -237,7 +239,7 @@ public abstract class Payslip_Base
             }
             int i = 0;
             for (final InsertPos pos : list) {
-                final Insert insertPos = new Insert(pos.getCIType());
+                final Insert insertPos = new Insert(pos.getType());
                 insertPos.add(CIPayroll.PositionAbstract.Amount, pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
                 insertPos.add(CIPayroll.PositionAbstract.CasePositionAbstractLink, pos.getId());
                 insertPos.add(CIPayroll.PositionAbstract.CurrencyLink, currInst.getId());
@@ -247,12 +249,64 @@ public abstract class Payslip_Base
                 insertPos.execute();
                 i++;
             }
+            if (amount2Pay == null && amountCosts == null) {
+                setAmounts(_parameter, insert.getInstance(), list);
+            }
+
+            _parameter.put(ParameterValues.INSTANCE, _parameter.getInstance());
+            final StandartReport report = new StandartReport();
+            final String fileName = CIPayroll.Payslip.getType().getName() + "_" + name;
+            report.setFileName(fileName);
+            ret = report.execute(_parameter);
+
         } catch (final ParseException e) {
             throw new EFapsException(Payslip_Base.class, "create.ParseException", e);
         }
 
         return ret;
     }
+
+
+
+
+    /**
+     * @param _parameter    Parameter as passed by the eFaps API
+     * @param _docInst      instance of the document to be updated
+     * @param _list         list of positions
+     * @throws EFapsException on error
+     */
+    protected void setAmounts(final Parameter _parameter,
+                              final Instance _docInst,
+                              final List<InsertPos> _list)
+          throws EFapsException
+    {
+        BigDecimal amount2pay = BigDecimal.ZERO;
+
+        for (final InsertPos pos : _list) {
+            if (pos.caseType.equals(CIPayroll.CasePositionRootSum.getType())) {
+                amount2pay = amount2pay.add(pos.getAmount());
+            }
+        }
+        final BigDecimal amountCost = amount2pay;
+
+        final Update update = new Update(_docInst);
+        update.add(CIPayroll.Payslip.Amount2Pay, amount2pay);
+        update.add(CIPayroll.Payslip.AmountCost, amountCost);
+        update.execute();
+    }
+
+    /**
+     * Get the name for the document on creation.
+     * @param _parameter    Parameter as passed by the eFaps API
+     * @return new Name
+     * @throws EFapsException on error
+     */
+    protected String getDocName4Create(final Parameter _parameter)
+        throws EFapsException
+    {
+        return _parameter.getParameterValue("name");
+    }
+
 
     /**
      * Method for return a first date of month and last date of month.
@@ -607,12 +661,12 @@ public abstract class Payslip_Base
     public class InsertPos
     {
 
-        private final CIType ciType;
+        private final Type posType;
         private final BigDecimal amount;
         private final long id;
         private String description;
         private Integer sorted;
-
+        private final Type caseType;
 
         /**
          * Getter method for the instance variable {@link #sorted}.
@@ -637,7 +691,8 @@ public abstract class Payslip_Base
                          final Map<Instance, TablePos> _values)
             throws EFapsException
         {
-            this.ciType = CIPayroll.PositionSum;
+            this.posType = CIPayroll.PositionSum.getType();
+            this.caseType = _position.getInstance().getType();
             this.amount = _position.getResult(_parameter, _sums, _values);
             this.id = _position.getInstance().getId();
             setValues(_position.getInstance());
@@ -662,12 +717,13 @@ public abstract class Payslip_Base
                          final BigDecimal _amount)
             throws EFapsException
         {
+            this.caseType = _instance.getType();
             if (_instance.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                this.ciType = CIPayroll.PositionDeduction;
+                this.posType = CIPayroll.PositionDeduction.getType();
             } else if (_instance.getType().equals(CIPayroll.CasePositionPayment.getType())) {
-                this.ciType = CIPayroll.PositionPayment;
+                this.posType = CIPayroll.PositionPayment.getType();
             } else {
-                this.ciType = CIPayroll.PositionNeutral;
+                this.posType = CIPayroll.PositionNeutral.getType();
             }
             this.amount = _amount;
             this.id = _instance.getId();
@@ -677,9 +733,9 @@ public abstract class Payslip_Base
         /**
          * @return
          */
-        public CIType getCIType()
+        public Type getType()
         {
-            return this.ciType;
+            return this.posType;
         }
 
         /**

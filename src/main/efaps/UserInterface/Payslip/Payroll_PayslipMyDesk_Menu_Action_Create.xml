@@ -39,11 +39,15 @@
         <!-- target definitions -->
         <target>
             <form>Payroll_PayslipForm</form>
-            <execute program="org.efaps.esjp.payroll.Payslip" method="create" />
+            <execute program="org.efaps.esjp.payroll.Payslip" method="create" >
+                <property name="JasperReport">Payroll_Payslip</property>
+                <property name="Mime">pdf</property>
+            </execute>
         </target>
         <!-- properties -->
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Payslip</property>
+        <property name="TargetShowFile">true</property>
         <property name="TargetMode">create</property>
         <property name="WindowHeight">660</property>
         <property name="WindowWidth">1200</property>
