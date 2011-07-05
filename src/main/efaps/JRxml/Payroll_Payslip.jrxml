@@ -1,38 +1,284 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_Payslip" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-    <property name="ireport.zoom" value="1.0"/>
-    <property name="ireport.x" value="0"/>
-    <property name="ireport.y" value="0"/>
-    <parameter name="EFAPS_DEFINITION" class="java.lang.String" isForPrompting="false">
-        <property name="UUID" value="b4600af4-1a3e-4e27-a0ff-d684d61d9779"/>
-        <property name="Instance" value="true"/>
-        <property name="hasSubReport" value="true"/>
-    </parameter>
-    <field name="name" class="java.lang.String">
-        <property name="Select" value="attribute[Name]"/>
-    </field>
-    <field name="firstName" class="java.lang.String">
-        <property name="Select" value="linkto[EmployeeAbstractLink].attribute[FirstName]"/>
-    </field>
-    <field name="lastName" class="java.lang.String">
-        <property name="Select" value="linkto[EmployeeAbstractLink].attribute[LastName]"/>
-    </field>
-     <field name="number" class="java.lang.String">
-        <property name="Select" value="linkto[EmployeeAbstractLink].attribute[Number]"/>
-    </field>
-    <pageHeader>
-        <band height="35" splitType="Stretch"/>
-    </pageHeader>
-    <columnHeader>
-        <band height="61" splitType="Stretch"/>
-    </columnHeader>
-    <detail>
-        <band height="125" splitType="Stretch"/>
-    </detail>
-    <columnFooter>
-        <band height="45" splitType="Stretch"/>
-    </columnFooter>
-    <pageFooter>
-        <band height="54" splitType="Stretch"/>
-    </pageFooter>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_Payslip" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="115"/>
+	<style name="heading1" mode="Opaque" backcolor="#CCCCCC" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<pen lineWidth="1.0"/>
+		<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+			<topPen lineWidth="1.0"/>
+			<leftPen lineWidth="1.0"/>
+			<bottomPen lineWidth="1.0"/>
+			<rightPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<style name="heading2" mode="Opaque" backcolor="#CCCCCC" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="text" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" hAlign="Left" vAlign="Middle" fontName="ArialMT" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<pen lineWidth="1.0"/>
+		<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+			<topPen lineWidth="1.0"/>
+			<leftPen lineWidth="1.0"/>
+			<bottomPen lineWidth="1.0"/>
+			<rightPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<style name="text2" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="EFAPS_DEFINITION" class="java.lang.String" isForPrompting="false">
+		<property name="UUID" value="b4600af4-1a3e-4e27-a0ff-d684d61d9779"/>
+		<property name="Instance" value="true"/>
+		<property name="hasSubReport" value="true"/>
+	</parameter>
+	<parameter name="sumDeduction" class="java.math.BigDecimal"/>
+	<parameter name="sumPayment" class="java.math.BigDecimal"/>
+	<parameter name="sumNeutral" class="java.math.BigDecimal"/>
+	<parameter name="sumTotal" class="java.math.BigDecimal"/>
+	<parameter name="EFAPS_SUBREPORT" class="java.util.HashMap"/>
+	<field name="name" class="java.lang.String">
+		<property name="Select" value="attribute[Name]"/>
+	</field>
+	<field name="firstName" class="java.lang.String">
+		<property name="Select" value="linkto[EmployeeAbstractLink].attribute[FirstName]"/>
+	</field>
+	<field name="lastName" class="java.lang.String">
+		<property name="Select" value="linkto[EmployeeAbstractLink].attribute[LastName]"/>
+	</field>
+	<field name="number" class="java.lang.String">
+		<property name="Select" value="linkto[EmployeeAbstractLink].attribute[Number]"/>
+	</field>
+	<field name="laborTimeValue" class="java.lang.Object">
+		<property name="Select" value="attribute[LaborTime].value"/>
+	</field>
+	<field name="laborTimeUoM" class="java.lang.Object">
+		<property name="Select" value="attribute[LaborTime].label"/>
+	</field>
+	<field name="currency" class="java.lang.String">
+		<property name="Select" value="linkto[CurrencyLink].attribute[Name]"/>
+	</field>
+	<field name="currencySymbol" class="java.lang.String">
+		<property name="Select" value="linkto[CurrencyLink].attribute[Symbol]"/>
+	</field>
+	<field name="date" class="org.joda.time.DateTime">
+		<property name="Select" value="attribute[Date]"/>
+	</field>
+	<field name="duedate" class="org.joda.time.DateTime">
+		<property name="Select" value="attribute[DueDate]"/>
+	</field>
+	<pageHeader>
+		<band height="61" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="153" splitType="Stretch">
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="89" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Hasta:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="41" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Empleado:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="255" y="41" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{number} + " - " + $F{firstName} + " " + $F{lastName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="73" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Desde:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement mode="Transparent" x="255" y="73" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{date}.toDate()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="57" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Horas Laboradas:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="105" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Moneda:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="255" y="57" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{laborTimeValue} + " " + $F{laborTimeUoM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="255" y="89" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{duedate}.toDate()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="255" y="105" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{currency}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="heading2" x="0" y="13" width="555" height="17"/>
+				<textElement/>
+				<text><![CDATA[INFORMACIÓN GENERAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="heading2" x="0" y="136" width="555" height="17"/>
+				<textElement/>
+				<text><![CDATA[REMUNERACIÓN]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<subreport isUsingCache="false">
+				<reportElement x="20" y="0" width="525" height="15"/>
+				<dataSourceExpression><![CDATA[$P{EFAPS_SUBREPORT}.get("Payroll_PayslipPositionPayment")]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["JasperReport.Payroll_PayslipPositionPayment"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="50">
+			<staticText>
+				<reportElement style="heading2" x="0" y="33" width="555" height="17"/>
+				<textElement/>
+				<text><![CDATA[DEDUCCIÓN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="459" y="0" width="86" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sumPayment}.setScale(2, BigDecimal.ROUND_HALF_UP ).toString()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="427" y="0" width="32" height="16"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{currencySymbol}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="15">
+			<subreport isUsingCache="false">
+				<reportElement x="20" y="0" width="525" height="15"/>
+				<dataSourceExpression><![CDATA[$P{EFAPS_SUBREPORT}.get("Payroll_PayslipPositionDeduction")]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["JasperReport.Payroll_PayslipPositionDeduction"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="50">
+			<staticText>
+				<reportElement style="heading2" x="0" y="33" width="555" height="17"/>
+				<textElement/>
+				<text><![CDATA[APORTE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="459" y="0" width="86" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sumDeduction}.setScale(2, BigDecimal.ROUND_HALF_UP ).toString()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="427" y="0" width="32" height="16"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{currencySymbol}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="15">
+			<subreport isUsingCache="false">
+				<reportElement x="20" y="0" width="525" height="15"/>
+				<dataSourceExpression><![CDATA[$P{EFAPS_SUBREPORT}.get("Payroll_PayslipPositionNeutral")]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["JasperReport.Payroll_PayslipPositionNeutral"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="16">
+			<textField>
+				<reportElement x="459" y="0" width="86" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sumNeutral}.setScale(2, BigDecimal.ROUND_HALF_UP ).toString()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="427" y="0" width="32" height="16"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{currencySymbol}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch">
+			<textField>
+				<reportElement mode="Transparent" x="427" y="6" width="32" height="16"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{currencySymbol}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="459" y="6" width="86" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineStyle="Double"/>
+					<topPen lineWidth="4.0" lineStyle="Double"/>
+					<leftPen lineStyle="Double"/>
+					<bottomPen lineStyle="Double"/>
+					<rightPen lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sumTotal}.setScale(2, BigDecimal.ROUND_HALF_UP ).toString()]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
 </jasperReport>

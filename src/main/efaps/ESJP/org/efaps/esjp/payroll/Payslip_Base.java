@@ -253,10 +253,19 @@ public abstract class Payslip_Base
                 setAmounts(_parameter, insert.getInstance(), list);
             }
 
-            _parameter.put(ParameterValues.INSTANCE, _parameter.getInstance());
+            _parameter.put(ParameterValues.INSTANCE, insert.getInstance());
             final StandartReport report = new StandartReport();
             final String fileName = CIPayroll.Payslip.getType().getName() + "_" + name;
             report.setFileName(fileName);
+
+            final BigDecimal sumPay = sumTables(_parameter, "Payment");
+            final BigDecimal sumDed = sumTables(_parameter, "Deduction");
+            final BigDecimal sumTot = sumPay.add(sumDed);
+            report.getJrParameters().put("sumDeduction", sumDed);
+            report.getJrParameters().put("sumPayment", sumPay);
+            report.getJrParameters().put("sumNeutral", sumTables(_parameter, "Neutral"));
+            report.getJrParameters().put("sumTotal", sumTot);
+
             ret = report.execute(_parameter);
 
         } catch (final ParseException e) {
@@ -653,6 +662,38 @@ public abstract class Payslip_Base
                     }
                 }
             }
+        } catch (final ParseException e) {
+            throw new EFapsException(Payslip.class, "", e);
+        }
+    }
+
+    protected BigDecimal sumTables(final Parameter _parameter,
+                             final String _postfix)
+        throws EFapsException
+    {
+        try {
+            final String[] posDed = _parameter.getParameterValues("casePosition_" + _postfix);
+            final String[] amountDed = _parameter.getParameterValues("amount_" + _postfix);
+            BigDecimal sum = BigDecimal.ZERO;
+            final DecimalFormat formater = getFormater(2, 2);
+            if (posDed != null) {
+                for (int i = 0; i < posDed.length; i++) {
+                    if (posDed[i] != null && !posDed[i].isEmpty()) {
+                        final Instance inst = Instance.get(posDed[i]);
+                        if (inst.isValid()) {
+                            BigDecimal amount = BigDecimal.ZERO;
+                            if (amountDed[i] != null && !amountDed[i].isEmpty()) {
+                                amount = (BigDecimal) formater.parse(amountDed[i]);
+                            }
+                            if (inst.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
+                                amount = amount.negate();
+                            }
+                            sum = sum.add(amount);
+                        }
+                    }
+                }
+            }
+            return sum;
         } catch (final ParseException e) {
             throw new EFapsException(Payslip.class, "", e);
         }
