@@ -39,6 +39,13 @@
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="ShowTypeIcon">true</property>
         </field>
+        <field name="casePosition">
+            <property name="SelectAlternateOID">linkto[ToAbstractLink].oid</property>
+            <property name="Select">linkto[ToAbstractLink].attribute[Name]</property>
+            <property name="Label">Payroll_CasePositionCalcTable.casePosition.Label</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
         <field name="numerator">
             <property name="Attribute">Numerator</property>
             <property name="Label">Payroll_CasePositionCalcTable/Numerator.Label</property>
