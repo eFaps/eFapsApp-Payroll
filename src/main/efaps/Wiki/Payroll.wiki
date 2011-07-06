@@ -1,6 +1,6 @@
 <wiki:comment>
 @eFapsPackage  org.efaps.wiki.payroll
-@eFapsUUID      dbac6d04-c1ab-4832-a34a-399aff1dcb36
+@eFapsUUID     dbac6d04-c1ab-4832-a34a-399aff1dcb36
 @eFapsRevision $Rev: 6527 $
 </wiki:comment>
 
@@ -50,7 +50,7 @@ Veremos los siguientes puntos:
   * 2.3 Crear masivo
   * 2.4 Exportar
 
-==2.1 Crear==
+===2.1 Crear===
 Para crear una boleta de pago usted debe dirigirse a acción y seleccionar crear, inmediatamente le aparecerá la ventana crear boleta de pago en donde ingresará la información correspondiente en cada campo obligatorio y secundario:
 
 Obligatorio:
@@ -65,11 +65,11 @@ Secundario:
   * Desde: es la fecha de inicio de la boleta de pago.
   * Hasta: es la fecha de culminación de la boleta de pago.
 
-==2.2 Borrar==
+===2.2 Borrar===
 Seleccionamos una o varias boletas haciendo check en las casillas, dirigirse a la opción acción y elija borrar
 selecto.
 
-==2.3 Crear masivo==
+===2.3 Crear masivo===
 Para crear un masivo usted debe dirigirse a acción y seleccionar crear masivo, inmediatamente le aparecerá la ventana Crear Boleta para empleados de forma Masiva en donde ingresará la información correspondiente en cada campo obligatorio y secundario:
 
 Obligatorio:
@@ -84,7 +84,7 @@ Secundario:
   * Costo: el costo correspondiente por empleado.
   * Moneda: elegir el tipo de moneda.
 
-==2.4 Exportar==
+===2.4 Exportar===
 Le sirve para poder imprimir una o varias hojas con todos los datos que se encuentran en el menú, en dos tipos
 de formatos PDF o XLS.
 

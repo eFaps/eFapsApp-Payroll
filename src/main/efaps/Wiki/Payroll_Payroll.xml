@@ -36,5 +36,8 @@
         <target>
             <wiki>org.efaps.wiki.payroll.Payroll.wiki</wiki>
         </target>
-            </definition>
+        <childs>
+            <child>Showpayslip_Payroll</child>
+        </childs>
+    </definition>
 </help-menu>
