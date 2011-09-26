@@ -27,7 +27,7 @@ Cuando usted ingrese a una boleta de pago podrá visualizar su contenido y adem�
 Ingrese a la opción acción y seleccione editar, inmediatamente le aparecerá la ventana *editar boleta de pago* en donde podrá editar todos los campos y actualizar.
 
 ==2. Posiciones==
-Es el contenido detallado de la boleta.
+Muestra en forma detallada el contenido de la boleta.
 
 ==3 Exportar==
 Le sirve para poder imprimir una o varias hojas con todos los datos que se encuentran en el menú, en dos tipos
