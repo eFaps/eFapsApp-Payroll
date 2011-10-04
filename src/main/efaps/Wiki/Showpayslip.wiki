@@ -11,7 +11,12 @@
 <wiki:toc max_depth="3"/>
 
 ----
+Veremos los siguientes puntos:
 
+  # Acceso a una boleta de pago
+  # Acceso a una boleta de pago(Obra)
+
+==1. Acceso a una boleta de pago==
 Para ingresar a una boleta debe hacerlo por la palabra mas resaltada, en este caso ingresa por la palabra boletaPa. También puede ingresar a los datos del empleado por su nombre, ejemplo 636-Peralta.
 
 || *Tipo* || *Nombre* || *Empleado* || *Horas laboradas* || *Pago* || *Costo* || *Moneda* ||
@@ -19,17 +24,36 @@ Para ingresar a una boleta debe hacerlo por la palabra mas resaltada, en este ca
 
 Cuando usted ingrese a una boleta de pago podrá visualizar su contenido y además las siguientes opciones:
 
-  # Editar
-  # Posiciones
-  # Exportar
+  1.1 Editar
+  1.2 Posiciones
+  1.3 Exportar
 
-==1. Editar==
+==1.1 Editar==
 Ingrese a la opción acción y seleccione editar, inmediatamente le aparecerá la ventana *editar boleta de pago* en donde podrá editar todos los campos y actualizar.
 
-==2. Posiciones==
+==1.2 Posiciones==
 Muestra en forma detallada el contenido de la boleta.
 
-==3 Exportar==
+==1.3 Exportar==
 Le sirve para poder imprimir una o varias hojas con todos los datos que se encuentran en el menú, en dos tipos
 de formatos PDF o XLS.
 
+==2. Acceso a una boleta de pago(Obra)==
+Mostraremos los siguientes:
+
+  * 2.1 Editar
+  * 2.2 Descargar
+
+===2.1 Editar===
+Se dirige a la opción acción y selecciona editar, inmediatamente le aparecerá la ventana *Editar boleta de pago* en donde podrá editar los siguientes campos:
+
+  * Número: puede cambiar el número registrado anteriormente.
+  * Desde: se puede modificar la fecha con el mismo formato mostrado o se puede seleccionar la fecha del calendario
+  * Hasta: se puede modificar la fecha con el mismo formato mostrado o se puede seleccionar la fecha del calendario
+  * Tiempo trabajado: colocar la cantidad correspondiente.
+  * Pago: puede cambiar el monto ingresado anteriormente.
+  * Costos: puede cambiar el monto ingresado anteriormente.
+  * Moneda: puede seleccionar un nuevo tipo de moneda.
+
+===2.2 Descargar===
+Se dirige a la opción acción y selecciona descargar.
