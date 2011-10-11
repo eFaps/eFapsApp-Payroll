@@ -238,8 +238,18 @@ public abstract class Payslip_Base
                 throw new EFapsException(Payslip_Base.class, "create.MissingConfigLink");
             }
             int i = 0;
+            BigDecimal sumDeduction = BigDecimal.ZERO;
+            BigDecimal sumPayment = BigDecimal.ZERO;
+            BigDecimal sumNeutral = BigDecimal.ZERO;
             for (final InsertPos pos : list) {
                 final Insert insertPos = new Insert(pos.getType());
+                if (pos.getType().equals(CIPayroll.PositionDeduction.getType())) {
+                    sumDeduction  = sumDeduction.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
+                } else if (pos.getType().equals(CIPayroll.PositionNeutral.getType())) {
+                    sumNeutral  = sumNeutral.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
+                } else if (pos.getType().equals(CIPayroll.PositionPayment.getType())) {
+                    sumPayment  = sumPayment.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
+                }
                 insertPos.add(CIPayroll.PositionAbstract.Amount, pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
                 insertPos.add(CIPayroll.PositionAbstract.CasePositionAbstractLink, pos.getId());
                 insertPos.add(CIPayroll.PositionAbstract.CurrencyLink, currInst.getId());
@@ -257,14 +267,10 @@ public abstract class Payslip_Base
             final StandartReport report = new StandartReport();
             final String fileName = CIPayroll.Payslip.getType().getName() + "_" + name;
             report.setFileName(fileName);
-
-            final BigDecimal sumPay = sumTables(_parameter, "Payment");
-            final BigDecimal sumDed = sumTables(_parameter, "Deduction");
-            final BigDecimal sumTot = sumPay.add(sumDed);
-            report.getJrParameters().put("sumDeduction", sumDed);
-            report.getJrParameters().put("sumPayment", sumPay);
-            report.getJrParameters().put("sumNeutral", sumTables(_parameter, "Neutral"));
-            report.getJrParameters().put("sumTotal", sumTot);
+            report.getJrParameters().put("sumDeduction", sumDeduction);
+            report.getJrParameters().put("sumPayment", sumPayment);
+            report.getJrParameters().put("sumNeutral", sumNeutral);
+            report.getJrParameters().put("sumTotal", sumPayment.subtract(sumDeduction));
 
             ret = report.execute(_parameter);
 
@@ -290,14 +296,15 @@ public abstract class Payslip_Base
           throws EFapsException
     {
         BigDecimal amount2pay = BigDecimal.ZERO;
-
+        BigDecimal amountCost = BigDecimal.ZERO;
         for (final InsertPos pos : _list) {
             if (pos.caseType.equals(CIPayroll.CasePositionRootSum.getType())) {
                 amount2pay = amount2pay.add(pos.getAmount());
+            }else if (pos.posType.equals(CIPayroll.PositionNeutral.getType())
+                            || pos.posType.equals(CIPayroll.PositionPayment.getType())) {
+                amountCost = amountCost.add(pos.getAmount());
             }
         }
-        final BigDecimal amountCost = amount2pay;
-
         final Update update = new Update(_docInst);
         update.add(CIPayroll.Payslip.Amount2Pay, amount2pay);
         update.add(CIPayroll.Payslip.AmountCost, amountCost);
@@ -653,9 +660,6 @@ public abstract class Payslip_Base
                             if (amountDed[i] != null && !amountDed[i].isEmpty()) {
                                 amount = (BigDecimal) formater.parse(amountDed[i]);
                             }
-                            if (inst.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                                amount = amount.negate();
-                            }
                             if (_values.containsKey(inst)) {
                                 _values.get(inst).add(amount, i);
                             } else {
@@ -666,38 +670,6 @@ public abstract class Payslip_Base
                     }
                 }
             }
-        } catch (final ParseException e) {
-            throw new EFapsException(Payslip.class, "", e);
-        }
-    }
-
-    protected BigDecimal sumTables(final Parameter _parameter,
-                             final String _postfix)
-        throws EFapsException
-    {
-        try {
-            final String[] posDed = _parameter.getParameterValues("casePosition_" + _postfix);
-            final String[] amountDed = _parameter.getParameterValues("amount_" + _postfix);
-            BigDecimal sum = BigDecimal.ZERO;
-            final DecimalFormat formater = getFormater(2, 2);
-            if (posDed != null) {
-                for (int i = 0; i < posDed.length; i++) {
-                    if (posDed[i] != null && !posDed[i].isEmpty()) {
-                        final Instance inst = Instance.get(posDed[i]);
-                        if (inst.isValid()) {
-                            BigDecimal amount = BigDecimal.ZERO;
-                            if (amountDed[i] != null && !amountDed[i].isEmpty()) {
-                                amount = (BigDecimal) formater.parse(amountDed[i]);
-                            }
-                            if (inst.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                                amount = amount.negate();
-                            }
-                            sum = sum.add(amount);
-                        }
-                    }
-                }
-            }
-            return sum;
         } catch (final ParseException e) {
             throw new EFapsException(Payslip.class, "", e);
         }
@@ -991,9 +963,6 @@ public abstract class Payslip_Base
                     final BigDecimal tmp = sum.getResult(_parameter, _sums, _values);
                     ret = tmp.multiply(new BigDecimal(this.numerator).divide(new BigDecimal(this.denominator),
                                     8, BigDecimal.ROUND_HALF_UP));
-                    if (getInstance().getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                        ret = ret.negate();
-                    }
                     if (_values.containsKey(getInstance())) {
                         _values.get(getInstance()).setSetValue(true);
                         final int count = _values.get(getInstance()).getValues().size();
@@ -1118,7 +1087,10 @@ public abstract class Payslip_Base
         {
             BigDecimal ret = BigDecimal.ZERO;
             for (final Position child : this.children) {
-                final BigDecimal result = child.getResult(_parameter, _sums, _values);
+                BigDecimal result = child.getResult(_parameter, _sums, _values);
+                if (child.getInstance().getType().equals(CIPayroll.CasePositionDeduction.getType())) {
+                    result = result.negate();
+                }
                 if (!child.getInstance().getType().equals(CIPayroll.CasePositionNeutral.getType())) {
                     ret = ret.add(result);
                 }
