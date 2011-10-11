@@ -552,13 +552,15 @@ public abstract class Payslip_Base
         final MultiPrintQuery multi = queryBldr.getPrint();
         multi.addAttribute(CIPayroll.CasePositionAbstract.Name,
                             CIPayroll.CasePositionAbstract.Description,
-                            CIPayroll.CasePositionAbstract.Sorted);
+                            CIPayroll.CasePositionAbstract.Sorted,
+                            CIPayroll.CasePositionAbstract.Mode);
         multi.execute();
         while (multi.next()) {
             final String name = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Name);
             final String description = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Description);
             final Integer sorted = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Sorted);
-            final SumPosition sum = new SumPosition(ret, multi.getCurrentInstance(), name, description, sorted);
+            final Integer mode = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Mode);
+            final SumPosition sum = new SumPosition(ret, multi.getCurrentInstance(), name, description, sorted, mode);
             ret.put(multi.getCurrentInstance(), sum);
         }
         return ret;
@@ -599,10 +601,12 @@ public abstract class Payslip_Base
         final StringBuilder html = new StringBuilder();
         html.append("document.getElementsByName('sums')[0].innerHTML='<table>");
         for (final SumPosition pos : sort) {
-            html.append("<tr><td>")
-                .append(pos.getName()).append("</td><td>")
-                .append(StringEscapeUtils.escapeJavaScript(pos.getDescription())).append("</td><td>")
-                .append(formater.format(pos.getResult(_parameter, sums, values))).append("</td></tr>");
+            if (pos.getMode() != CasePosition_Base.MODE.DEAVTIVATED.ordinal()) {
+                html.append("<tr><td>")
+                    .append(pos.getName()).append("</td><td>")
+                    .append(StringEscapeUtils.escapeJavaScript(pos.getDescription())).append("</td><td>")
+                    .append(formater.format(pos.getResult(_parameter, sums, values))).append("</td></tr>");
+            }
         }
         html.append("</table>';");
 
@@ -1016,44 +1020,60 @@ public abstract class Payslip_Base
 
         private final Integer sorted;
 
+        private final Integer mode;
+
 
         public SumPosition(final Map<Instance, SumPosition> _sums,
                            final Instance _instance,
                            final String _name,
                            final String _description,
-                           final Integer _sorted)
+                           final Integer _sorted,
+                           final Integer _mode)
             throws EFapsException
         {
             super(_instance);
             this.name = _name;
             this.description = _description;
             this.sorted = _sorted;
-
+            this.mode = _mode;
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.CasePositionAbstract);
             queryBldr.addWhereAttrEqValue(CIPayroll.CasePositionAbstract.ParentAbstractLink, getInstance().getId());
 
             final MultiPrintQuery multi = queryBldr.getPrint();
             multi.addAttribute(CIPayroll.CasePositionAbstract.Name,
                                 CIPayroll.CasePositionAbstract.Description,
-                                CIPayroll.CasePositionAbstract.Sorted);
+                                CIPayroll.CasePositionAbstract.Sorted,
+                                CIPayroll.CasePositionAbstract.Mode);
             multi.execute();
             while (multi.next()) {
                 final String childName = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Name);
                 final String childDescription = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Description);
                 final Integer sortedTmp = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Sorted);
-
+                final Integer mode = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Mode);
                 if (multi.getCurrentInstance().getType().isKindOf(CIPayroll.CasePositionSumAbstract.getType())) {
                     final SumPosition sum = new SumPosition(_sums,
                                                             multi.getCurrentInstance(),
                                                             childName,
                                                             childDescription,
-                                                            sortedTmp);
+                                                            sortedTmp,
+                                                            mode);
                     _sums.put(multi.getCurrentInstance(), sum);
                     this.children.add(sum);
                 } else {
                     this.children.add(new CalcPosition(multi.getCurrentInstance()));
                 }
             }
+        }
+
+
+        /**
+         * Getter method for the instance variable {@link #mode}.
+         *
+         * @return value of instance variable {@link #mode}
+         */
+        public Integer getMode()
+        {
+            return this.mode;
         }
 
         /**
