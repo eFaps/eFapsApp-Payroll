@@ -57,20 +57,6 @@
                      <property name="keyValue">Value</property>
              </trigger>
         </field>
-        <field name="date">
-            <property name="Attribute">Date</property>
-            <property name="Label">Payroll_Payslip/Date.Label</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="FilterType">FREETEXT</property>
-            <property name="FilterRequired">TRUE</property>
-            <property name="FilterBase">DATABASE</property>
-            <property name="FilterDefault">WEEK</property>
-        </field>
-        <field name="dueDate">
-            <property name="Attribute">DueDate</property>
-            <property name="Label">Payroll_Payslip/DueDate.Label</property>
-            <property name="ModeCreate">EDITABLE</property>
-        </field>
         <field name="laborTime">
             <property name="Attribute">LaborTime</property>
             <property name="Label">Payroll_Payslip/LaborTime.Label</property>
