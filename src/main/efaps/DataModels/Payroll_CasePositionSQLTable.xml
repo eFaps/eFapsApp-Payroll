@@ -47,6 +47,7 @@
             <column name="DFLT"        type="DECIMAL"                      length="8" scale="2"/>
             <column name="ESJP"        type="STRING_SHORT"                 length="128" />
             <column name="METHOD"      type="STRING_SHORT"                 length="128" />
+            <column name="ACTIONDEFID" type="INTEGER"/>
         </database>
     </definition>
 

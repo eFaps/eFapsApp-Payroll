@@ -32,8 +32,8 @@ import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.datamodel.ui.FieldValue;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Parameter.ParameterValues;
+import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
@@ -116,6 +116,10 @@ public abstract class CasePosition_Base
         insert.add(CIPayroll.CasePositionAbstract.Sorted, pos);
         if (!parent.getType().isKindOf(CIPayroll.CaseAbstract.getType())) {
             insert.add(CIPayroll.CasePositionAbstract.ParentAbstractLink, parent.getId());
+        }
+        if ( _parameter.getParameterValue("actionDefinitionLink") != null) {
+            insert.add(CIPayroll.CasePositionCalc.ActionDefinitionLink,
+                            _parameter.getParameterValue("actionDefinitionLink"));
         }
         insert.execute();
 

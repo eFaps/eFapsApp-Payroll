@@ -31,5 +31,10 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll-Configuration</name>
+        <attribute>
+            <key>ActivateAccountingTransaction</key>
+            <value>false</value>
+            <description>Activate creation of transactions when a payslip is created.</description>
+        </attribute>
     </definition>
 </common-systemconfiguration>
