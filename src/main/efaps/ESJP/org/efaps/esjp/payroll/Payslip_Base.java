@@ -45,6 +45,7 @@ import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.datamodel.ui.FieldValue;
+import org.efaps.admin.datamodel.ui.UIInterface;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
@@ -314,7 +315,7 @@ public abstract class Payslip_Base
             final Insert insert = new Insert(UUID.fromString("f1962037-c73b-4b55-94d8-f33e47a219d6"));
             insert.add("Name", _parameter.getParameterValue("name"));
             insert.add("Description", _parameter.getParameterValue("name") + " - " + employee);
-            insert.add("Date", _parameter.getParameterValue("date"));
+            insert.add("Date", _parameter.getParameterValue("transactionDate"));
             insert.add("PeriodeLink", instPer.getId());
             // Accounting_TransactionStatus
             insert.add("Status", Status.find(UUID.fromString("bdd988b5-9e97-4633-9dae-fde41c671d3e"), "Open").getId());
@@ -761,6 +762,36 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    public Return rateCurrencyFieldValueUI(final Parameter _parameter)
+        throws EFapsException
+    {
+        final FieldValue fieldValue = (FieldValue) _parameter.get(ParameterValues.UIOBJECT);
+        final QueryBuilder queryBldr = new QueryBuilder(CIERP.Currency);
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        multi.addAttribute(CIERP.Currency.Name);
+        multi.execute();
+        final Map<String, Long> values = new TreeMap<String, Long>();
+        while (multi.next()) {
+            values.put(multi.<String>getAttribute(CIERP.Currency.Name), multi.getCurrentInstance().getId());
+        }
+        // Sales-Configuration
+        final Instance baseInst = SystemConfiguration.get(UUID.fromString("c9a1cbc3-fd35-4463-80d2-412422a3802f"))
+                        .getLink("CurrencyBase");
+        final StringBuilder html = new StringBuilder();
+        html.append("<select ").append(UIInterface.EFAPSTMPTAG)
+                        .append(" name=\"").append(fieldValue.getField().getName()).append("\" size=\"1\">");
+        for (final Entry<String, Long> entry : values.entrySet()) {
+            html.append("<option value=\"").append(entry.getValue()).append("\"");
+            if (entry.getValue().equals(baseInst.getId())) {
+                html.append(" selected=\"selected\" ");
+            }
+            html.append(">").append(entry.getKey()).append("</option>");
+        }
+        html.append("</select>");
+        final Return retVal = new Return();
+        retVal.put(ReturnValues.SNIPLETT, html.toString());
+        return retVal;
+    }
 
     /**
      * Method to update the fields on leaving a amount field.
