@@ -42,6 +42,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.efaps.admin.common.SystemConfiguration;
+import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.datamodel.ui.FieldValue;
@@ -67,6 +68,7 @@ import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
+import org.efaps.esjp.erp.CommonDocument;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.Rate;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
@@ -84,6 +86,7 @@ import org.joda.time.DateTime;
 @EFapsUUID("f1c7d3d5-23d2-4d72-a5d4-3c811a159062")
 @EFapsRevision("$Rev$")
 public abstract class Payslip_Base
+    extends CommonDocument
 {
 
     /**
@@ -108,6 +111,188 @@ public abstract class Payslip_Base
         if (_minFrac != null) {
             formater.setMinimumFractionDigits(_minFrac);
         }
+        formater.setRoundingMode(RoundingMode.HALF_UP);
+        formater.setParseBigDecimal(true);
+        return formater;
+    }
+
+    /**
+     * Method to set the instance of the payslip selected to the Context.
+     *
+     * @param _parameter as passed from eFaps API.
+     * @return new Return.
+     * @throws EFapsException on error
+     */
+    public Return getJavaScriptUIValue(final Parameter _parameter)
+        throws EFapsException
+    {
+        if (Context.getThreadContext().getSessionAttribute("payslip") != null) {
+            Context.getThreadContext().setSessionAttribute("payslip", null);
+        }
+        final String oid = _parameter.getParameterValue("selectedRow");
+        final Instance inst = Instance.get(oid);
+        Context.getThreadContext().setSessionAttribute("payslip", inst);
+        final StringBuilder js = new StringBuilder();
+
+        js.append("<script type=\"text/javascript\">");
+        if (inst != null && inst.isValid()) {
+            js.append(getSetValuesString(inst));
+        }
+        js.append("</script>");
+        final Return ret = new Return();
+        ret.put(ReturnValues.SNIPLETT, js.toString());
+        return ret;
+    }
+
+    /**
+     * Method to get the javascript part for setting the values.
+     * @param _instance  instance to be copied
+     * @return  javascript
+     * @throws EFapsException on error
+     */
+    protected String getSetValuesString(final Instance _instance)
+        throws EFapsException
+    {
+
+        final StringBuilder js = new StringBuilder();
+        final PrintQuery print = new PrintQuery(_instance);
+        print.addAttribute(CIPayroll.Payslip.Name,
+                           CIPayroll.Payslip.Note,
+                           CIPayroll.Payslip.LaborTime,
+                           CIPayroll.Payslip.Amount2Pay,
+                           CIPayroll.Payslip.AmountCost,
+                           CIPayroll.Payslip.CurrencyLink);
+        final SelectBuilder selEmpOID = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink).oid();
+        final SelectBuilder selEmpNum = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                            .attribute(CIHumanResource.Employee.Number);
+        final SelectBuilder selEmpLastName = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                            .attribute(CIHumanResource.Employee.LastName);
+        final SelectBuilder selEmpFirstName = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                            .attribute(CIHumanResource.Employee.FirstName);
+        print.addSelect(selEmpOID, selEmpLastName, selEmpFirstName, selEmpNum);
+        print.execute();
+
+        final BigDecimal amount2Pay = print.<BigDecimal>getAttribute(CIPayroll.Payslip.Amount2Pay);
+        final BigDecimal amountCosts = print.<BigDecimal>getAttribute(CIPayroll.Payslip.AmountCost);
+        final String empOid = print.<String>getSelect(selEmpOID);
+        final String empNum = print.<String>getSelect(selEmpNum);
+        final String empLName = print.<String>getSelect(selEmpLastName);
+        final String empFName = print.<String>getSelect(selEmpFirstName);
+        final Object[] laborTime = print.getAttribute(CIPayroll.Payslip.LaborTime);
+        final BigDecimal laborTimeVal = (BigDecimal) laborTime[0];
+        final UoM laborTimeUoM = (UoM) laborTime[1];
+
+        final Long curId = print.<Long>getAttribute(CIPayroll.Payslip.CurrencyLink);
+
+
+        final DecimalFormat formater = getTwoDigitsformater();
+
+        js.append("function removeRows(elName){")
+            .append("e = document.getElementsByName(elName);")
+            .append("zz = e.length;")
+            .append("for (var i=0; i <zz;i++) {")
+            .append("x = e[0].parentNode.parentNode;")
+            .append("var p = x.parentNode;p.removeChild(x);")
+            .append("}}")
+            .append("function setValue() {")
+            .append("document.getElementsByName('currencyLink')[0].value=").append(curId).append(";")
+            .append(getSetFieldValue(0, "number", empOid))
+            .append(getSetFieldValue(0, "numberAutoComplete", empNum))
+            .append(getSetFieldValue(0, "employeeData", empLName + ", "+ empFName))
+            .append(getSetFieldValue(0, "laborTime", formater.format(laborTimeVal)))
+            .append("document.getElementsByName('laborTimeUoM')[0].value=").append(laborTimeUoM.getId()).append(";")
+            .append(getSetFieldValue(0, "amount2Pay", amount2Pay == null
+                            ? BigDecimal.ZERO.toString() : formater.format(amount2Pay)))
+            .append(getSetFieldValue(0, "amountCost", amountCosts == null
+                            ? BigDecimal.ZERO.toString() : formater.format(amountCosts)))
+            .append("}");
+
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _instance.getId());
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        multi.addAttribute(CIPayroll.PositionAbstract.PositionNumber,
+                            CIPayroll.PositionAbstract.Amount,
+                            CIPayroll.PositionAbstract.Description);
+        final SelectBuilder selCaseOID = new SelectBuilder()
+                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink).oid();
+        final SelectBuilder selCaseName = new SelectBuilder()
+                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
+                            .attribute(CIPayroll.CasePositionCalc.Name);
+        multi.addSelect(selCaseOID, selCaseName);
+        multi.execute();
+
+        final Map<Integer, Object[]> values = new TreeMap<Integer, Object[]>();
+
+        while (multi.next()) {
+            final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
+
+            final Object[] value = new Object[] { multi.getSelect(selCaseName),
+                            multi.getSelect(selCaseOID),
+                            multi.getAttribute(CIPayroll.PositionAbstract.Description),
+                            amount,
+                            multi.getCurrentInstance()};
+            values.put(multi.<Integer>getAttribute(CIPayroll.PositionAbstract.PositionNumber), value);
+        }
+
+        final StringBuilder dedBldr = new StringBuilder();
+        final StringBuilder payBldr = new StringBuilder();
+        final StringBuilder neuBldr = new StringBuilder();
+        dedBldr.append("function setDeduction(){");
+        payBldr.append("function setPayment(){");
+        neuBldr.append("function setNeutral(){");
+        int ded = 0;
+        int pay = 0;
+        int neu = 0;
+        if (!values.isEmpty()) {
+            for (final Entry<Integer, Object[]> entry : values.entrySet()) {
+                final Instance instPos = (Instance) entry.getValue()[4];
+                if (instPos.getType().isKindOf(Type.get(CIPayroll.PositionPayment.uuid))) {
+                    payBldr.append(getSetFieldValue(pay, "casePosition_PaymentAutoComplete",
+                                    (String) entry.getValue()[0]))
+                        .append(getSetFieldValue(pay, "casePosition_Payment", (String) entry.getValue()[1]))
+                        .append(getSetFieldValue(pay, "description_Payment", (String) entry.getValue()[2]))
+                        .append(getSetFieldValue(pay, "amount_Payment", formater.format(entry.getValue()[3])));
+                    pay++;
+                } else if (instPos.getType().isKindOf(Type.get(CIPayroll.PositionDeduction.uuid))) {
+                    dedBldr.append(getSetFieldValue(ded, "casePosition_DeductionAutoComplete",
+                                    (String) entry.getValue()[0]))
+                        .append(getSetFieldValue(ded, "casePosition_Deduction", (String) entry.getValue()[1]))
+                        .append(getSetFieldValue(ded, "description_Deduction", (String) entry.getValue()[2]))
+                        .append(getSetFieldValue(ded, "amount_Deduction", formater.format(entry.getValue()[3])));
+                    ded++;
+                } else if (instPos.getType().isKindOf(Type.get(CIPayroll.PositionNeutral.uuid))) {
+                    neuBldr.append(getSetFieldValue(neu, "casePosition_NeutralAutoComplete",
+                                    (String) entry.getValue()[0]))
+                        .append(getSetFieldValue(neu, "casePosition_Neutral", (String) entry.getValue()[1]))
+                        .append(getSetFieldValue(neu, "description_Neutral", (String) entry.getValue()[2]))
+                        .append(getSetFieldValue(neu, "amount_Neutral", formater.format(entry.getValue()[3])));
+                    neu++;
+                }
+            }
+        }
+        payBldr.append("}");
+        dedBldr.append("}");
+        neuBldr.append("}");
+        js.append(payBldr).append(dedBldr).append(neuBldr)
+            .append("Wicket.Event.add(window, \"domready\", function(event) {")
+            .append("removeRows('amount_Payment');")
+            .append("removeRows('amount_Deduction');")
+            .append("removeRows('amount_Neutral');")
+            .append("addNewRows_paymentTable(").append(pay).append(", setPayment, null);")
+            .append("addNewRows_deductionTable(").append(ded).append(", setDeduction, null);")
+            .append("addNewRows_neutralTable(").append(neu).append(", setNeutral, null);")
+            .append("setValue();")
+            .append(" });");
+
+        return js.toString();
+    }
+
+    protected DecimalFormat getTwoDigitsformater()
+        throws EFapsException
+    {
+        final DecimalFormat formater = (DecimalFormat) NumberFormat.getInstance(Context.getThreadContext().getLocale());
+        formater.setMaximumFractionDigits(2);
+        formater.setMinimumFractionDigits(2);
         formater.setRoundingMode(RoundingMode.HALF_UP);
         formater.setParseBigDecimal(true);
         return formater;
