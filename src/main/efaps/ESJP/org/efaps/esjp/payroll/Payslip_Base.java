@@ -21,6 +21,10 @@
 
 package org.efaps.esjp.payroll;
 
+import java.awt.Color;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -39,6 +43,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRXlsAbstractExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.efaps.admin.common.SystemConfiguration;
@@ -67,14 +80,34 @@ import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.common.file.FileUtil;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.erp.CommonDocument;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.Rate;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
+import org.efaps.esjp.ui.print.Table_Base;
+import org.efaps.esjp.ui.print.Table_Base.Section;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
+
+import ar.com.fdvs.dj.core.DynamicJasperHelper;
+import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.core.layout.ListLayoutManager;
+import ar.com.fdvs.dj.domain.AutoText;
+import ar.com.fdvs.dj.domain.ColumnOperation;
+import ar.com.fdvs.dj.domain.DynamicReport;
+import ar.com.fdvs.dj.domain.Style;
+import ar.com.fdvs.dj.domain.builders.ColumnBuilder;
+import ar.com.fdvs.dj.domain.builders.ColumnBuilderException;
+import ar.com.fdvs.dj.domain.builders.DynamicReportBuilder;
+import ar.com.fdvs.dj.domain.constants.Border;
+import ar.com.fdvs.dj.domain.constants.Font;
+import ar.com.fdvs.dj.domain.constants.Page;
+import ar.com.fdvs.dj.domain.constants.Stretching;
+import ar.com.fdvs.dj.domain.constants.Transparency;
+import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 
 
 /**
@@ -198,7 +231,7 @@ public abstract class Payslip_Base
             .append("document.getElementsByName('currencyLink')[0].value=").append(curId).append(";")
             .append(getSetFieldValue(0, "number", empOid))
             .append(getSetFieldValue(0, "numberAutoComplete", empNum))
-            .append(getSetFieldValue(0, "employeeData", empLName + ", "+ empFName))
+            .append(getSetFieldValue(0, "employeeData", empLName + ", " + empFName))
             .append(getSetFieldValue(0, "laborTime", formater.format(laborTimeVal)))
             .append("document.getElementsByName('laborTimeUoM')[0].value=").append(laborTimeUoM.getId()).append(";")
             .append(getSetFieldValue(0, "amount2Pay", amount2Pay == null
@@ -287,6 +320,12 @@ public abstract class Payslip_Base
         return js.toString();
     }
 
+    /**
+     * Method to get a formatter for two decimals.
+     *
+     * @return DecimalFormat with the format.
+     * @throws EFapsException on error.
+     */
     protected DecimalFormat getTwoDigitsformater()
         throws EFapsException
     {
@@ -319,7 +358,7 @@ public abstract class Payslip_Base
         final String[] amount2Pays = _parameter.getParameterValues("amount2Pay");
         final String[] amountCosts = _parameter.getParameterValues("amountCost");
         final String[] currencyLinks = _parameter.getParameterValues("currencyLink");
-        final DecimalFormat formater = getFormater(2,2);
+        final DecimalFormat formater = getFormater(2, 2);
         try {
             for (int i = 0; i < employees.length; i++) {
                 if (employees[i] != null && !employees[i].isEmpty()
@@ -477,6 +516,12 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    /**
+     * @param _parameter as passed from eFaps API.
+     * @param lstPos
+     * @return
+     * @throws EFapsException on error.
+     */
     private Return createTransaction (final Parameter _parameter,
                                       final List<InsertPos> lstPos) throws EFapsException {
         final Instance instEmployee = Instance.get(_parameter.getParameterValue("number"));
@@ -516,7 +561,7 @@ public abstract class Payslip_Base
                     print.execute();
                     final Instance instAction = Instance.get(print.<String>getSelect(selActionOid));
                     if (instAction.isValid()) {
-                        insertPositions(_parameter,insert.getInstance(), instAction, instPer, pos, "Payment");
+                        insertPositions(_parameter, insert.getInstance(), instAction, instPer, pos, "Payment");
                     }
                 }
             }
@@ -525,6 +570,15 @@ public abstract class Payslip_Base
         return new Return();
     }
 
+    /**
+     * @param _parameter
+     * @param _instance
+     * @param _instAction
+     * @param _instPeriode
+     * @param _pos
+     * @param _postFix
+     * @throws EFapsException
+     */
     public void insertPositions(final Parameter _parameter,
                                 final Instance _instance,
                                 final Instance _instAction,
@@ -555,11 +609,13 @@ public abstract class Payslip_Base
             final String accountOid = multi.<String>getSelect(selAccountOid);
             Type type = null;
             // Accounting_Account2CaseCredit
-            if (multi.getCurrentInstance().getType().isKindOf(Type.get(UUID.fromString("f6f52802-c362-4e77-9068-ba02303f7b5c")))) {
+            if (multi.getCurrentInstance().getType()
+                            .isKindOf(Type.get(UUID.fromString("f6f52802-c362-4e77-9068-ba02303f7b5c")))) {
                 // Accounting_TransactionPositionCredit
                 type = Type.get(UUID.fromString("5336550c-3da0-41da-9b94-0f68788423b1"));
             // Accounting_Account2CaseDebit
-            } else if (multi.getCurrentInstance().getType().isKindOf(Type.get(UUID.fromString("c413ba55-714a-415d-b904-9af49efeb785")))) {
+            } else if (multi.getCurrentInstance().getType()
+                            .isKindOf(Type.get(UUID.fromString("c413ba55-714a-415d-b904-9af49efeb785")))) {
                 // Accounting_TransactionPositionDebit
                 type = Type.get(UUID.fromString("2190cf3c-eb36-4565-9d8a-cd9105451f35"));
             }
@@ -601,7 +657,6 @@ public abstract class Payslip_Base
      * @param _periodeInst  Instance of the periode
      * @param _currId       id of the currency
      * @param _date         date the exchange rate is wanted for
-     * @param _curr2Rate    map of currencyid to rates
      * @return rate
      * @throws EFapsException on error
      */
@@ -649,6 +704,12 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    /**
+     * @param _periodeInstance
+     * @param _currInstance
+     * @return
+     * @throws EFapsException
+     */
     protected Object[] getRateObject(final Instance _periodeInstance,
                                      final Instance _currInstance)
         throws EFapsException
@@ -674,7 +735,7 @@ public abstract class Payslip_Base
         for (final InsertPos pos : _list) {
             if (pos.caseType.equals(CIPayroll.CasePositionRootSum.getType())) {
                 amount2pay = amount2pay.add(pos.getAmount());
-            }else if (pos.posType.equals(CIPayroll.PositionNeutral.getType())
+            } else if (pos.posType.equals(CIPayroll.PositionNeutral.getType())
                             || pos.posType.equals(CIPayroll.PositionPayment.getType())) {
                 amountCost = amountCost.add(pos.getAmount());
             }
@@ -702,6 +763,7 @@ public abstract class Payslip_Base
      * Method for return a first date of month and last date of month.
      * @param _parameter Parameter as passed from eFaps API.
      * @return ret Return.
+     * @throws EFapsException on error.
      */
     public Return dateValueUI(final Parameter _parameter)
         throws EFapsException
@@ -920,6 +982,11 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    /**
+     * @param _parameter as passed from eFaps API.
+     * @return
+     * @throws EFapsException on error.
+     */
     protected Map<Instance, SumPosition> analyseSums(final Parameter _parameter)
         throws EFapsException
     {
@@ -947,6 +1014,11 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    /**
+     * @param _parameter as passed from eFaps API.
+     * @return
+     * @throws EFapsException on error.
+     */
     public Return rateCurrencyFieldValueUI(final Parameter _parameter)
         throws EFapsException
     {
@@ -1044,7 +1116,7 @@ public abstract class Payslip_Base
      * @param _parameter    Parameter as passed from the eFaps API
      * @param _values
      * @param _postfix
-     * @throws EFapsException
+     * @throws EFapsException on error.
      */
     protected void analyseTables(final Parameter _parameter,
                                  final Map<Instance, TablePos> _values,
@@ -1077,6 +1149,374 @@ public abstract class Payslip_Base
         } catch (final ParseException e) {
             throw new EFapsException(Payslip.class, "", e);
         }
+    }
+
+    /**
+     * Method to create a report for the accounting actions definition, related with the payslip cases.
+     *
+     * @param _parameter as passed from eFaps API.
+     * @return Return with the report.
+     * @throws EFapsException on error.
+     */
+    public Return createActionReport(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Return ret = new Return();
+        final Map<?, ?> properties = (Map<?, ?>) _parameter.get(ParameterValues.PROPERTIES);
+
+        final String mime = (String) properties.get("Mime");
+        final boolean print = "pdf".equalsIgnoreCase(mime);
+
+        final Style detailStyle = getStyle(_parameter, Table_Base.Section.DETAIL);
+        final Style headerStyle = getStyle(_parameter, Table_Base.Section.HEADER);
+        final Style titleStyle = getStyle(_parameter, Table_Base.Section.TITLE);
+        final Style subtitleStyle = getStyle(_parameter, Table_Base.Section.SUBTITLE);
+        final Style columnStyle = getStyle(_parameter, Table_Base.Section.COLUMN);
+        final Style columnHeaderStyle = getStyle(_parameter, Table_Base.Section.COLUMNHEADER);
+
+        final DynamicReportBuilder drb = new DynamicReportBuilder()
+            .setTitle("ActionReport")
+            .setUseFullPageWidth(true);
+        if (print) {
+            drb.setDetailHeight(15)
+                .setHeaderHeight(15)
+                .setDefaultStyles(titleStyle, subtitleStyle, headerStyle, detailStyle)
+                .setColumnsPerPage(1)
+                .setPageSizeAndOrientation(Page.Page_A4_Landscape())
+                .setMargins(20, 20, 20, 20); // (top, bottom, left and right)
+        } else {
+            drb.setPrintColumnNames(true)
+                .setIgnorePagination(true)
+                .setMargins(0, 0, 0, 0)
+                .setReportName("ActionReport")
+                .setDefaultStyles(titleStyle, subtitleStyle, headerStyle, detailStyle);
+        }
+
+        try {
+            final Map<String, Boolean> columns = getActionColums();
+
+            ColumnBuilder cbldr = ColumnBuilder.getNew();
+            cbldr.setColumnProperty("employee", String.class.getName()).setTitle("RR.HH.");
+            drb.addColumn(cbldr.build());
+
+            final List<AbstractColumn> lstColumsSum = new ArrayList<AbstractColumn>();
+            for (final Entry<String, Boolean> entry : columns.entrySet()) {
+                cbldr = ColumnBuilder.getNew();
+                final String clazzname = BigDecimal.class.getName();
+                final String[] nameOid = entry.getKey().split(":");
+                cbldr.setColumnProperty(nameOid[0], clazzname).setTitle(nameOid[1]);
+                if (print) {
+                    cbldr.setStyle(columnStyle)
+                        .setHeaderStyle(columnHeaderStyle);
+                }
+                final AbstractColumn col = cbldr.build();
+                if (!entry.getValue()) {
+                    lstColumsSum.add(col);
+                }
+                drb.addColumn(col);
+            }
+
+            cbldr = ColumnBuilder.getNew();
+            cbldr.setTitle("TOTAL").setStyle(columnStyle).setHeaderStyle(columnHeaderStyle)
+                            .addColumnOperation(ColumnOperation.SUM,
+                            (AbstractColumn[]) lstColumsSum.toArray(new AbstractColumn[0]));
+
+            //cbldr.addFieldProperty("net.sf.jasperreports.export.xls.formula", "=SUM(C2+D2)");
+            drb.addColumn(cbldr.build());
+            //drb.addGlobalColumnVariable(position, column, valueExpression)
+
+            if (print) {
+                drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y, AutoText.POSITION_FOOTER,
+                                AutoText.ALIGMENT_RIGHT, 200, 40);
+                drb.addAutoText(AutoText.AUTOTEXT_CREATED_ON, AutoText.POSITION_HEADER, AutoText.ALIGMENT_RIGHT,
+                            AutoText.PATTERN_DATE_DATE_TIME);
+            }
+
+            drb.setReportLocale(Context.getThreadContext().getLocale());
+            final DynamicReport dr = drb.build(); // Finally build the
+            // report!
+            final JRDataSource ds = getValues4ActionReport(_parameter, columns);
+            final JasperPrint jp = DynamicJasperHelper.generateJasperPrint(dr,
+                                    print ? new  ClassicLayoutManager() : new ListLayoutManager(), ds);
+            ret.put(ReturnValues.VALUES, getFile(jp, mime));
+            ret.put(ReturnValues.TRUE, true);
+        } catch (final ColumnBuilderException e) {
+            throw new EFapsException(Table_Base.class, "ColumnBuilderException", e);
+        } catch (final JRException e) {
+            throw new EFapsException(Table_Base.class, "JRException", e);
+        } catch (final IOException e) {
+            throw new EFapsException(Table_Base.class, "IOException", e);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Return the file for the action report.
+     *
+     * @param _jasperPrint
+     * @param _mime document format.
+     * @return
+     * @throws IOException
+     * @throws JRException
+     * @throws EFapsException on error.
+     */
+    private Object getFile(final JasperPrint _jasperPrint,
+                           final String _mime) throws IOException, JRException, EFapsException
+    {
+        File file = null;
+        if ("pdf".equalsIgnoreCase(_mime) || _mime == null) {
+            file = new FileUtil().getFile("ActionReport", "pdf");
+            final FileOutputStream os = new FileOutputStream(file);
+            JasperExportManager.exportReportToPdfStream(_jasperPrint, os);
+            os.close();
+        } else if ("xls".equalsIgnoreCase(_mime)) {
+            file = new FileUtil().getFile("ActionReport", "xls");
+            final FileOutputStream os = new FileOutputStream(file);
+            final JRXlsExporter exporter = new JRXlsExporter();
+            _jasperPrint.setName(_jasperPrint.getName().replace("/", "-"));
+            exporter.setParameter(JRExporterParameter.JASPER_PRINT, _jasperPrint);
+            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+            exporter.setParameter(JRXlsAbstractExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+            exporter.setParameter(JRXlsAbstractExporterParameter.IS_IGNORE_CELL_BORDER, Boolean.TRUE);
+            exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, Boolean.TRUE);
+            exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+            exporter.setParameter(JRXlsAbstractExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+            exporter.setParameter(JRXlsAbstractExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.FALSE);
+            exporter.setParameter(JRExporterParameter.IGNORE_PAGE_MARGINS, Boolean.TRUE);
+            exporter.exportReport();
+            os.close();
+        }
+        return file;
+    }
+
+    /**
+     * Method to get the action definition of accounting.
+     *
+     * @return Map with the OID and Name as key and a Boolean if it's related with a neutral payslip case.
+     * @throws EFapsException on error.
+     */
+    private Map<String, Boolean> getActionColums()
+        throws EFapsException
+    {
+        final HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        // Accounting_ActionDefinitionPayrollCasePosition
+        final QueryBuilder queryBldr = new QueryBuilder(Type
+                        .get(UUID.fromString("9f890acc-0b0f-4d78-ae0a-8070618f130b")));
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        multi.addAttribute("Name");
+        final SelectBuilder selCasePos = new SelectBuilder()
+                .linkfrom(CIPayroll.CasePositionAbstract, CIPayroll.CasePositionAbstract.ActionDefinitionAbstractLink)
+                .attribute(CIPayroll.CasePositionNeutral.OID);
+        multi.addSelect(selCasePos);
+        multi.execute();
+        while (multi.next()) {
+            final Object casePos = multi.getSelect(selCasePos);
+            boolean neutral = false;
+            if (casePos instanceof String) {
+                if (Instance.get((String) casePos).getType().isKindOf(CIPayroll.CasePositionNeutral.getType())) {
+                    neutral = true;
+                }
+            } else if (casePos instanceof List) {
+                @SuppressWarnings("unchecked")
+                final
+                String oidAct = ((List<String>) casePos).get(0);
+                if (Instance.get(oidAct).getType().isKindOf(CIPayroll.CasePositionNeutral.getType())) {
+                    neutral = true;
+                }
+            }
+            final String name = multi.<String>getAttribute("Name");
+            map.put(multi.getCurrentInstance().getOid() + ":" + name, neutral);
+        }
+
+        return map;
+    }
+
+    /**
+     * Get the Style for the different Sections.
+     * @param _parameter    Parameter as passed by the eFaps API
+     * @param _detail       Section
+     * @return Style for Dynamic JAsper
+     * @throws EFapsException on error
+     */
+    protected Style getStyle(final Parameter _parameter,
+                             final Section _detail)
+        throws EFapsException
+    {
+        Style ret;
+        switch (_detail) {
+            case TITLE:
+                ret = new Style();
+                ret.setFont(Font.VERDANA_BIG_BOLD);
+                ret.getFont().setPdfFontEmbedded(true);
+                break;
+            case COLUMN:
+                ret = new Style();
+                ret.setFont(Font.VERDANA_MEDIUM);
+                ret.setBorder(Border.PEN_1_POINT);
+                ret.getFont().setPdfFontEmbedded(true);
+                break;
+            case COLUMNHEADER:
+                ret = new Style();
+                ret.setFont(Font.VERDANA_MEDIUM_BOLD);
+                ret.setBackgroundColor(Color.gray);
+                ret.setBorder(Border.PEN_1_POINT);
+                ret.setTransparency(Transparency.OPAQUE);
+                ret.setTextColor(Color.white);
+                ret.setStreching(Stretching.NO_STRETCH);
+                ret.getFont().setPdfFontEmbedded(true);
+                break;
+            default:
+                ret = new Style();
+                ret.setFont(Font.VERDANA_MEDIUM);
+                ret.getFont().setPdfFontEmbedded(true);
+                break;
+        }
+        return ret;
+    }
+
+    /**
+     * Method to get the values to put in the report.
+     *
+     * @param _parameter as passed from eFaps API.
+     * @param _columns Map with the columns
+     * @return JRMapCollectionDataSource with the data for the report.
+     * @throws EFapsException on error.
+     */
+    public JRMapCollectionDataSource getValues4ActionReport(final Parameter _parameter,
+                                                            final Map<String, Boolean> _columns)
+        throws EFapsException
+    {
+        final Map<String, Map<String, ActionPos>> map = new HashMap<String, Map<String, ActionPos>>();
+        final DateTime dateTo = new DateTime(_parameter.getParameterValue("dateTo"));
+        final DateTime dateFrom = new DateTime(_parameter.getParameterValue("dateFrom"));
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
+        queryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
+        queryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusSeconds(1));
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        final SelectBuilder selLEmp = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                        .attribute(CIHumanResource.Employee.LastName);
+        final SelectBuilder selFEmp = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                        .attribute(CIHumanResource.Employee.FirstName);
+        multi.addSelect(selFEmp, selLEmp);
+        multi.execute();
+        while (multi.next()) {
+            final String empName = multi.<String>getSelect(selLEmp) + ", " + multi.<String>getSelect(selFEmp);
+            final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
+            queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type, CIPayroll.PositionSum.getType().getId());
+            queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
+                            multi.getCurrentInstance().getId());
+            final MultiPrintQuery multi2 = queryBldr2.getPrint();
+            multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
+            final SelectBuilder selAction = new SelectBuilder()
+                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
+                            .linkto(CIPayroll.CasePositionAbstract.ActionDefinitionAbstractLink).oid();
+            final SelectBuilder selActionName = new SelectBuilder()
+                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
+                            .linkto(CIPayroll.CasePositionAbstract.ActionDefinitionAbstractLink).attribute("Name");
+            multi2.addSelect(selAction, selActionName);
+            multi2.execute();
+            while (multi2.next()) {
+                BigDecimal amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
+                if (multi2.getCurrentInstance().getType().isKindOf(CIPayroll.PositionDeduction.getType())) {
+                    amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount).negate();
+                }
+                final Instance actInst = Instance.get(multi2.<String>getSelect(selAction));
+                final String actName = multi2.<String>getSelect(selActionName);
+                if (actInst.isValid()) {
+                    if (!map.containsKey(empName)) {
+                        final Map<String, ActionPos> map2 = new HashMap<String, ActionPos>();
+                        final ActionPos actionPos = new ActionPos(actInst, actName, amount);
+                        map2.put(actInst.getOid(), actionPos);
+                        map.put(empName, map2);
+                    } else {
+                        final Map<String, ActionPos> map2 = map.get(empName);
+                        if (map2.containsKey(actInst.getOid())) {
+                            final ActionPos actionPos = map2.get(actInst.getOid());
+                            actionPos.setSumAmount(amount);
+                        } else {
+                            final ActionPos actionPos = new ActionPos(actInst, actName, amount);
+                            map2.put(actInst.getOid(), actionPos);
+                            map.put(empName, map2);
+                        }
+                    }
+                }
+            }
+        }
+
+        final List<Map<String, ?>> lstMap = new ArrayList<Map<String, ?>>();
+        for (final Entry<String, Map<String, ActionPos>> entry : map.entrySet()) {
+            final Map<String, Object> values = new HashMap<String, Object>();
+            values.put("employee", entry.getKey());
+            for (final Entry<String, ActionPos> entry2 : entry.getValue().entrySet()) {
+                values.put(entry2.getKey(), entry2.getValue().getSumAmount());
+            }
+            for (final Entry<String, Boolean> entry3 : _columns.entrySet()) {
+                final String[] nameOid = entry3.getKey().split(":");
+                if (!values.containsKey(nameOid[0])) {
+                    values.put(nameOid[0], BigDecimal.ZERO);
+                }
+            }
+            //values.put("total", "=SUM(C2+D2)");
+            lstMap.add(values);
+        }
+
+        final JRMapCollectionDataSource ds = new JRMapCollectionDataSource(lstMap);
+        return ds;
+    }
+
+    public class ActionPos
+    {
+        private final Instance actionInst;
+        private final String actionName;
+        private BigDecimal sumAmount;
+
+        /**
+         * @param _actionInst
+         * @param _actionName
+         * @param _sumAmount
+         */
+        public ActionPos(final Instance _actionInst,
+                         final String _actionName,
+                         final BigDecimal _sumAmount) {
+            this.actionInst = _actionInst;
+            this.actionName = _actionName;
+            this.sumAmount = _sumAmount;
+        }
+
+        /**
+         * @return the sumAmount
+         */
+        private BigDecimal getSumAmount()
+        {
+            return sumAmount;
+        }
+
+        /**
+         * @param sumAmount the sumAmount to set
+         */
+        private void setSumAmount(final BigDecimal _sumAmount)
+        {
+            this.sumAmount = this.sumAmount.add(_sumAmount);
+        }
+
+        /**
+         * @return the actionInst
+         */
+        private Instance getActionInst()
+        {
+            return actionInst;
+        }
+
+        /**
+         * @return the actionName
+         */
+        private String getActionName()
+        {
+            return actionName;
+        }
+
+
     }
 
     public class InsertPos

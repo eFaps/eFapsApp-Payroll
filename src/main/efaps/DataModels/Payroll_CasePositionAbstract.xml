@@ -90,5 +90,12 @@
             <sqltable>Payroll_CasePositionSQLTable</sqltable>
             <sqlcolumn>MODE</sqlcolumn>
         </attribute>
+        <attribute>
+            <name>ActionDefinitionAbstractLink</name>
+            <type>Link</type>
+            <typelink>Accounting_ActionDefinitionPayrollCasePosition</typelink>
+            <sqltable>Payroll_CasePositionSQLTable</sqltable>
+            <sqlcolumn>ACTIONDEFID</sqlcolumn>
+        </attribute>
     </definition>
 </datamodel-type>
