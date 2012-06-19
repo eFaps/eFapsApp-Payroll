@@ -1219,7 +1219,7 @@ public abstract class Payslip_Base
             cbldr = ColumnBuilder.getNew();
             cbldr.setTitle("TOTAL").setStyle(columnStyle).setHeaderStyle(columnHeaderStyle)
                             .addColumnOperation(ColumnOperation.SUM,
-                            (AbstractColumn[]) lstColumsSum.toArray(new AbstractColumn[0]));
+                            lstColumsSum.toArray(new AbstractColumn[0]));
 
             //cbldr.addFieldProperty("net.sf.jasperreports.export.xls.formula", "=SUM(C2+D2)");
             drb.addColumn(cbldr.build());
@@ -1353,14 +1353,14 @@ public abstract class Payslip_Base
             case COLUMN:
                 ret = new Style();
                 ret.setFont(Font.VERDANA_MEDIUM);
-                ret.setBorder(Border.PEN_1_POINT);
+                ret.setBorder(Border.PEN_1_POINT());
                 ret.getFont().setPdfFontEmbedded(true);
                 break;
             case COLUMNHEADER:
                 ret = new Style();
                 ret.setFont(Font.VERDANA_MEDIUM_BOLD);
                 ret.setBackgroundColor(Color.gray);
-                ret.setBorder(Border.PEN_1_POINT);
+                ret.setBorder(Border.PEN_1_POINT());
                 ret.setTransparency(Transparency.OPAQUE);
                 ret.setTextColor(Color.white);
                 ret.setStreching(Stretching.NO_STRETCH);
@@ -1489,7 +1489,7 @@ public abstract class Payslip_Base
          */
         private BigDecimal getSumAmount()
         {
-            return sumAmount;
+            return this.sumAmount;
         }
 
         /**
@@ -1505,7 +1505,7 @@ public abstract class Payslip_Base
          */
         private Instance getActionInst()
         {
-            return actionInst;
+            return this.actionInst;
         }
 
         /**
@@ -1513,7 +1513,7 @@ public abstract class Payslip_Base
          */
         private String getActionName()
         {
-            return actionName;
+            return this.actionName;
         }
 
 
