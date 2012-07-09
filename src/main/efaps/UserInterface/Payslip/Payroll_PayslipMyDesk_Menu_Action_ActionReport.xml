@@ -43,10 +43,6 @@
         <!-- properties -->
         <property name="Target">modal</property>
         <property name="TargetMode">create</property>
-        <!--<property name="TargetCreateType">Payroll_Payslip</property>
-        <property name="TargetShowFile">true</property>
-        <property name="WindowHeight">660</property>
-        <property name="WindowWidth">1200</property>-->
         <property name="TargetShowFile">true</property>
         <property name="Submit">true</property>
         <property name="SubmitSelectedRows">-1</property>
