@@ -602,11 +602,14 @@ public abstract class Payslip_Base
         final QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("7efe5f1a-4fdc-41d7-8f55-77777212f02b"));
         queryBldr.addWhereAttrInQuery("ToCaseAbstractLink", attrQuery2);
         final MultiPrintQuery multi = queryBldr.getPrint();
+        multi.addAttribute("Numerator", "Denominator");
         final SelectBuilder selAccountOid = new SelectBuilder().linkto("FromAccountAbstractLink").oid();
         multi.addSelect(selAccountOid);
         multi.execute();
         while (multi.next()) {
             final String accountOid = multi.<String>getSelect(selAccountOid);
+            final BigDecimal numerator = new BigDecimal(multi.<Integer>getAttribute("Numerator"));
+            final BigDecimal denominator = new BigDecimal(multi.<Integer>getAttribute("Denominator"));
             Type type = null;
             // Accounting_Account2CaseCredit
             if (multi.getCurrentInstance().getType()
@@ -641,10 +644,18 @@ public abstract class Payslip_Base
             insert2.add("Rate", rateObj);
 
             final BigDecimal rateAmount = _pos.getAmount().setScale(6, BigDecimal.ROUND_HALF_UP);
-            final boolean isDebitTrans = type.getUUID().equals(UUID.fromString("2190cf3c-eb36-4565-9d8a-cd9105451f35"));
-            insert2.add("RateAmount", isDebitTrans ? rateAmount.negate() : rateAmount);
             final BigDecimal amount = rateAmount.divide(rate, 12, BigDecimal.ROUND_HALF_UP);
-            insert2.add("Amount", isDebitTrans ? amount.negate() : amount);
+
+            final BigDecimal rateAmount2 = rateAmount.multiply(numerator
+                                .divide(denominator, 8, BigDecimal.ROUND_HALF_UP));
+            final BigDecimal amount2 = amount.multiply(numerator
+                                .divide(denominator, 8, BigDecimal.ROUND_HALF_UP));
+
+            final boolean isDebitTrans = type.getUUID()
+                            .equals(UUID.fromString("2190cf3c-eb36-4565-9d8a-cd9105451f35"));
+            insert2.add("RateAmount", isDebitTrans ? rateAmount2.negate() : rateAmount2);
+
+            insert2.add("Amount", isDebitTrans ? amount2.negate() : amount2);
             insert2.execute();
 
         }
