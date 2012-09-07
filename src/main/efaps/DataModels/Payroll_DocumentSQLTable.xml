@@ -44,6 +44,9 @@
             <column name="TIME"             type="DECIMAL"                      length="16" scale="6"/>
             <column name="TIMEUOMID"        type="INTEGER"/>
             <column name="TIMEBASE"         type="REAL"/>
+            <column name="EXTRATIME"        type="DECIMAL"                      length="16" scale="6"/>
+            <column name="EXTRATIMEUOMID"   type="INTEGER"/>
+            <column name="EXTRATIMEBASE"    type="REAL"/>
             <!-- foreign keys -->
             <foreign name="T_PRDOC_EMPLOYEEID"   key="EMPLOYEEID"      reference="T_HREMPLOYEE(ID)"/>
             <foreign name="T_PRDOC_CURRENCYID"   key="CURRENCYID"      reference="T_ERPCUR(ID)"/>

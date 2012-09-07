@@ -23,8 +23,11 @@ package org.efaps.esjp.payroll;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -69,6 +72,7 @@ import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
 import org.efaps.db.AttributeQuery;
+import org.efaps.db.Checkin;
 import org.efaps.db.Context;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
@@ -408,6 +412,8 @@ public abstract class Payslip_Base
         final Long employeeid = Instance.get(_parameter.getParameterValue("number")).getId();
         final String laborTimes = _parameter.getParameterValue("laborTime");
         final String laborTimeUoMs = _parameter.getParameterValue("laborTimeUoM");
+        final String extraLaborTimes = _parameter.getParameterValue("extraLaborTime");
+        final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
         final String amount2Pay = _parameter.getParameterValue("amount2Pay");
         final String amountCosts = _parameter.getParameterValue("amountCost");
         final String currencyLinks = _parameter.getParameterValue("currencyLink");
@@ -429,10 +435,14 @@ public abstract class Payslip_Base
             final BigDecimal time = laborTimes != null && !laborTimes.isEmpty()
                                                         ? (BigDecimal) formater.parse(laborTimes)
                                                         : BigDecimal.ZERO;
+            final BigDecimal extraTime = extraLaborTimes != null && !extraLaborTimes.isEmpty()
+                                                        ? (BigDecimal) formater.parse(extraLaborTimes)
+                                                        : BigDecimal.ZERO;
             insert.add(CIPayroll.Payslip.Amount2Pay, pay);
             insert.add(CIPayroll.Payslip.AmountCost, cost);
             insert.add(CIPayroll.Payslip.CurrencyLink, currencyLinks);
             insert.add(CIPayroll.Payslip.LaborTime, new Object[] { time, laborTimeUoMs});
+            insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraTime, extraLaborTimeUoMs});
             insert.execute();
             final Map<Instance, TablePos> values = new HashMap<Instance, TablePos>();
             analyseTables(_parameter, values, "Deduction");
@@ -508,6 +518,16 @@ public abstract class Payslip_Base
             report.getJrParameters().put("sumTotal", sumPayment.subtract(sumDeduction));
 
             ret = report.execute(_parameter);
+
+            final Map<?, ?> properties = (Map<?, ?>) _parameter.get(ParameterValues.PROPERTIES);
+            try {
+                final File file = (File) ret.get(ReturnValues.VALUES);
+                final InputStream input = new FileInputStream(file);
+                final Checkin checkin = new Checkin(insert.getInstance());
+                checkin.execute(fileName + "." + properties.get("Mime"), input, ((Long) file.length()).intValue());
+            } catch (final FileNotFoundException e) {
+                throw new EFapsException(Payslip.class, "create.FileNotFoundException", e);
+            }
 
         } catch (final ParseException e) {
             throw new EFapsException(Payslip_Base.class, "create.ParseException", e);

@@ -75,5 +75,12 @@
             <sqlcolumn>TIME,TIMEUOMID,TIMEBASE</sqlcolumn>
             <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
         </attribute>
+        <attribute>
+            <name>ExtraLaborTime</name>
+            <type>DecimalWithUoM</type>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>EXTRATIME,EXTRATIMEUOMID,EXTRATIMEBASE</sqlcolumn>
+            <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
+        </attribute>
     </definition>
 </datamodel-type>

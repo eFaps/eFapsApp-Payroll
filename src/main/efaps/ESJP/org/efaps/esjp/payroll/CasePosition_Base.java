@@ -117,7 +117,9 @@ public abstract class CasePosition_Base
         if (!parent.getType().isKindOf(CIPayroll.CaseAbstract.getType())) {
             insert.add(CIPayroll.CasePositionAbstract.ParentAbstractLink, parent.getId());
         }
-        if ( _parameter.getParameterValue("actionDefinitionLink") != null) {
+        if ( _parameter.getParameterValue("actionDefinitionLink") != null
+                        && !_parameter.getParameterValue("actionDefinitionLink").isEmpty()
+                        && !"null".equals(_parameter.getParameterValue("actionDefinitionLink"))) {
             insert.add(CIPayroll.CasePositionCalc.ActionDefinitionLink,
                             _parameter.getParameterValue("actionDefinitionLink"));
         }

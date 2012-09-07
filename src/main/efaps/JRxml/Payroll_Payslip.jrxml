@@ -45,11 +45,29 @@
 	<field name="number" class="java.lang.String">
 		<property name="Select" value="linkto[EmployeeAbstractLink].attribute[Number]"/>
 	</field>
+	<field name="startDate" class="org.joda.time.DateTime">
+		<property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassLocation].attribute[StartDate]"/>
+	</field>
+    <field name="laborSystem" class="java.lang.String">
+		<property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassLocation].attribute[LaborSystem]"/>
+	</field>
+    <field name="afp" class="java.lang.String">
+		<property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassLocation].attribute[Afp]"/>
+	</field>
+    <field name="cuspp" class="java.lang.String">
+		<property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassLocation].attribute[Cuspp]"/>
+	</field>
 	<field name="laborTimeValue" class="java.lang.Object">
 		<property name="Select" value="attribute[LaborTime].value"/>
 	</field>
 	<field name="laborTimeUoM" class="java.lang.Object">
 		<property name="Select" value="attribute[LaborTime].label"/>
+	</field>
+	<field name="extraLaborTimeValue" class="java.lang.Object">
+		<property name="Select" value="attribute[ExtraLaborTime].value"/>
+	</field>
+	<field name="extraLaborTimeUoM" class="java.lang.Object">
+		<property name="Select" value="attribute[ExtraLaborTime].label"/>
 	</field>
 	<field name="currency" class="java.lang.String">
 		<property name="Select" value="linkto[CurrencyLink].attribute[Name]"/>
@@ -67,9 +85,9 @@
 		<band height="61" splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="153" splitType="Stretch">
+		<band height="231" splitType="Stretch">
 			<staticText>
-				<reportElement style="text2" mode="Transparent" x="20" y="89" width="525" height="16"/>
+				<reportElement style="text2" mode="Transparent" x="20" y="57" width="525" height="16"/>
 				<box>
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="0.0"/>
@@ -80,7 +98,7 @@
 				<textElement>
 					<font size="10" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Hasta:]]></text>
+				<text><![CDATA[Fecha de Ingreso o Reingreso:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="text2" mode="Transparent" x="20" y="41" width="525" height="16"/>
@@ -102,7 +120,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{number} + " - " + $F{firstName} + " " + $F{lastName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement style="text2" mode="Transparent" x="20" y="73" width="525" height="16"/>
+				<reportElement style="text2" mode="Transparent" x="20" y="153" width="525" height="16"/>
 				<box>
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="0.0"/>
@@ -116,12 +134,12 @@
 				<text><![CDATA[Desde:]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement mode="Transparent" x="255" y="73" width="290" height="16"/>
+				<reportElement mode="Transparent" x="255" y="153" width="290" height="16"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{date}.toDate()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement style="text2" mode="Transparent" x="20" y="57" width="525" height="16"/>
+				<reportElement style="text2" mode="Transparent" x="20" y="121" width="525" height="16"/>
 				<box>
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="0.0"/>
@@ -135,7 +153,7 @@
 				<text><![CDATA[Horas Laboradas:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="text2" mode="Transparent" x="20" y="105" width="525" height="16"/>
+				<reportElement style="text2" mode="Transparent" x="20" y="185" width="525" height="16"/>
 				<box>
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="0.0"/>
@@ -149,17 +167,17 @@
 				<text><![CDATA[Moneda:]]></text>
 			</staticText>
 			<textField>
-				<reportElement mode="Transparent" x="255" y="57" width="290" height="16"/>
+				<reportElement mode="Transparent" x="255" y="121" width="290" height="16"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{laborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{laborTimeUoM}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="255" y="89" width="290" height="16"/>
+				<reportElement mode="Transparent" x="255" y="169" width="290" height="16"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{duedate}.toDate()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Transparent" x="255" y="105" width="290" height="16"/>
+				<reportElement mode="Transparent" x="255" y="185" width="290" height="16"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{currency}]]></textFieldExpression>
 			</textField>
@@ -169,10 +187,105 @@
 				<text><![CDATA[INFORMACIÓN GENERAL]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="heading2" x="0" y="136" width="555" height="17"/>
+				<reportElement style="heading2" x="0" y="214" width="555" height="17"/>
 				<textElement/>
 				<text><![CDATA[REMUNERACIÓN]]></text>
 			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement mode="Transparent" x="255" y="57" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{startDate}.toDate()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="169" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Hasta:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="73" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Régimen Laboral:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="255" y="73" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{laborSystem}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="89" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[AFP:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="255" y="89" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{afp}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="105" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[CUSPP:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="255" y="105" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cuspp}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="text2" mode="Transparent" x="20" y="137" width="525" height="16"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Horas en Sobretiempo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="255" y="137" width="290" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{extraLaborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{extraLaborTimeUoM}]]></textFieldExpression>
+			</textField>
 		</band>
 	</columnHeader>
 	<detail>
