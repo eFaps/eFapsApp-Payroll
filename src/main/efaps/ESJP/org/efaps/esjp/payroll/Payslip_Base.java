@@ -88,6 +88,7 @@ import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
 import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIERP;
+import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
@@ -393,16 +394,18 @@ public abstract class Payslip_Base
     {
         Return ret = new Return();
         final String name = getDocName4Create(_parameter);
-        final String date = _parameter.getParameterValue("date");
-        final String dueDate = _parameter.getParameterValue("dueDate");
-        final Long employeeid = Instance.get(_parameter.getParameterValue("number")).getId();
-        final String laborTimes = _parameter.getParameterValue("laborTime");
+        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
+        final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
+        final Long employeeid = Instance.get(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.number.name)).getId();
+        final String laborTimes = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
         final String laborTimeUoMs = _parameter.getParameterValue("laborTimeUoM");
-        final String extraLaborTimes = _parameter.getParameterValue("extraLaborTime");
+        final String extraLaborTimes = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
         final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
-        final String amount2Pay = _parameter.getParameterValue("amount2Pay");
-        final String amountCosts = _parameter.getParameterValue("amountCost");
-        final String currencyLinks = _parameter.getParameterValue("currencyLink");
+        final String amount2Pay = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amount2Pay.name);
+        final String amountCosts = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amountCost.name);
+        final String currencyLinks = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.currencyLink.name);
         final DecimalFormat formater = getFormater(2, 2);
         try {
             final Insert insert = new Insert(CIPayroll.Payslip);
