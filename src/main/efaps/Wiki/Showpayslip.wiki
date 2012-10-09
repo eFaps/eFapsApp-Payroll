@@ -20,7 +20,7 @@ Veremos los siguientes puntos:
 Para ingresar a una boleta debe hacerlo por la palabra mas resaltada, en este caso ingresa por la palabra boletaPa. También puede ingresar a los datos del empleado por su nombre, ejemplo 636-Peralta.
 
 || *Tipo* || *Nombre* || *Empleado* || *Horas laboradas* || *Pago* || *Costo* || *Moneda* ||
-|| Boleta de pago || *boletaPa* || *636-Perarlta* || 8 || 650 || 800 || Nuevos soles ||
+|| Boleta de pago || *boletaPa* || *636-Peralta* || 8 || 650 || 800 || Nuevos soles ||
 
 Cuando usted ingrese a una boleta de pago podrá visualizar su contenido y además las siguientes opciones:
 
