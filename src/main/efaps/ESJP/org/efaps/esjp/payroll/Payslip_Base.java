@@ -175,14 +175,14 @@ public abstract class Payslip_Base
      * @throws EFapsException on error
      */
     protected String getSetValuesString(final Instance _instance)
-        throws EFapsException
+                    throws EFapsException
     {
-
         final StringBuilder js = new StringBuilder();
         final PrintQuery print = new PrintQuery(_instance);
         print.addAttribute(CIPayroll.Payslip.Name,
                            CIPayroll.Payslip.Note,
                            CIPayroll.Payslip.LaborTime,
+                           CIPayroll.Payslip.ExtraLaborTime,
                            CIPayroll.Payslip.Amount2Pay,
                            CIPayroll.Payslip.AmountCost,
                            CIPayroll.Payslip.CurrencyLink);
@@ -205,6 +205,9 @@ public abstract class Payslip_Base
         final Object[] laborTime = print.getAttribute(CIPayroll.Payslip.LaborTime);
         final BigDecimal laborTimeVal = (BigDecimal) laborTime[0];
         final UoM laborTimeUoM = (UoM) laborTime[1];
+        final Object[] extraLaborTime = print.getAttribute(CIPayroll.Payslip.ExtraLaborTime);
+        final BigDecimal extraLaborTimeVal = (BigDecimal) extraLaborTime[0];
+        final UoM extraLaborTimeUoM = (UoM) extraLaborTime[1];
 
         final Long curId = print.<Long>getAttribute(CIPayroll.Payslip.CurrencyLink);
 
@@ -224,7 +227,11 @@ public abstract class Payslip_Base
             .append(getSetFieldValue(0, "numberAutoComplete", empNum))
             .append(getSetFieldValue(0, "employeeData", empLName + ", " + empFName))
             .append(getSetFieldValue(0, "laborTime", formater.format(laborTimeVal)))
-            .append("document.getElementsByName('laborTimeUoM')[0].value=").append(laborTimeUoM.getId()).append(";")
+            .append("document.getElementsByName('laborTimeUoM')[0].value=")
+                .append(laborTimeUoM.getId()).append(";")
+            .append(getSetFieldValue(0, "extraLaborTime", formater.format(extraLaborTimeVal)))
+            .append("document.getElementsByName('extraLaborTimeUoM')[0].value=")
+                .append(extraLaborTimeUoM.getId()).append(";")
             .append(getSetFieldValue(0, "amount2Pay", amount2Pay == null
                             ? BigDecimal.ZERO.toString() : formater.format(amount2Pay)))
             .append(getSetFieldValue(0, "amountCost", amountCosts == null
