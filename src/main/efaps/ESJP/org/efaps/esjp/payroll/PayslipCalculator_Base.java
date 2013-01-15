@@ -22,12 +22,14 @@
 package org.efaps.esjp.payroll;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.AttributeQuery;
+import org.efaps.db.Context;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
@@ -50,6 +52,8 @@ import org.efaps.util.EFapsException;
 @EFapsRevision("$Rev$")
 public class PayslipCalculator_Base
 {
+    public static final String ADVANCE_PAYMENTS = "org.efaps.esjp.payroll.PayslipCalculator.AdvancePay";
+
     /**
      * @param _parameter    Parameter as passed by the eFaps API
      * @param _sums         mapping of instances to sum positions
@@ -58,6 +62,7 @@ public class PayslipCalculator_Base
      * @return  sum of advances payed
      * @throws EFapsException on error
      */
+    @SuppressWarnings("unchecked")
     public BigDecimal advance(final Parameter _parameter,
                               final Map<Instance, SumPosition> _sums,
                               final Map<Instance, TablePos> _values,
@@ -80,9 +85,25 @@ public class PayslipCalculator_Base
             multi.addAttribute(CIPayroll.Advance.Amount2Pay);
             multi.execute();
             while (multi.next()) {
+                Map<String, Instance> mapAdv = new HashMap<String, Instance>();
+                if (Context.getThreadContext().getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS) != null) {
+                    mapAdv = (Map<String, Instance>) Context.getThreadContext()
+                                    .getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS);
+                } else {
+                    Context.getThreadContext().setSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS, mapAdv);
+                }
+                mapAdv.put(multi.getCurrentInstance().getOid(), multi.getCurrentInstance());
                 final BigDecimal pay = multi.<BigDecimal>getAttribute(CIPayroll.Advance.Amount2Pay);
                 if (pay != null) {
                     ret = ret.add(pay);
+                }
+            }
+            if (_values.containsKey(_position.getInstance())) {
+                _values.get(_position.getInstance()).setSetValue(true);
+                final int count = _values.get(_position.getInstance()).getValues().size();
+                _values.get(_position.getInstance()).getValues().clear();
+                for (int i = 0; i < count; i++) {
+                    _values.get(_position.getInstance()).getValues().add(ret);
                 }
             }
         }

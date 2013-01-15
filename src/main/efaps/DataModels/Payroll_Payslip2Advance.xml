@@ -39,7 +39,7 @@
             <type>Link</type>
             <typelink>Payroll_Advance</typelink>
             <sqltable>ERP_Object2ObjectAbstractSQLTable</sqltable>
-            <sqlcolumn>FROMID</sqlcolumn>
+            <sqlcolumn>TOID</sqlcolumn>
         </attribute>
     </definition>
 </datamodel-type>

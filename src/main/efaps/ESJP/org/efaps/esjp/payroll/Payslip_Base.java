@@ -551,6 +551,24 @@ public abstract class Payslip_Base
             report.getJrParameters().put("sumNeutral", sumNeutral);
             report.getJrParameters().put("sumTotal", sumPayment.subtract(sumDeduction));
 
+            if (Context.getThreadContext().getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS) != null) {
+                @SuppressWarnings("unchecked")
+                final
+                Map<String, Instance> mapAdv = (Map<String, Instance>) Context.getThreadContext()
+                                .getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS);
+                for (final Instance instAdv : mapAdv.values()) {
+                    final Update updateAdv = new Update(instAdv);
+                    updateAdv.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.uuid, "Paid").getId());
+                    updateAdv.execute();
+
+                    final Insert insertPay2Adv = new Insert(CIPayroll.Payslip2Advance);
+                    insertPay2Adv.add(CIPayroll.Payslip2Advance.FromLink, insert.getId());
+                    insertPay2Adv.add(CIPayroll.Payslip2Advance.ToLink, instAdv.getId());
+                    insertPay2Adv.execute();
+                }
+                Context.getThreadContext().setSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS, null);
+            }
+
             ret = report.execute(_parameter);
 
             final Map<?, ?> properties = (Map<?, ?>) _parameter.get(ParameterValues.PROPERTIES);

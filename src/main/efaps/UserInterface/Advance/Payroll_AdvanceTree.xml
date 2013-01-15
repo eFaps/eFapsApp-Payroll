@@ -28,11 +28,15 @@
         <name>Payroll_AdvanceTree</name>
         <!-- targets -->
         <target>
+            <menu>Payroll_AdvanceTree_Menu</menu>
             <form>Payroll_AdvanceForm</form>
         </target>
         <!-- type tree for -->
         <type>Payroll_Advance</type>
         <!-- child -->
+        <childs>
+            <child>Payroll_AdvanceTree_Payslip</child>
+        </childs>
         <!-- properties -->
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
