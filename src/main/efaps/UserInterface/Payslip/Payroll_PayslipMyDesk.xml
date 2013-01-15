@@ -41,7 +41,7 @@
             <menu>Payroll_PayslipMyDesk_Menu</menu>
             <table>Payroll_PayslipTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_Payslip</property>
+                <property name="Types">Payroll_DocumentAbstract</property>
                 <property name="ExpandChildTypes">true</property>
             </evaluate>
         </target>

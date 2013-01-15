@@ -69,6 +69,7 @@ import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.datamodel.ui.FieldValue;
 import org.efaps.admin.datamodel.ui.UIInterface;
+import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
@@ -91,6 +92,7 @@ import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.erp.CommonDocument;
 import org.efaps.esjp.erp.CurrencyInst;
@@ -333,6 +335,42 @@ public abstract class Payslip_Base
         formater.setRoundingMode(RoundingMode.HALF_UP);
         formater.setParseBigDecimal(true);
         return formater;
+    }
+
+    public Return createAdvance(final Parameter _parameter)
+        throws EFapsException
+    {
+        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.date.name);
+
+        final String[] employees = _parameter.getParameterValues(CITablePayroll.Payroll_AdvanceTable.employee.name);
+        final String[] employeeNames = _parameter.getParameterValues("employeeAutoComplete");
+        final String[] amount2Pays = _parameter.getParameterValues(CITablePayroll.Payroll_AdvanceTable.amount2Pay.name);
+        final String[] currencyLinks = _parameter
+                        .getParameterValues(CITablePayroll.Payroll_AdvanceTable.currencyLink.name);
+        final DecimalFormat formater = getFormater(2, 2);
+        try {
+            for (int i = 0; i < employees.length; i++) {
+                if (employees[i] != null && !employees[i].isEmpty()) {
+                    final BigDecimal pay = amount2Pays[i] != null && !amount2Pays[i].isEmpty()
+                                    ? (BigDecimal) formater.parse(amount2Pays[i])
+                                    : BigDecimal.ZERO;
+                    final Insert insert = new Insert(CIPayroll.Advance);
+                    insert.add(CIPayroll.Advance.Name,
+                                    DBProperties.getProperty("org.efaps.esjp.payroll.Payslip.Advance") + " "
+                                                    + employeeNames[i]);
+                    insert.add(CIPayroll.Advance.Date, date);
+                    insert.add(CIPayroll.Advance.EmployeeAbstractLink, Instance.get(employees[i]).getId());
+                    insert.add(CIPayroll.Advance.Status,
+                                    ((Long) Status.find(CIPayroll.AdvanceStatus.uuid, "Open").getId()).toString());
+                    insert.add(CIPayroll.Advance.Amount2Pay, pay);
+                    insert.add(CIPayroll.Advance.CurrencyLink, currencyLinks[i]);
+                    insert.execute();
+                }
+            }
+        } catch (final ParseException e) {
+            throw new EFapsException(Payslip_Base.class, "createMassive.ParseException", e);
+        }
+        return new Return();
     }
 
     /**
@@ -779,6 +817,7 @@ public abstract class Payslip_Base
      * @return new Name
      * @throws EFapsException on error
      */
+    @Override
     protected String getDocName4Create(final Parameter _parameter)
         throws EFapsException
     {

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+
+  Copyright 2003 - 2010 The eFaps Team
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  Author:          The eFaps Team
+  Revision:        $Rev: 7956 $
+  Last Changed:    $Date: 2012-09-07 10:37:31 -0500 (vie, 07 sep 2012) $
+  Last Changed By: $Author: jorge.cueva@moxter.net $
+
+--><ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>32107a8a-9003-4a6e-955d-de00a6655326</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <file-revision>$Rev: 7956 $</file-revision>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_AdvanceForm</name>
+        <!-- fields -->
+        <field name="type">
+            <property name="Attribute">Type</property>
+        </field>
+        <field character="Group" name="nameGroup">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+        </field>
+        <field name="name">
+            <property name="ModeSearch">EDITABLE</property>
+            <property name="Attribute">Name</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
+        <field name="date">
+            <property name="Attribute">Date</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <trigger event="UI_FIELD_VALUE" method="dateValueUI" name="Payroll_PayslipForm.date.UI_FIELD_VALUE" program="org.efaps.esjp.payroll.Payslip"/>
+        </field>
+        <field name="number">
+            <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Label">Payroll_PayslipForm.number.Label</property>
+            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModeView">READONLY</property>
+            <property name="Required">true</property>
+            <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee" name="Payroll_PayslipForm.number.UI_FIELD_AUTOCOMPLETE" program="org.efaps.esjp.humanresource.Employee">
+            </trigger>
+            <trigger event="UI_FIELD_UPDATE" method="updateFields4Employee" name="Payroll_PayslipForm.number.UI_FIELD_UPDATE" program="org.efaps.esjp.payroll.Payslip"/>
+        </field>
+        <field name="amount2Pay">
+            <property name="Attribute">Amount2Pay</property>
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">EDITABLE</property>
+        </field>
+        <field name="currencyLink">
+            <property name="Attribute">CurrencyLink</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
+        </field>
+        <field name="payslip">
+            <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>
+            <property name="Select">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].attribute[Name]</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Label">Payroll_AdvanceForm.payslip.Label</property>
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModeView">READONLY</property>
+        </field>
+    </definition>
+</ui-form>
