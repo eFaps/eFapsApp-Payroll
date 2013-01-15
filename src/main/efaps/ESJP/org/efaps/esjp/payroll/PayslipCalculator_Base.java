@@ -31,6 +31,8 @@ import org.efaps.db.AttributeQuery;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
+import org.efaps.esjp.ci.CIFormPayroll;
+import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.payroll.Payslip_Base.Position;
 import org.efaps.esjp.payroll.Payslip_Base.SumPosition;
@@ -48,7 +50,6 @@ import org.efaps.util.EFapsException;
 @EFapsRevision("$Rev$")
 public class PayslipCalculator_Base
 {
-
     /**
      * @param _parameter    Parameter as passed by the eFaps API
      * @param _sums         mapping of instances to sum positions
@@ -64,19 +65,26 @@ public class PayslipCalculator_Base
         throws EFapsException
     {
         BigDecimal ret = BigDecimal.ZERO;
-        final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip2Advance);
-        final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.Payslip2Advance.ToLink);
+        // get the instance of the employee the payslip belongs to
+        final Instance emplInst = Instance.get(_parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.number.name));
 
-        final QueryBuilder queryBlder = new QueryBuilder(CIPayroll.Advance);
-        queryBlder.addWhereAttrNotInQuery(CIPayroll.Advance.ID, attrQuery);
-        final MultiPrintQuery multi = queryBlder.getPrint();
-        multi.addAttribute(CIPayroll.Advance.Amount2Pay);
-        multi.execute();
-        while (multi.next()) {
-             final BigDecimal pay = multi.<BigDecimal>getAttribute(CIPayroll.Advance.Amount2Pay);
-             if (pay != null) {
-                 ret = ret.add(pay);
-             }
+        if (emplInst.isValid() && emplInst.getType().isKindOf(CIHumanResource.EmployeeAbstract.getType())) {
+            final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip2Advance);
+            final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.Payslip2Advance.ToLink);
+
+            final QueryBuilder queryBlder = new QueryBuilder(CIPayroll.Advance);
+            queryBlder.addWhereAttrEqValue(CIPayroll.Advance.EmployeeAbstractLink, emplInst.getId());
+            queryBlder.addWhereAttrNotInQuery(CIPayroll.Advance.ID, attrQuery);
+            final MultiPrintQuery multi = queryBlder.getPrint();
+            multi.addAttribute(CIPayroll.Advance.Amount2Pay);
+            multi.execute();
+            while (multi.next()) {
+                final BigDecimal pay = multi.<BigDecimal>getAttribute(CIPayroll.Advance.Amount2Pay);
+                if (pay != null) {
+                    ret = ret.add(pay);
+                }
+            }
         }
         return ret;
     }
