@@ -53,6 +53,10 @@
             <property name="Attribute">CurrencyLink</property>
             <property name="Label">Payroll_Payslip/CurrencyLink.Label</property>
             <property name="ModeCreate">EDITABLE</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                method="rateCurrencyFieldValueUI"
+                name="Sales_InvoiceForm.currencyId.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE" />
         </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>

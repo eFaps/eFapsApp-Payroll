@@ -143,7 +143,7 @@ public class PayslipReport_Base extends Reports
         throws EFapsException
     {
         final Return ret = new Return();
-        final DateTime dateFrom = new DateTime(_parameter.getParameterValue("dateFrom"));
+        final DateTime dateFrom = new DateTime(_parameter.getParameterValue("date"));
 
         final String name = getName4TextFile(PayslipReport_Base.format, dateFrom);
 
@@ -165,7 +165,7 @@ public class PayslipReport_Base extends Reports
     protected String getReportDataText(final Parameter _parameter)
         throws EFapsException
     {
-        final DateTime dateFrom = new DateTime(_parameter.getParameterValue("dateFrom"));
+        final DateTime dateFrom = new DateTime(_parameter.getParameterValue("date"));
         final DateTime dateTo = new DateTime(_parameter.getParameterValue("dateTo"));
         final StringBuilder rep = new StringBuilder();
         final List<Map<String, Object>> values = getReportData(dateFrom, dateTo);

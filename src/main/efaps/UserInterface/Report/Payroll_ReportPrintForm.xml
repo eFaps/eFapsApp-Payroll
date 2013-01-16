@@ -19,15 +19,23 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_ReportPrintForm</name>
-        <field name="dateFrom">
+        <field name="date">
             <property name="Label">Payroll_ReportPrintForm.dateFrom.Label</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                     method="dateValueUI"
+                     name="Payroll_PayslipForm.date.UI_FIELD_VALUE"
+                     event="UI_FIELD_VALUE" />
         </field>
         <field name="dateTo">
             <property name="Label">Payroll_ReportPrintForm.dateTo.Label</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                     method="dateValueUI"
+                     name="Payroll_PayslipForm.duedate.UI_FIELD_VALUE"
+                     event="UI_FIELD_VALUE" />
         </field>
     </definition>
 </ui-form>
