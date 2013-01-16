@@ -63,6 +63,11 @@
                      name="Payroll_CasePositionForm.mode.UI_FIELD_VALUE"
                      event="UI_FIELD_VALUE" method="modeFieldValueUI" />
         </field>
+        <field name="export">
+            <property name="Attribute">ExportReport</property>
+            <property name="Label">Payroll_CasePositionAbstract/ExportReport.Label</property>
+            <property name="SortAble">false</property>
+        </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>

@@ -35,6 +35,7 @@
         <childs>
             <child>Payroll_PayslipMyDesk</child>
             <child>Payroll_CaseMyDesk</child>
+            <child>Payroll_ReportMyDesk</child>
         </childs>
     </definition>
 </ui-menu>

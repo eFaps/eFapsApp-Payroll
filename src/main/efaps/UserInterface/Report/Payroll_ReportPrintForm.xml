@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+
+  Copyright 2009 - 2011 moxter.net S.A.C.
+
+  All Rights Reserved.
+  This program contains proprietary and trade secret information of
+  moxter.net S.A.C. Copyright notice is precautionary only and does not
+  evidence any actual or intended publication of such program.
+
+  Author:          moxter.net S.A.C.
+  Revision:        $Rev: 269 $
+  Last Changed:    $Date: 2011-04-29 16:50:35 -0500 (vie, 29 abr 2011) $
+  Last Changed By: $Author: Jorge Cueva $
+
+--><ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>07ed074a-9c75-4d21-89b1-e755e98ff420</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <file-revision>$Rev: 269 $</file-revision>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_ReportPrintForm</name>
+        <field name="dateFrom">
+            <property name="Label">Payroll_ReportPrintForm.dateFrom.Label</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+        </field>
+        <field name="dateTo">
+            <property name="Label">Payroll_ReportPrintForm.dateTo.Label</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+        </field>
+    </definition>
+</ui-form>

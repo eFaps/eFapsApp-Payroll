@@ -75,7 +75,12 @@
         </field>
         <field name="calculatorESJP">
             <property name="Attribute">CalculatorESJP</property>
-            <property name="Columns">15</property>
+            <property name="Columns">25</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+        </field>
+        <field name="exportReport">
+            <property name="Attribute">ExportReport</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
         </field>

@@ -36,5 +36,10 @@
             <value>false</value>
             <description>Activate creation of transactions when a payslip is created.</description>
         </attribute>
+        <attribute>
+            <key>TaxNumber</key>
+            <value>0</value>
+            <description>TaxNumber of the current company.</description>
+        </attribute>
     </definition>
 </common-systemconfiguration>

@@ -47,6 +47,7 @@
             <column name="DFLT"        type="DECIMAL"                      length="8" scale="2"/>
             <column name="ESJP"        type="STRING_SHORT"                 length="128" />
             <column name="METHOD"      type="STRING_SHORT"                 length="128" />
+            <column name="EXPORT"      type="BOOLEAN" />
             <column name="ACTIONDEFID" type="INTEGER"/>
             <!-- foreign keys -->
             <foreign name="T_PRCASEPOS_PARENTID"   key="PARENTID"      reference="T_PRCASEPOS(ID)"/>

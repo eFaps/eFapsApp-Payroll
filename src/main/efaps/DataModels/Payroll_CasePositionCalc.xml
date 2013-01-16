@@ -37,6 +37,13 @@
         <parent>Payroll_CasePositionAbstract</parent>
         <purpose abstract="true"/>
         <attribute>
+            <name>ExportReport</name>
+            <type>Boolean</type>
+            <sqltable>Payroll_CasePositionSQLTable</sqltable>
+            <sqlcolumn>EXPORT</sqlcolumn>
+            <defaultvalue>false</defaultvalue>
+        </attribute>
+        <attribute>
             <name>DefaultValue</name>
             <type>Decimal</type>
             <sqltable>Payroll_CasePositionSQLTable</sqltable>
