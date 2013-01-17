@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
@@ -52,9 +53,9 @@ import org.joda.time.DateTime;
  * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z
  *          Jorge Cueva $
  */
-@EFapsUUID("382d554b-7372-4b6a-a89d-1affcae5e333")
+@EFapsUUID("551faac7-0ac6-4794-bdd7-44839a746ad5")
 @EFapsRevision("$Rev: 295 $")
-public class PayslipReport_Base extends Reports
+public class LaborTimeReport_Base extends Reports
 {
 
     private static String format = "0601";
@@ -70,11 +71,13 @@ public class PayslipReport_Base extends Reports
         /** */
         DOCNUM("docNum", 15, null),
         /** */
-        REMUCODE("remuCode", 4, null),
+        LABTIMEHOUR("laborTime_Hour", 3, null),
         /** */
-        AMOUNT("amount", 10, 2),
+        LABTIMEMIN("laborTime_Min", 2, null),
         /** */
-        PAYAMOUNT("payAmount", 10, 2);
+        LABEXTIMEHOUR("laborExtraTime_Hour", 3, null),
+        /** */
+        LABEXTIMEMIN("laborExtraTime_Min", 2, null);
         /**
          * key.
          */
@@ -145,18 +148,18 @@ public class PayslipReport_Base extends Reports
         final Return ret = new Return();
         final DateTime dateFrom = new DateTime(_parameter.getParameterValue("date"));
 
-        final String name = getName4TextFile(PayslipReport_Base.format, dateFrom);
+        final String name = getName4TextFile(LaborTimeReport_Base.format, dateFrom);
 
         File file;
         try {
-            file = new FileUtil().getFile(name == null ? "REM" : name, "rem");
+            file = new FileUtil().getFile(name == null ? "JOR" : name, "jor");
             final PrintWriter writer = new PrintWriter(file);
             writer.print(getReportDataText(_parameter).toString());
             writer.close();
             ret.put(ReturnValues.VALUES, file);
             ret.put(ReturnValues.TRUE, true);
         } catch (final IOException e) {
-            throw new EFapsException(PayslipReport_Base.class, "execute.IOException", e);
+            throw new EFapsException(LaborTimeReport_Base.class, "execute.IOException", e);
         }
 
         return ret;
@@ -172,16 +175,18 @@ public class PayslipReport_Base extends Reports
 
         int cont = 1;
         for (final Map<String, Object> map : values) {
-            rep.append(getCharacterValue(map.get(PayslipReport_Base.Field.DOCTYPE.getKey()),
-                                PayslipReport_Base.Field.DOCTYPE)).append(getSeparator())
-                .append(getCharacterValue(map.get(PayslipReport_Base.Field.DOCNUM.getKey()),
-                                PayslipReport_Base.Field.DOCNUM)).append(getSeparator())
-                .append(getNumberValue(map.get(PayslipReport_Base.Field.REMUCODE.getKey()),
-                                PayslipReport_Base.Field.REMUCODE)).append(getSeparator())
-                .append(getNumberValue(map.get(PayslipReport_Base.Field.AMOUNT.getKey()),
-                                PayslipReport_Base.Field.AMOUNT)).append(getSeparator())
-                .append(getNumberValue(map.get(PayslipReport_Base.Field.PAYAMOUNT.getKey()),
-                                PayslipReport_Base.Field.PAYAMOUNT))
+            rep.append(getCharacterValue(map.get(LaborTimeReport_Base.Field.DOCTYPE.getKey()),
+                                LaborTimeReport_Base.Field.DOCTYPE)).append(getSeparator())
+                .append(getCharacterValue(map.get(LaborTimeReport_Base.Field.DOCNUM.getKey()),
+                                LaborTimeReport_Base.Field.DOCNUM)).append(getSeparator())
+                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABTIMEHOUR.getKey()),
+                                LaborTimeReport_Base.Field.LABTIMEHOUR)).append(getSeparator())
+                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABTIMEMIN.getKey()),
+                                LaborTimeReport_Base.Field.LABTIMEMIN)).append(getSeparator())
+                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABEXTIMEHOUR.getKey()),
+                                LaborTimeReport_Base.Field.LABEXTIMEHOUR)).append(getSeparator())
+                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABEXTIMEMIN.getKey()),
+                                LaborTimeReport_Base.Field.LABEXTIMEMIN))
                 .append("\n");
             cont++;
         }
@@ -210,6 +215,7 @@ public class PayslipReport_Base extends Reports
         queryBldr.setOr(true);
 
         final MultiPrintQuery multi = queryBldr.getPrint();
+        multi.addAttribute(CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime);
         final SelectBuilder selDoc = new SelectBuilder()
                     .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
         final SelectBuilder selDocType = new SelectBuilder()
@@ -219,38 +225,39 @@ public class PayslipReport_Base extends Reports
         multi.addSelect(selDoc, selDocType);
         multi.execute();
         while (multi.next()) {
+            final Map<String, Object> value = new HashMap<String, Object>();
+
             final String doc = multi.<String>getSelect(selDoc);
             final String docType = multi.<String>getSelect(selDocType);
+            final Object[] laborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.LaborTime);
+            final Object[] extraLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.ExtraLaborTime);
 
-            final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
-            queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type, CIPayroll.PositionSum.getType().getId());
-            queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
-                            multi.getCurrentInstance().getId());
-            final MultiPrintQuery multi2 = queryBldr2.getPrint();
-            multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
-            final SelectBuilder selCaseName = new SelectBuilder()
-                    .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                    .attribute(CIPayroll.CasePositionAbstract.Name);
-            final SelectBuilder selCaseExp = new SelectBuilder()
-                    .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                    .attribute(CIPayroll.CasePositionCalc.ExportReport);
-            multi2.addSelect(selCaseName, selCaseExp);
-            multi2.execute();
-            while (multi2.next()) {
-                final Map<String, Object> value = new HashMap<String, Object>();
-                final BigDecimal amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
-                final String caseName = multi2.<String>getSelect(selCaseName);
-                final Boolean caseNameExp = multi2.<Boolean>getSelect(selCaseExp);
+            final UoM laborTimeUom = (UoM)laborTimeOb[1];
+            final BigDecimal laborTime = ((BigDecimal)laborTimeOb[0])
+                            .multiply(new BigDecimal(laborTimeUom.getNumerator()))
+                            .divide(new BigDecimal(laborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
+            final Integer laborTimeHour = laborTime.intValue();
+            final Integer laborTimeMin = laborTime.subtract(new BigDecimal(laborTime.intValue()))
+                            .multiply(new BigDecimal(60)).intValue();
 
-                if (caseNameExp != null && caseNameExp) {
-                    value.put(PayslipReport_Base.Field.DOCNUM.getKey(), doc);
-                    value.put(PayslipReport_Base.Field.DOCTYPE.getKey(), docType);
-                    value.put(PayslipReport_Base.Field.REMUCODE.getKey(), caseName);
-                    value.put(PayslipReport_Base.Field.AMOUNT.getKey(), amount);
-                    value.put(PayslipReport_Base.Field.PAYAMOUNT.getKey(), amount);
-                    values.add(value);
-                }
-            }
+            final UoM extraLaborTimeUom = (UoM)extraLaborTimeOb[1];
+            final BigDecimal extraLaborTime = ((BigDecimal)extraLaborTimeOb[0])
+                            .multiply(new BigDecimal(extraLaborTimeUom.getNumerator()))
+                            .divide(new BigDecimal(extraLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
+
+
+            final Integer extraLaborTimeHour = extraLaborTime.intValue();
+            final Integer extraLaborTimeMin = extraLaborTime.subtract(new BigDecimal(extraLaborTime.intValue()))
+                            .multiply(new BigDecimal(60)).intValue();
+
+            value.put(LaborTimeReport_Base.Field.DOCNUM.getKey(), doc);
+            value.put(LaborTimeReport_Base.Field.DOCTYPE.getKey(), docType);
+            value.put(LaborTimeReport_Base.Field.LABTIMEHOUR.getKey(), laborTimeHour);
+            value.put(LaborTimeReport_Base.Field.LABTIMEMIN.getKey(), laborTimeMin);
+            value.put(LaborTimeReport_Base.Field.LABEXTIMEHOUR.getKey(), extraLaborTimeHour);
+            value.put(LaborTimeReport_Base.Field.LABEXTIMEMIN.getKey(), extraLaborTimeMin);
+            values.add(value);
+
         }
 
         Collections.sort(values, new Comparator<Map<String, Object>>()
@@ -259,8 +266,8 @@ public class PayslipReport_Base extends Reports
             public int compare(final Map<String, Object> _o1,
                                final Map<String, Object> _o2)
             {
-                final String name1 = (String) _o1.get(PayslipReport_Base.Field.DOCNUM.getKey());
-                final String name2 = (String) _o2.get(PayslipReport_Base.Field.DOCNUM.getKey());
+                final String name1 = (String) _o1.get(LaborTimeReport_Base.Field.DOCNUM.getKey());
+                final String name2 = (String) _o2.get(LaborTimeReport_Base.Field.DOCNUM.getKey());
                 final int ret = name1.compareTo(name2);
                 return ret;
             }

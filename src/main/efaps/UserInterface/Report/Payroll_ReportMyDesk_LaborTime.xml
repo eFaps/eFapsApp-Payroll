@@ -13,17 +13,17 @@
   Last Changed By: $Author: Jorge Cueva $
 
 --><ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>1aa6aa35-c208-4a96-af0f-c6505c10193f</uuid>
+    <uuid>44fdd6a3-af1b-4a0d-935a-065d6e883eff</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 269 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_ReportMyDesk_Payslip</name>
+        <name>Payroll_ReportMyDesk_LaborTime</name>
 
         <!-- target definitions -->
         <target>
             <form>Payroll_ReportPrintForm</form>
-            <execute program="org.efaps.esjp.payroll.reports.PayslipReport">
+            <execute program="org.efaps.esjp.payroll.reports.LaborTimeReport">
             </execute>
         </target>
         <!-- properties -->

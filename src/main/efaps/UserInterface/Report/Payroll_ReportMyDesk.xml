@@ -22,7 +22,7 @@
         <name>Payroll_ReportMyDesk</name>
         <childs>
             <child>Payroll_ReportMyDesk_Payslip</child>
-
+            <child>Payroll_ReportMyDesk_LaborTime</child>
         </childs>
     </definition>
 </ui-menu>
