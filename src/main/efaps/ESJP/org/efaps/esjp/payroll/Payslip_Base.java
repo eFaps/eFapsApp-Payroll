@@ -1043,9 +1043,11 @@ public abstract class Payslip_Base
                 }
             }
         }
-        dedBldr.append("}\n");
         payBldr.append("}\n");
-        neuBldr.append("}\n");
+        dedBldr.append("}\n");
+        neuBldr.append("positionTableColumns(eFapsTable100);\n")
+            .append("positionTableColumns(eFapsTable200);\n")
+            .append("positionTableColumns(eFapsTable300);\n").append("}\n");
 
         js.append(dedBldr).append(payBldr).append(neuBldr)
             .append(" addNewRows_paymentTable(").append(cred)
