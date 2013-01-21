@@ -981,23 +981,19 @@ public abstract class Payslip_Base
             values.put(name, set);
         }
         final StringBuilder js = new StringBuilder();
-
-        js.append("function removeRows(elName){")
-            .append("e = document.getElementsByName(elName);")
-            .append("zz = e.length;")
-            .append("for (var i=0; i <zz;i++) {")
-            .append("x = e[0].parentNode.parentNode;")
-            .append("var p = x.parentNode;p.removeChild(x);")
-            .append("}}")
-            .append("removeRows('amount_Payment');")
-            .append("removeRows('amount_Deduction');")
-            .append("removeRows('amount_Neutral');");
+        // remove all positions from the tables
+        js.append("require([\"dojo/query\"], function(query){\n")
+            .append("   var rows=query(\".eFapsTableRowOdd, .eFapsTableRowEven\");\n")
+            .append("   rows.forEach(function(row){\n")
+            .append("       dojo.destroy(row);\n")
+            .append("   });\n")
+            .append("});");
         final StringBuilder dedBldr = new StringBuilder();
         final StringBuilder payBldr = new StringBuilder();
         final StringBuilder neuBldr = new StringBuilder();
-        dedBldr.append("function setDeduction(){");
-        payBldr.append("function setPayment(){");
-        neuBldr.append("function setNeutral(){");
+        dedBldr.append("function setDeduction(){\n");
+        payBldr.append("function setPayment(){\n");
+        neuBldr.append("function setNeutral(){\n");
         int deb = 0;
         int cred = 0;
         int neu = 0;
@@ -1019,48 +1015,45 @@ public abstract class Payslip_Base
                     count = neu;
                     neu++;
                 }
-                bldr.append("document.getElementsByName('casePosition").append(value[3])
-                    .append("AutoComplete')[").append(count)
-                    .append("].value='").append(StringEscapeUtils.escapeJavaScript((String) value[1])).append("';")
-                    .append("document.getElementsByName('casePosition").append(value[3])
-                    .append("')[").append(count).append("].value='")
-                    .append(value[0]).append("';")
-                    .append("document.getElementsByName('description").append(value[3])
-                    .append("')[").append(count).append("].appendChild(document.createTextNode('")
-                    .append(StringEscapeUtils.escapeJavaScript((String) value[2])).append("'));");
+                bldr.append("eFapsSetFieldValue(").append(count).append(",'casePosition").append(value[3])
+                    .append("AutoComplete','")
+                    .append(StringEscapeUtils.escapeJavaScript((String) value[1])).append("');\n")
+                    .append("eFapsSetFieldValue(").append(count).append(",'casePosition").append(value[3])
+                    .append("','").append(value[0]).append("');\n")
+                    .append("eFapsSetFieldValue(").append(count).append(",'description").append(value[3])
+                    .append("','").append(StringEscapeUtils.escapeJavaScript((String) value[2])).append("');\n");
                 if (!value[4].equals(MODE.OPTIONAL_DEFAULT.ordinal())) {
-                    bldr .append("x = document.getElementsByName('casePosition").append(value[3])
-                        .append("AutoComplete')[").append(count).append("];")
-                        .append("x.disabled = true;")
-                        .append("var y = x.parentNode.parentNode.firstChild;")
-                        .append("while (y.nodeName != 'DIV') {")
-                        .append("y = y.nextSibling;")
-                        .append("}")
-                        .append("y.innerHTML='';");
+                    bldr.append("var x = document.getElementsByName('casePosition_PaymentAutoComplete')[1];\n")
+                        .append("x.disabled = true;\n")
+                        .append("require([\"dojo/query\"], function(query){\n")
+                        .append("var rows=query(\".eFapsTableRemoveRowCell > *\", x.parentNode.parentNode);\n")
+                        .append("rows.forEach(function(row){\n")
+                        .append("dojo.destroy(row);\n")
+                        .append("});\n")
+                        .append("});\n");
                 }
                 if (value[4].equals(MODE.REQUIRED_NOEDITABLE.ordinal())) {
                     bldr .append("x = document.getElementsByName('amount").append(value[3]).append("')[")
                         .append(count).append("];")
-                        .append("x.readOnly = true;");
+                        .append("x.readOnly = true;\n");
                 }
                 if (value[5] != null) {
-                    bldr.append("document.getElementsByName('amount").append(value[3])
-                        .append("')[").append(count).append("].value='")
-                        .append(formater.format(value[5])).append("';");
+                    bldr.append("eFapsSetFieldValue(").append(count).append(",'amount").append(value[3])
+                        .append("','").append(formater.format(value[5])).append("');\n");
                 }
             }
         }
-        dedBldr.append("}");
-        payBldr.append("}");
-        neuBldr.append("}");
+        dedBldr.append("}\n");
+        payBldr.append("}\n");
+        neuBldr.append("}\n");
 
         js.append(dedBldr).append(payBldr).append(neuBldr)
             .append(" addNewRows_paymentTable(").append(cred)
-            .append(", setPayment, null);")
+            .append(", setPayment, null);\n")
             .append(" addNewRows_deductionTable(").append(deb)
-            .append(", setDeduction, null);")
+            .append(", setDeduction, null);\n")
             .append(" addNewRows_neutralTable(").append(neu)
-            .append(", setNeutral, null);");
+            .append(", setNeutral, null);\n");
 
         ret.put(ReturnValues.SNIPLETT, js.toString());
         return ret;
