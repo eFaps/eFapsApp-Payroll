@@ -152,9 +152,6 @@ public abstract class Payslip_Base
     public Return getJavaScriptUIValue(final Parameter _parameter)
         throws EFapsException
     {
-        if (Context.getThreadContext().getSessionAttribute("payslip") != null) {
-            Context.getThreadContext().setSessionAttribute("payslip", null);
-        }
         final String oid = _parameter.getParameterValue("selectedRow");
         final Instance inst = Instance.get(oid);
         Context.getThreadContext().setSessionAttribute("payslip", inst);
@@ -172,29 +169,30 @@ public abstract class Payslip_Base
 
     /**
      * Method to get the javascript part for setting the values.
-     * @param _instance  instance to be copied
-     * @return  javascript
+     *
+     * @param _instance instance to be copied
+     * @return javascript
      * @throws EFapsException on error
      */
     protected String getSetValuesString(final Instance _instance)
-                    throws EFapsException
+        throws EFapsException
     {
         final StringBuilder js = new StringBuilder();
         final PrintQuery print = new PrintQuery(_instance);
         print.addAttribute(CIPayroll.Payslip.Name,
-                           CIPayroll.Payslip.Note,
-                           CIPayroll.Payslip.LaborTime,
-                           CIPayroll.Payslip.ExtraLaborTime,
-                           CIPayroll.Payslip.Amount2Pay,
-                           CIPayroll.Payslip.AmountCost,
-                           CIPayroll.Payslip.CurrencyLink);
+                        CIPayroll.Payslip.Note,
+                        CIPayroll.Payslip.LaborTime,
+                        CIPayroll.Payslip.ExtraLaborTime,
+                        CIPayroll.Payslip.Amount2Pay,
+                        CIPayroll.Payslip.AmountCost,
+                        CIPayroll.Payslip.CurrencyLink);
         final SelectBuilder selEmpOID = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink).oid();
         final SelectBuilder selEmpNum = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .attribute(CIHumanResource.Employee.Number);
+                        .attribute(CIHumanResource.Employee.Number);
         final SelectBuilder selEmpLastName = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .attribute(CIHumanResource.Employee.LastName);
+                        .attribute(CIHumanResource.Employee.LastName);
         final SelectBuilder selEmpFirstName = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .attribute(CIHumanResource.Employee.FirstName);
+                        .attribute(CIHumanResource.Employee.FirstName);
         print.addSelect(selEmpOID, selEmpLastName, selEmpFirstName, selEmpNum);
         print.execute();
 
@@ -213,110 +211,74 @@ public abstract class Payslip_Base
 
         final Long curId = print.<Long>getAttribute(CIPayroll.Payslip.CurrencyLink);
 
-
         final DecimalFormat formater = getTwoDigitsformater();
 
-        js.append("function removeRows(elName){")
-            .append("e = document.getElementsByName(elName);")
-            .append("zz = e.length;")
-            .append("for (var i=0; i <zz;i++) {")
-            .append("x = e[0].parentNode.parentNode;")
-            .append("var p = x.parentNode;p.removeChild(x);")
-            .append("}}")
-            .append("function setValue() {")
-            .append("document.getElementsByName('currencyLink')[0].value=").append(curId).append(";")
-            .append(getSetFieldValue(0, "number", empOid))
-            .append(getSetFieldValue(0, "numberAutoComplete", empNum))
-            .append(getSetFieldValue(0, "employeeData", empLName + ", " + empFName))
-            .append(getSetFieldValue(0, "laborTime", formater.format(laborTimeVal)))
+        js.append("function setValue() {\n")
+            .append("document.getElementsByName('currencyLink')[0].value=").append(curId).append(";\n")
+            .append(getSetFieldValue(0, "number", empOid)).append("\n")
+            .append(getSetFieldValue(0, "numberAutoComplete", empNum)).append("\n")
+            .append(getSetFieldValue(0, "employeeData", empLName + ", " + empFName)).append("\n")
+            .append(getSetFieldValue(0, "laborTime", formater.format(laborTimeVal))).append("\n")
             .append("document.getElementsByName('laborTimeUoM')[0].value=")
-                .append(laborTimeUoM.getId()).append(";")
-            .append(getSetFieldValue(0, "extraLaborTime", formater.format(extraLaborTimeVal)))
+            .append(laborTimeUoM.getId()).append(";")
+            .append(getSetFieldValue(0, "extraLaborTime", formater.format(extraLaborTimeVal))).append("\n")
             .append("document.getElementsByName('extraLaborTimeUoM')[0].value=")
-                .append(extraLaborTimeUoM.getId()).append(";")
+            .append(extraLaborTimeUoM.getId()).append(";\n")
             .append(getSetFieldValue(0, "amount2Pay", amount2Pay == null
-                            ? BigDecimal.ZERO.toString() : formater.format(amount2Pay)))
+                            ? BigDecimal.ZERO.toString() : formater.format(amount2Pay))).append("\n")
             .append(getSetFieldValue(0, "amountCost", amountCosts == null
-                            ? BigDecimal.ZERO.toString() : formater.format(amountCosts)))
-            .append("}");
+                            ? BigDecimal.ZERO.toString() : formater.format(amountCosts))).append("\n")
+            .append("}\n");
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
         queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _instance.getId());
         final MultiPrintQuery multi = queryBldr.getPrint();
         multi.addAttribute(CIPayroll.PositionAbstract.PositionNumber,
-                            CIPayroll.PositionAbstract.Amount,
-                            CIPayroll.PositionAbstract.Description);
-        final SelectBuilder selCaseOID = new SelectBuilder()
-                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink).oid();
+                        CIPayroll.PositionAbstract.Amount,
+                        CIPayroll.PositionAbstract.Description);
+        final SelectBuilder selCaseInst = new SelectBuilder()
+                        .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink).instance();
         final SelectBuilder selCaseName = new SelectBuilder()
-                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                            .attribute(CIPayroll.CasePositionCalc.Name);
-        multi.addSelect(selCaseOID, selCaseName);
+                        .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
+                        .attribute(CIPayroll.CasePositionCalc.Name);
+        final SelectBuilder selCaseMode = new SelectBuilder()
+            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
+                .attribute(CIPayroll.CasePositionCalc.Mode);
+        multi.addSelect(selCaseInst, selCaseName, selCaseMode);
         multi.execute();
 
-        final Map<Integer, Object[]> values = new TreeMap<Integer, Object[]>();
-
+        final Map<String, Set<Object[]>> values = new TreeMap<String, Set<Object[]>>();
         while (multi.next()) {
-            final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
+            final String name = multi.<String>getSelect(selCaseName);
+            final String desc = multi.<String> getAttribute(CIPayroll.PositionAbstract.Description);
+            final Integer mode = multi.<Integer>getSelect(selCaseMode);
+            final BigDecimal dVal = multi.<BigDecimal> getAttribute( CIPayroll.PositionAbstract.Amount);
 
-            final Object[] value = new Object[] { multi.getSelect(selCaseName),
-                            multi.getSelect(selCaseOID),
-                            multi.getAttribute(CIPayroll.PositionAbstract.Description),
-                            amount,
-                            multi.getCurrentInstance()};
-            values.put(multi.<Integer>getAttribute(CIPayroll.PositionAbstract.PositionNumber), value);
-        }
-
-        final StringBuilder dedBldr = new StringBuilder();
-        final StringBuilder payBldr = new StringBuilder();
-        final StringBuilder neuBldr = new StringBuilder();
-        dedBldr.append("function setDeduction(){");
-        payBldr.append("function setPayment(){");
-        neuBldr.append("function setNeutral(){");
-        int ded = 0;
-        int pay = 0;
-        int neu = 0;
-        if (!values.isEmpty()) {
-            for (final Entry<Integer, Object[]> entry : values.entrySet()) {
-                final Instance instPos = (Instance) entry.getValue()[4];
-                if (instPos.getType().isKindOf(Type.get(CIPayroll.PositionPayment.uuid))) {
-                    payBldr.append(getSetFieldValue(pay, "casePosition_PaymentAutoComplete",
-                                    (String) entry.getValue()[0]))
-                        .append(getSetFieldValue(pay, "casePosition_Payment", (String) entry.getValue()[1]))
-                        .append(getSetFieldValue(pay, "description_Payment", (String) entry.getValue()[2]))
-                        .append(getSetFieldValue(pay, "amount_Payment", formater.format(entry.getValue()[3])));
-                    pay++;
-                } else if (instPos.getType().isKindOf(Type.get(CIPayroll.PositionDeduction.uuid))) {
-                    dedBldr.append(getSetFieldValue(ded, "casePosition_DeductionAutoComplete",
-                                    (String) entry.getValue()[0]))
-                        .append(getSetFieldValue(ded, "casePosition_Deduction", (String) entry.getValue()[1]))
-                        .append(getSetFieldValue(ded, "description_Deduction", (String) entry.getValue()[2]))
-                        .append(getSetFieldValue(ded, "amount_Deduction", formater.format(entry.getValue()[3])));
-                    ded++;
-                } else if (instPos.getType().isKindOf(Type.get(CIPayroll.PositionNeutral.uuid))) {
-                    neuBldr.append(getSetFieldValue(neu, "casePosition_NeutralAutoComplete",
-                                    (String) entry.getValue()[0]))
-                        .append(getSetFieldValue(neu, "casePosition_Neutral", (String) entry.getValue()[1]))
-                        .append(getSetFieldValue(neu, "description_Neutral", (String) entry.getValue()[2]))
-                        .append(getSetFieldValue(neu, "amount_Neutral", formater.format(entry.getValue()[3])));
-                    neu++;
+            final Instance instance = multi.<Instance>getSelect(selCaseInst);
+            final String oid = instance.getOid();
+            String postFix = null;
+            if (instance.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
+                postFix = "_Deduction";
+            } else if (instance.getType().equals(CIPayroll.CasePositionPayment.getType())) {
+                postFix = "_Payment";
+            } else if (instance.getType().equals(CIPayroll.CasePositionNeutral.getType())) {
+                postFix = "_Neutral";
+            }
+            if (postFix != null) {
+                final Object[] value = new Object[] { oid, name, desc, postFix, mode, dVal};
+                Set<Object[]> set;
+                if (values.containsKey(name)) {
+                    set = values.get(name);
+                } else {
+                    set = new HashSet<Object[]>();
                 }
+                set.add(value);
+                values.put(name, set);
             }
         }
-        payBldr.append("}");
-        dedBldr.append("}");
-        neuBldr.append("}");
-        js.append(payBldr).append(dedBldr).append(neuBldr)
-            .append("Wicket.Event.add(window, \"domready\", function(event) {")
-            .append("removeRows('amount_Payment');")
-            .append("removeRows('amount_Deduction');")
-            .append("removeRows('amount_Neutral');")
-            .append("addNewRows_paymentTable(").append(pay).append(", setPayment, null);")
-            .append("addNewRows_deductionTable(").append(ded).append(", setDeduction, null);")
-            .append("addNewRows_neutralTable(").append(neu).append(", setNeutral, null);")
-            .append("setValue();")
+        js.append("Wicket.Event.add(window, \"domready\", function(event) {\n")
+            .append(getJs(values)).append("\n setValue();\n")
             .append(" });");
-
         return js.toString();
     }
 
@@ -980,6 +942,14 @@ public abstract class Payslip_Base
             set.add(value);
             values.put(name, set);
         }
+        ret.put(ReturnValues.SNIPLETT, getJs(values).toString());
+        return ret;
+    }
+
+
+    protected StringBuilder getJs(final Map<String, Set<Object[]>> _values)
+        throws EFapsException
+    {
         final StringBuilder js = new StringBuilder();
         // remove all positions from the tables
         js.append("require([\"dojo/query\"], function(query){\n")
@@ -998,7 +968,7 @@ public abstract class Payslip_Base
         int cred = 0;
         int neu = 0;
         final DecimalFormat formater = getFormater(2, 2);
-        for (final Set<Object[]> set : values.values()) {
+        for (final Set<Object[]> set : _values.values()) {
             for (final Object[] value : set) {
                 final int count;
                 final StringBuilder bldr;
@@ -1015,13 +985,10 @@ public abstract class Payslip_Base
                     count = neu;
                     neu++;
                 }
-                bldr.append("eFapsSetFieldValue(").append(count).append(",'casePosition").append(value[3])
-                    .append("AutoComplete','")
-                    .append(StringEscapeUtils.escapeJavaScript((String) value[1])).append("');\n")
-                    .append("eFapsSetFieldValue(").append(count).append(",'casePosition").append(value[3])
-                    .append("','").append(value[0]).append("');\n")
-                    .append("eFapsSetFieldValue(").append(count).append(",'description").append(value[3])
-                    .append("','").append(StringEscapeUtils.escapeJavaScript((String) value[2])).append("');\n");
+                bldr.append(getSetFieldValue(count, "casePosition" + value[3] + "AutoComplete", value[1].toString()))
+                    .append("\n")
+                    .append(getSetFieldValue(count, "casePosition" + value[3], value[0].toString())).append("\n")
+                    .append(getSetFieldValue(count, "description" + value[3], value[2].toString())).append("\n");
                 if (!value[4].equals(MODE.OPTIONAL_DEFAULT.ordinal())) {
                     bldr.append("var x = document.getElementsByName('casePosition").append(value[3])
                         .append("AutoComplete')[").append(count).append("];\n")
@@ -1039,8 +1006,7 @@ public abstract class Payslip_Base
                         .append("x.readOnly = true;\n");
                 }
                 if (value[5] != null) {
-                    bldr.append("eFapsSetFieldValue(").append(count).append(",'amount").append(value[3])
-                        .append("','").append(formater.format(value[5])).append("');\n");
+                    bldr.append(getSetFieldValue(count, "amount" + value[3], formater.format(value[5]))).append("\n");
                 }
             }
         }
@@ -1057,9 +1023,7 @@ public abstract class Payslip_Base
             .append(", setDeduction, null);\n")
             .append(" addNewRows_neutralTable(").append(neu)
             .append(", setNeutral, null);\n");
-
-        ret.put(ReturnValues.SNIPLETT, js.toString());
-        return ret;
+        return js;
     }
 
     /**
