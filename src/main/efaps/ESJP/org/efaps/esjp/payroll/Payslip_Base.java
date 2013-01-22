@@ -1023,7 +1023,8 @@ public abstract class Payslip_Base
                     .append("eFapsSetFieldValue(").append(count).append(",'description").append(value[3])
                     .append("','").append(StringEscapeUtils.escapeJavaScript((String) value[2])).append("');\n");
                 if (!value[4].equals(MODE.OPTIONAL_DEFAULT.ordinal())) {
-                    bldr.append("var x = document.getElementsByName('casePosition_PaymentAutoComplete')[1];\n")
+                    bldr.append("var x = document.getElementsByName('casePosition").append(value[3])
+                        .append("AutoComplete')[").append(count).append("];\n")
                         .append("x.disabled = true;\n")
                         .append("require([\"dojo/query\"], function(query){\n")
                         .append("var rows=query(\".eFapsTableRemoveRowCell > *\", x.parentNode.parentNode);\n")
@@ -1049,7 +1050,7 @@ public abstract class Payslip_Base
             .append("positionTableColumns(eFapsTable200);\n")
             .append("positionTableColumns(eFapsTable300);\n").append("}\n");
 
-        js.append(dedBldr).append(payBldr).append(neuBldr)
+        js.append(payBldr).append(dedBldr).append(neuBldr)
             .append(" addNewRows_paymentTable(").append(cred)
             .append(", setPayment, null);\n")
             .append(" addNewRows_deductionTable(").append(deb)
@@ -1140,8 +1141,6 @@ public abstract class Payslip_Base
         throws EFapsException
     {
         final Return ret = new Return();
-
-
         final Map<Instance, TablePos> values = new HashMap<Instance, TablePos>();
         analyseTables(_parameter, values, "Deduction");
         analyseTables(_parameter, values, "Payment");
@@ -1161,12 +1160,13 @@ public abstract class Payslip_Base
         });
         final DecimalFormat formater = getFormater(2, 2);
         final StringBuilder html = new StringBuilder();
-        html.append("document.getElementsByName('sums')[0].innerHTML='<table>");
+        html.append("document.getElementsByName('sums')[0].innerHTML='<table style=\"width:50%\">");
         for (final SumPosition pos : sort) {
             if (pos.getMode() != CasePosition_Base.MODE.DEAVTIVATED.ordinal()) {
-                html.append("<tr><td>")
-                    .append(pos.getName()).append("</td><td>")
-                    .append(StringEscapeUtils.escapeJavaScript(pos.getDescription())).append("</td><td>")
+                html.append("<tr>")
+                    .append("<td style=\"font-weight:bold\">").append(pos.getName()).append("</td>")
+                    .append("<td>").append(StringEscapeUtils.escapeJavaScript(pos.getDescription())).append("</td>")
+                    .append("<td style=\"text-align:right\">")
                     .append(formater.format(pos.getResult(_parameter, sums, values))).append("</td></tr>");
             }
         }
