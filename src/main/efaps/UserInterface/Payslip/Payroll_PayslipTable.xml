@@ -38,6 +38,14 @@
             <property name="Label">Payroll_Payslip/Type.Label</property>
             <property name="ShowTypeIcon">true</property>
         </field>
+        <field name="date">
+            <property name="FilterType">FREETEXT</property>
+            <property name="FilterRequired">TRUE</property>
+            <property name="FilterBase">DATABASE</property>
+            <property name="FilterDefault">MONTH:3</property>
+            <property name="Attribute">Date</property>
+            <property name="Label">ERP_DocumentAbstract/Date.Label</property>
+        </field>
         <field name="name">
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Attribute">Name</property>
@@ -89,6 +97,11 @@
             <property name="ModeEdit">NONE</property>
             <property name="Select">linkto[CurrencyLink].attribute[Name]</property>
             <property name="Label">Payroll_Payslip/CurrencyLink.Label</property>
+        </field>
+         <field name="statusAbstract">
+            <property name="ModeEdit">NONE</property>
+            <property name="Attribute">StatusAbstract</property>
+            <property name="Label">Payroll_Payslip/Status.Label</property>
         </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>

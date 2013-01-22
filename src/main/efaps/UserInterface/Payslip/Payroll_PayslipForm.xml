@@ -133,6 +133,11 @@
             <property name="Select">linkto[CurrencyLink].attribute[Name]</property>
             <property name="Label">Payroll_Payslip/CurrencyLink.Label</property>
         </field>
+        <field name="status">
+            <property name="Attribute">Status</property>
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">EDITABLE</property>
+        </field>
         <field name="caseGroup" character="Group">
             <property name="GroupCount">2</property>
             <property name="ModeCreate">READONLY</property>
