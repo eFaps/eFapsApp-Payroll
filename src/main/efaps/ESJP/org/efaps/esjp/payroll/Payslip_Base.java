@@ -952,10 +952,10 @@ public abstract class Payslip_Base
     {
         final StringBuilder js = new StringBuilder();
         // remove all positions from the tables
-        js.append("require([\"dojo/query\"], function(query){\n")
+        js.append("require([\"dojo/query\",\"dojo/dom-construct\"], function(query,domConstruct){\n")
             .append("   var rows=query(\".eFapsTableRowOdd, .eFapsTableRowEven\");\n")
             .append("   rows.forEach(function(row){\n")
-            .append("       dojo.destroy(row);\n")
+            .append("       domConstruct.destroy(row);\n")
             .append("   });\n")
             .append("});");
         final StringBuilder dedBldr = new StringBuilder();
@@ -993,10 +993,10 @@ public abstract class Payslip_Base
                     bldr.append("var x = document.getElementsByName('casePosition").append(value[3])
                         .append("AutoComplete')[").append(count).append("];\n")
                         .append("x.disabled = true;\n")
-                        .append("require([\"dojo/query\"], function(query){\n")
+                        .append("require([\"dojo/query\",\"dojo/dom-construct\"], function(query,domConstruct){\n")
                         .append("var rows=query(\".eFapsTableRemoveRowCell > *\", x.parentNode.parentNode);\n")
                         .append("rows.forEach(function(row){\n")
-                        .append("dojo.destroy(row);\n")
+                        .append("domConstruct.destroy(row);\n")
                         .append("});\n")
                         .append("});\n");
                 }
