@@ -44,5 +44,6 @@
         <!-- properties -->
         <property name="Target">content</property>
         <property name="TargetShowCheckBoxes">true</property>
+        <property name="TargetMode">view</property>
     </definition>
 </ui-command>

@@ -39,6 +39,8 @@
         <field name="casePosition">
             <property name="SelectAlternateOID">linkto[CasePositionAbstractLink].oid</property>
             <property name="Select">linkto[CasePositionAbstractLink].attribute[Name]</property>
+            <property name="Label">Payroll_PositionForm.casePosition.Label</property>
+            <property name="HRef">TREE</property>
             <property name="ModeEdit">READONLY</property>
         </field>
         <field name="description">
@@ -50,6 +52,7 @@
             <property name="ModeEdit">EDITABLE</property>
         </field>
         <field name="currencyLink">
+            <property name="Label">Payroll_PositionForm.currencyLink.Label</property>
             <property name="SelectAlternateOID">linkto[CurrencyLink].oid</property>
             <property name="Select">linkto[CurrencyLink].attribute[Symbol]</property>
             <property name="ModeEdit">READONLY</property>
