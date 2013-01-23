@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2009 The eFaps Team
+ * Copyright 2003 - 2013 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,12 +49,12 @@ import org.joda.time.DateTime;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z
- *          Jorge Cueva $
+ * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z Jorge Cueva $
  */
 @EFapsUUID("382d554b-7372-4b6a-a89d-1affcae5e333")
 @EFapsRevision("$Rev: 295 $")
-public class PayslipReport_Base extends Reports
+public abstract class PayslipReport_Base
+    extends AbstractReports
 {
 
     private static String format = "0601";
@@ -75,6 +75,7 @@ public class PayslipReport_Base extends Reports
         AMOUNT("amount", 10, 2),
         /** */
         PAYAMOUNT("payAmount", 10, 2);
+
         /**
          * key.
          */
@@ -169,11 +170,15 @@ public class PayslipReport_Base extends Reports
         final DateTime dateTo = new DateTime(_parameter.getParameterValue("dateTo"));
         final StringBuilder rep = new StringBuilder();
         final List<Map<String, Object>> values = getReportData(dateFrom, dateTo);
-
-        int cont = 1;
+        boolean first = true;
         for (final Map<String, Object> map : values) {
+            if (first) {
+                first = false;
+            } else {
+                rep.append("\r\n");
+            }
             rep.append(getCharacterValue(map.get(PayslipReport_Base.Field.DOCTYPE.getKey()),
-                                PayslipReport_Base.Field.DOCTYPE)).append(getSeparator())
+                            PayslipReport_Base.Field.DOCTYPE)).append(getSeparator())
                 .append(getCharacterValue(map.get(PayslipReport_Base.Field.DOCNUM.getKey()),
                                 PayslipReport_Base.Field.DOCNUM)).append(getSeparator())
                 .append(getNumberValue(map.get(PayslipReport_Base.Field.REMUCODE.getKey()),
@@ -181,17 +186,17 @@ public class PayslipReport_Base extends Reports
                 .append(getNumberValue(map.get(PayslipReport_Base.Field.AMOUNT.getKey()),
                                 PayslipReport_Base.Field.AMOUNT)).append(getSeparator())
                 .append(getNumberValue(map.get(PayslipReport_Base.Field.PAYAMOUNT.getKey()),
-                                PayslipReport_Base.Field.PAYAMOUNT))
-                .append("\n");
-            cont++;
+                                            PayslipReport_Base.Field.PAYAMOUNT)).append(getSeparator());
         }
+        AbstractReports_Base.LOG.debug(rep.toString());
         return rep.toString();
     }
 
     protected List<Map<String, Object>> getReportData(final DateTime _dateFrom,
-                                                        final DateTime _dateTo)
+                                                      final DateTime _dateTo)
         throws EFapsException
     {
+        AbstractReports_Base.LOG.debug("dateFrom: '{}' dateTo: '{}'", _dateFrom, _dateTo);
         final List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
 
         final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
@@ -211,11 +216,11 @@ public class PayslipReport_Base extends Reports
 
         final MultiPrintQuery multi = queryBldr.getPrint();
         final SelectBuilder selDoc = new SelectBuilder()
-                    .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
+                        .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
         final SelectBuilder selDocType = new SelectBuilder()
-                    .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                    .linkto(CIHumanResource.Employee.NumberTypeLink)
-                    .attribute(CIHumanResource.AttributeDefinitionNumberType.Value);
+                        .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                        .linkto(CIHumanResource.Employee.NumberTypeLink)
+                        .attribute(CIHumanResource.AttributeDefinitionNumberType.Value);
         multi.addSelect(selDoc, selDocType);
         multi.execute();
         while (multi.next()) {
@@ -229,11 +234,11 @@ public class PayslipReport_Base extends Reports
             final MultiPrintQuery multi2 = queryBldr2.getPrint();
             multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
             final SelectBuilder selCaseName = new SelectBuilder()
-                    .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                    .attribute(CIPayroll.CasePositionAbstract.Name);
+                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
+                            .attribute(CIPayroll.CasePositionAbstract.Name);
             final SelectBuilder selCaseExp = new SelectBuilder()
-                    .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                    .attribute(CIPayroll.CasePositionCalc.ExportReport);
+                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
+                            .attribute(CIPayroll.CasePositionCalc.ExportReport);
             multi2.addSelect(selCaseName, selCaseExp);
             multi2.execute();
             while (multi2.next()) {
@@ -255,6 +260,7 @@ public class PayslipReport_Base extends Reports
 
         Collections.sort(values, new Comparator<Map<String, Object>>()
         {
+
             @Override
             public int compare(final Map<String, Object> _o1,
                                final Map<String, Object> _o2)

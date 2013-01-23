@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2012 The eFaps Team
+ * Copyright 2003 - 2013 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  */
 @EFapsUUID("2857ae54-8c14-4cfa-bd33-c0d166e23978")
 @EFapsRevision("$Rev: 8514 $")
-public class Reports
-    extends Reports_Base
+public abstract class AbstractReports
+    extends AbstractReports_Base
 {
 
 }

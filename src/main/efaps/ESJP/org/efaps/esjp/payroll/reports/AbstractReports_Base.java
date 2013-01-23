@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2009 The eFaps Team
+ * Copyright 2003 - 2013 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,18 +27,24 @@ import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z
- *          Jorge Cueva $
+ * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z Jorge Cueva $
  */
 @EFapsUUID("275b47ff-d9ac-4c68-a809-f2f7b2d165f7")
 @EFapsRevision("$Rev: 295 $")
-public class Reports_Base
+public abstract class AbstractReports_Base
 {
+    /**
+     * Logger for this classes.
+     */
+    protected final static Logger LOG = LoggerFactory.getLogger(AbstractReports_Base.class);
+
     /**
      * Definitions for Columns.
      */
@@ -112,7 +118,7 @@ public class Reports_Base
                     valStr = "" + ((BigDecimal) _value).intValue();
                 }
             } catch (final ArithmeticException e) {
-                throw new EFapsException(Reports_Base.class, "execute.IOException", e);
+                throw new EFapsException(AbstractReports_Base.class, "execute.IOException", e);
             }
         } else if (_value instanceof String) {
             valStr = ((String) _value).replace(",", ".");
