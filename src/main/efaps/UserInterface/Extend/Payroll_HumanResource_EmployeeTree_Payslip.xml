@@ -33,6 +33,11 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_HumanResource_EmployeeTree_Payslip</name>
+        <access>
+            <role>Payroll_Admin</role>
+            <role>Payroll_Modifier</role>
+            <role>Payroll_Reader</role>
+        </access>
         <target>
             <menu>Payroll_HumanResource_EmployeeTree_Payslip_Menu</menu>
             <table>Payroll_PayslipTable</table>

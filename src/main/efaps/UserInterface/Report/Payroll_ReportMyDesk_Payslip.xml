@@ -19,7 +19,11 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_ReportMyDesk_Payslip</name>
-
+        <access>
+            <role>Payroll_Admin</role>
+            <role>Payroll_Modifier</role>
+            <role>Payroll_Reader</role>
+        </access>
         <!-- target definitions -->
         <target>
             <form>Payroll_ReportPrintForm</form>
