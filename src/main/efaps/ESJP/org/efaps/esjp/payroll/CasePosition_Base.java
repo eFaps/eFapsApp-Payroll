@@ -18,7 +18,6 @@
  * Last Changed By: $Author$
  */
 
-
 package org.efaps.esjp.payroll;
 
 import java.util.ArrayList;
@@ -46,35 +45,51 @@ import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.Update;
+import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
-
-
 
 /**
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: CasePosition_Base.java 7956 2012-09-07 15:37:31Z
+ *          jorge.cueva@moxter.net $
  */
 @EFapsUUID("55f00ed3-4110-4e5d-b57c-9f1ee9f983ba")
 @EFapsRevision("$Rev$")
 public abstract class CasePosition_Base
 {
-    public enum MODE {
+
+    /**
+     * List of miodes for the Positions.
+     */
+    public enum MODE
+    {
+        /** deavtivated. */
         DEAVTIVATED,
+        /** optional. */
         OPTIONAL,
+        /** optional and active by default. */
         OPTIONAL_DEFAULT,
+        /** required and editable. */
         REQUIRED_EDITABLE,
+        /** required and not editable. */
         REQUIRED_NOEDITABLE;
 
-        public String getLabel() {
+        /**
+         * @return the label string
+         */
+        public String getLabel()
+        {
             return DBProperties.getProperty("CasePosition.MODE." + ordinal());
         }
     }
 
     /**
      * Create a position.
+     *
      * @param _parameter Parameter as passed from the eFaps API
      * @return new Return
      * @throws EFapsException on error
@@ -88,7 +103,7 @@ public abstract class CasePosition_Base
         final Instance parent = _parameter.getInstance();
         final long caseID;
         if (parent.getType().isKindOf(CIPayroll.CaseAbstract.getType())) {
-            caseID =  parent.getId();
+            caseID = parent.getId();
         } else {
             final PrintQuery print = new PrintQuery(parent);
             print.addAttribute(CIPayroll.CasePositionAbstract.CaseAbstractLink);
@@ -109,20 +124,37 @@ public abstract class CasePosition_Base
         }
         pos++;
         final Insert insert = new Insert(command.getTargetCreateType());
-        insert.add(CIPayroll.CasePositionAbstract.Name, _parameter.getParameterValue("name"));
-        insert.add(CIPayroll.CasePositionAbstract.Description, _parameter.getParameterValue("description"));
-        insert.add(CIPayroll.CasePositionAbstract.Mode, _parameter.getParameterValue("mode"));
+        insert.add(CIPayroll.CasePositionAbstract.Name,
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_CasePositionForm.name.name));
+        insert.add(CIPayroll.CasePositionAbstract.Description,
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_CasePositionForm.description.name));
+        insert.add(CIPayroll.CasePositionAbstract.Mode,
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_CasePositionForm.mode.name));
         insert.add(CIPayroll.CasePositionAbstract.CaseAbstractLink, caseID);
         insert.add(CIPayroll.CasePositionAbstract.Sorted, pos);
         if (!parent.getType().isKindOf(CIPayroll.CaseAbstract.getType())) {
             insert.add(CIPayroll.CasePositionAbstract.ParentAbstractLink, parent.getId());
         }
-        if ( _parameter.getParameterValue("actionDefinitionLink") != null
-                        && !_parameter.getParameterValue("actionDefinitionLink").isEmpty()
-                        && !"null".equals(_parameter.getParameterValue("actionDefinitionLink"))) {
-            insert.add(CIPayroll.CasePositionCalc.ActionDefinitionLink,
-                            _parameter.getParameterValue("actionDefinitionLink"));
+        if (_parameter.getParameterValue(CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name) != null
+                        && !_parameter.getParameterValue(
+                                        CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name)
+                                        .isEmpty()
+                        && !"null".equals(_parameter.getParameterValue(
+                                        CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name))) {
+            insert.add(CIPayroll.CasePositionCalc.ActionDefinitionLink, _parameter.getParameterValue(
+                            CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name));
         }
+        if (_parameter.getParameterValue(CIFormPayroll.Payroll_CasePosition2CalcForm.calculatorESJP.name) != null) {
+            insert.add(CIPayroll.CasePositionCalc.CalculatorESJP,_parameter.getParameterValue(
+                            CIFormPayroll.Payroll_CasePosition2CalcForm.calculatorESJP.name));
+            insert.add(CIPayroll.CasePositionCalc.CalculatorMethod,_parameter.getParameterValue(
+                            CIFormPayroll.Payroll_CasePosition2CalcForm.calculatorMethod.name));
+            insert.add(CIPayroll.CasePositionCalc.DefaultValue,_parameter.getParameterValue(
+                            CIFormPayroll.Payroll_CasePosition2CalcForm.defaultValue.name));
+            insert.add(CIPayroll.CasePositionCalc.ExportReport,_parameter.getParameterValue(
+                            CIFormPayroll.Payroll_CasePosition2CalcForm.exportReport.name));
+        }
+
         insert.execute();
 
         return new Return();
@@ -130,6 +162,7 @@ public abstract class CasePosition_Base
 
     /**
      * Get the html snipplet for the field continaing the mode.
+     *
      * @param _parameter Parameter as passed from the eFaps API
      * @return new Return
      * @throws EFapsException on error
@@ -146,7 +179,7 @@ public abstract class CasePosition_Base
                         || TargetMode.EDIT.equals(_parameter.get(ParameterValues.ACCESSMODE))) {
             for (final MODE mode : CasePosition.MODE.values()) {
                 html.append("<input type=\"radio\" name=\"").append(fieldValue.getField().getName())
-                    .append("\" value=\"").append(mode.ordinal()).append("\" ");
+                                .append("\" value=\"").append(mode.ordinal()).append("\" ");
                 if (new Integer(mode.ordinal()).equals(ordinal)) {
                     html.append("checked=\"checked\"");
                 }
@@ -161,6 +194,7 @@ public abstract class CasePosition_Base
 
     /**
      * Move a caseposition one position up or down.
+     *
      * @param _parameter Parameter as passed from the eFaps API
      * @return new Return
      * @throws EFapsException on error
@@ -221,6 +255,7 @@ public abstract class CasePosition_Base
 
     /**
      * Executed on autocomplete event for the caseposition field.
+     *
      * @param _parameter Parameter as passed from the eFaps API
      * @return values for autocomplete
      * @throws EFapsException on error
@@ -244,7 +279,7 @@ public abstract class CasePosition_Base
         }
         final MultiPrintQuery multi = queryBldr.getPrint();
         multi.addAttribute(CIPayroll.CasePositionAbstract.Name,
-                           CIPayroll.CasePositionAbstract.Description);
+                        CIPayroll.CasePositionAbstract.Description);
         multi.execute();
 
         while (multi.next()) {
@@ -253,9 +288,9 @@ public abstract class CasePosition_Base
             final String oid = multi.getCurrentInstance().getOid();
             final Map<String, String> map = new HashMap<String, String>();
             final String choice = name + " - " + descr;
-            map.put("eFapsAutoCompleteKEY", oid);
-            map.put("eFapsAutoCompleteVALUE", name);
-            map.put("eFapsAutoCompleteCHOICE", choice);
+            map.put(EFapsKey.AUTOCOMPLETE_KEY.getKey(), oid);
+            map.put(EFapsKey.AUTOCOMPLETE_VALUE.getKey(), name);
+            map.put(EFapsKey.AUTOCOMPLETE_CHOICE.getKey(), choice);
             map.put("description_" + postfix, descr);
             sortMap.put(choice, map);
         }
@@ -269,6 +304,7 @@ public abstract class CasePosition_Base
 
     /**
      * Executed on update event for the caseposition field.
+     *
      * @param _parameter Parameter as passed from the eFaps API
      * @return values to be updated
      * @throws EFapsException on error
