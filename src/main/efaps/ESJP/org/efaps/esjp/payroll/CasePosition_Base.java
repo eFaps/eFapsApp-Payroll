@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2010 The eFaps Team
+ * Copyright 2003 - 2013 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import org.efaps.db.QueryBuilder;
 import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.common.uisearch.Search;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
 
@@ -145,13 +146,13 @@ public abstract class CasePosition_Base
                             CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name));
         }
         if (_parameter.getParameterValue(CIFormPayroll.Payroll_CasePosition2CalcForm.calculatorESJP.name) != null) {
-            insert.add(CIPayroll.CasePositionCalc.CalculatorESJP,_parameter.getParameterValue(
+            insert.add(CIPayroll.CasePositionCalc.CalculatorESJP, _parameter.getParameterValue(
                             CIFormPayroll.Payroll_CasePosition2CalcForm.calculatorESJP.name));
-            insert.add(CIPayroll.CasePositionCalc.CalculatorMethod,_parameter.getParameterValue(
+            insert.add(CIPayroll.CasePositionCalc.CalculatorMethod, _parameter.getParameterValue(
                             CIFormPayroll.Payroll_CasePosition2CalcForm.calculatorMethod.name));
-            insert.add(CIPayroll.CasePositionCalc.DefaultValue,_parameter.getParameterValue(
+            insert.add(CIPayroll.CasePositionCalc.DefaultValue, _parameter.getParameterValue(
                             CIFormPayroll.Payroll_CasePosition2CalcForm.defaultValue.name));
-            insert.add(CIPayroll.CasePositionCalc.ExportReport,_parameter.getParameterValue(
+            insert.add(CIPayroll.CasePositionCalc.ExportReport, _parameter.getParameterValue(
                             CIFormPayroll.Payroll_CasePosition2CalcForm.exportReport.name));
         }
 
@@ -316,4 +317,36 @@ public abstract class CasePosition_Base
         return ret;
     }
 
+    /**
+     * Search for Postions only in the same case
+     *
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return values to be updated
+     * @throws EFapsException on error
+     */
+    public Return search(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Search search = new Search()
+        {
+
+            @Override
+            protected void add2QueryBuilder(final Parameter _parameter,
+                                            final QueryBuilder _queryBldr)
+                throws EFapsException
+            {
+                final Instance casePosInst = _parameter.getInstance();
+
+                if (casePosInst.isValid() && casePosInst.getType().isKindOf(CIPayroll.CasePositionAbstract.getType())) {
+                    final PrintQuery print = new PrintQuery(casePosInst);
+                    print.addAttribute(CIPayroll.CasePositionAbstract.CaseAbstractLink);
+                    print.executeWithoutAccessCheck();
+
+                    _queryBldr.addWhereAttrEqValue(CIPayroll.CasePositionAbstract.CaseAbstractLink,
+                                    print.getAttribute(CIPayroll.CasePositionAbstract.CaseAbstractLink));
+                }
+            }
+        };
+        return search.execute(_parameter);
+    }
 }

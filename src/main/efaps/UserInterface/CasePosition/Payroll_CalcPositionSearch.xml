@@ -38,7 +38,7 @@
         <target>
             <form>Payroll_CasePositionForm</form>
             <table>Payroll_CasePositionTable</table>
-            <evaluate program="org.efaps.esjp.common.uisearch.Search">
+            <evaluate program="org.efaps.esjp.payroll.CasePosition" method="search">
                 <property name="Types">Payroll_CasePositionSumAbstract</property>
                 <property name="ExpandChildTypes">true</property>
             </evaluate>
