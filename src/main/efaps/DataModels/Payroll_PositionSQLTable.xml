@@ -37,17 +37,22 @@
         <database>
             <table-name>T_PRPOSITION</table-name>
             <!-- columns -->
-            <column name="TYPEID"      type="INTEGER"      not-null="true" />
-            <column name="DOCID"       type="INTEGER"      not-null="true"/>
-            <column name="CASEPOSID"   type="INTEGER"      not-null="true"/>
-            <column name="POS"         type="INTEGER"      not-null="true"/>
-            <column name="DESCR"       type="STRING_SHORT" not-null="true" length="512" />
-            <column name="AMOUNT"      type="DECIMAL"      not-null="true" length="20" scale="2"/>
-            <column name="CURRENCYID"  type="INTEGER"      not-null="true"  />
+            <column name="TYPEID"           type="INTEGER"      not-null="true" />
+            <column name="DOCID"            type="INTEGER"      not-null="true"/>
+            <column name="CASEPOSID"        type="INTEGER"      not-null="true"/>
+            <column name="POS"              type="INTEGER"      not-null="true"/>
+            <column name="DESCR"            type="STRING_SHORT" not-null="true" length="512" />
+            <column name="AMOUNT"           type="DECIMAL"      not-null="true" length="20" scale="2"/>
+            <column name="CURRENCYID"       type="INTEGER"      not-null="true"  />
+            <column name="RATECURRENCYID"   type="INTEGER"      not-null="true"/>
+            <column name="RATEAMOUNT"       type="DECIMAL"      not-null="true" length="20" scale="2"/>
+            <column name="RATE"             type="DECIMAL"      not-null="true" length="14" scale="6"/>
+            <column name="RATEDENOM"        type="DECIMAL"      not-null="true" length="14" scale="6" />
             <!-- foreign keys -->
             <foreign name="T_PRPOSITION_DOCID"           key="DOCID"           reference="T_ERPDOC(ID)"/>
             <foreign name="T_PRPOSITION_CASEPOSID"       key="CASEPOSID"       reference="T_PRCASEPOS(ID)"/>
             <foreign name="T_PRPOSITION_CURRENCYID"      key="CURRENCYID"      reference="T_ERPCUR(ID)"/>
+            <foreign name="T_PRPOSITION_RATECURRENCYID"  key="RATECURRENCYID"  reference="T_ERPCUR(ID)"/>
         </database>
     </definition>
 

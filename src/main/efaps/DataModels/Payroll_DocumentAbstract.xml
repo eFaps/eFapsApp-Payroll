@@ -34,7 +34,7 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_DocumentAbstract</name>
-        <parent>ERP_DocumentAbstract</parent>
+        <parent>Sales_DocumentSumAbstract</parent>
         <purpose abstract="true"/>
         <attribute>
             <name>EmployeeAbstractLink</name>
@@ -44,29 +44,10 @@
             <sqlcolumn>EMPLOYEEID</sqlcolumn>
         </attribute>
         <attribute>
-            <name>Amount2Pay</name>
-            <type>Decimal</type>
-            <sqltable>Payroll_DocumentSQLTable</sqltable>
-            <sqlcolumn>AMOUNTPAY</sqlcolumn>
-        </attribute>
-        <attribute>
             <name>AmountCost</name>
             <type>Decimal</type>
             <sqltable>Payroll_DocumentSQLTable</sqltable>
             <sqlcolumn>AMOUNTCOST</sqlcolumn>
-        </attribute>
-        <attribute>
-            <name>CurrencyLink</name>
-            <type>LinkWithRanges</type>
-            <typelink>ERP_Currency</typelink>
-            <sqltable>Payroll_DocumentSQLTable</sqltable>
-            <sqlcolumn>CURRENCYID</sqlcolumn>
-            <trigger program="org.efaps.esjp.admin.datamodel.RangesValue"
-                name="Payroll_DocumentAbstract.CurrencyLink.RANGE_VALUE"
-                event="RANGE_VALUE">
-                <property name="Value">Name</property>
-                <property name="Type">ERP_Currency</property>
-            </trigger>
         </attribute>
         <attribute>
             <name>LaborTime</name>

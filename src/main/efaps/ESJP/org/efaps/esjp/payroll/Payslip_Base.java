@@ -30,9 +30,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,7 +67,6 @@ import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.datamodel.ui.FieldValue;
-import org.efaps.admin.datamodel.ui.UIInterface;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
@@ -95,10 +92,11 @@ import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
-import org.efaps.esjp.erp.CommonDocument;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.Rate;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
+import org.efaps.esjp.sales.PriceUtil;
+import org.efaps.esjp.sales.document.DocumentSum;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
@@ -115,13 +113,8 @@ import org.slf4j.LoggerFactory;
 @EFapsUUID("f1c7d3d5-23d2-4d72-a5d4-3c811a159062")
 @EFapsRevision("$Rev$")
 public abstract class Payslip_Base
-    extends CommonDocument
+    extends DocumentSum
 {
-
-    /**
-     * Classloader used for EventDefinition.
-     */
-    private static final EFapsClassLoader CLASSLOADER =  new EFapsClassLoader(Payslip.class.getClassLoader());
 
     /**
      * Logger for this classes.
@@ -129,25 +122,198 @@ public abstract class Payslip_Base
     protected static final Logger LOG = LoggerFactory.getLogger(Payslip_Base.class);
 
     /**
-     * @return a formater used to format bigdecimal for the user interface
-     * @param _maxFrac maximum Faction, null to deactivate
-     * @param _minFrac minimum Faction, null to activate
+     * Classloader used for EventDefinition.
+     */
+    protected static final EFapsClassLoader CLASSLOADER =  new EFapsClassLoader(Payslip.class.getClassLoader());
+
+    /**
+     * Create a payslip.
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return new Return
      * @throws EFapsException on error
      */
-    protected DecimalFormat getFormater(final Integer _minFrac,
-                                        final Integer _maxFrac)
+    public Return create(final Parameter _parameter)
         throws EFapsException
     {
-        final DecimalFormat formater = (DecimalFormat) NumberFormat.getInstance(Context.getThreadContext().getLocale());
-        if (_maxFrac != null) {
-            formater.setMaximumFractionDigits(_maxFrac);
+        Return ret = new Return();
+
+        final String name = getDocName4Create(_parameter);
+
+        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
+        final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
+        final Long employeeid = Instance.get(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.number.name)).getId();
+        final String laborTimes = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
+        final String laborTimeUoMs = _parameter.getParameterValue("laborTimeUoM");
+        final String extraLaborTimes = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
+        final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
+        final String amount2Pay = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amount2Pay.name);
+        final String amountCosts = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amountCost.name);
+        final String currencyLinks = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.currencyLink.name);
+        try {
+            final DecimalFormat formater = getFormater(2, 2);
+
+            final Instance baseCurIns = SystemConfiguration.get(
+                            UUID.fromString("c9a1cbc3-fd35-4463-80d2-412422a3802f")).getLink("CurrencyBase");
+
+            final Instance rateCurrInst = Instance.get(CIERP.Currency.getType(), currencyLinks);
+
+            final PriceUtil util = new PriceUtil();
+            final BigDecimal[] rates = util.getExchangeRate(util.getDateFromParameter(_parameter), rateCurrInst);
+            final CurrencyInst cur = new CurrencyInst(rateCurrInst);
+            final Object[] rate = new Object[] { cur.isInvert() ? BigDecimal.ONE : rates[1],
+                            cur.isInvert() ? rates[1] : BigDecimal.ONE };
+            final BigDecimal ratePay = amount2Pay != null && !amount2Pay.isEmpty()
+                                                        ? (BigDecimal) formater.parse(amount2Pay)
+                                                        : BigDecimal.ZERO;
+            final BigDecimal rateCost = amountCosts != null && !amountCosts.isEmpty()
+                                                        ? (BigDecimal) formater.parse(amountCosts)
+                                                        : BigDecimal.ZERO;
+            final BigDecimal time = laborTimes != null && !laborTimes.isEmpty()
+                                                        ? (BigDecimal) formater.parse(laborTimes)
+                                                        : BigDecimal.ZERO;
+            final BigDecimal extraTime = extraLaborTimes != null && !extraLaborTimes.isEmpty()
+                                                        ? (BigDecimal) formater.parse(extraLaborTimes)
+                            : BigDecimal.ZERO;
+            final BigDecimal pay = ratePay.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : ratePay
+                            .setScale(8, BigDecimal.ROUND_HALF_UP).divide(rates[0], BigDecimal.ROUND_HALF_UP)
+                            .setScale(2, BigDecimal.ROUND_HALF_UP);
+            final BigDecimal cost = rateCost.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rateCost
+                            .setScale(8, BigDecimal.ROUND_HALF_UP).divide(rates[0], BigDecimal.ROUND_HALF_UP)
+                            .setScale(2, BigDecimal.ROUND_HALF_UP);
+
+            final Insert insert = new Insert(CIPayroll.Payslip);
+            insert.add(CIPayroll.Payslip.Name, name);
+            insert.add(CIPayroll.Payslip.Date, date);
+            insert.add(CIPayroll.Payslip.DueDate, dueDate);
+            insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
+            insert.add(CIPayroll.Payslip.StatusAbstract,
+                            ((Long) Status.find(CIPayroll.PayslipStatus.uuid, "Open").getId()).toString());
+            insert.add(CIPayroll.Payslip.RateCrossTotal, ratePay);
+            insert.add(CIPayroll.Payslip.RateNetTotal, ratePay);
+            insert.add(CIPayroll.Payslip.Rate, rate);
+            insert.add(CIPayroll.Payslip.CrossTotal, pay);
+            insert.add(CIPayroll.Payslip.NetTotal, pay);
+            insert.add(CIPayroll.Payslip.DiscountTotal, 0);
+            insert.add(CIPayroll.Payslip.RateDiscountTotal, 0);
+            insert.add(CIPayroll.Payslip.AmountCost, cost);
+            insert.add(CIPayroll.Payslip.CurrencyId, baseCurIns.getId());
+            insert.add(CIPayroll.Payslip.RateCurrencyId, currencyLinks);
+            insert.add(CIPayroll.Payslip.LaborTime, new Object[] { time, laborTimeUoMs });
+            insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraTime, extraLaborTimeUoMs });
+            insert.execute();
+            final Map<Instance, TablePos> values = new HashMap<Instance, TablePos>();
+            analyseTables(_parameter, values, "Deduction");
+            analyseTables(_parameter, values, "Payment");
+            analyseTables(_parameter, values, "Neutral");
+
+            final Map<Instance, Position> sums = analysePositions(_parameter);
+
+            final List<InsertPos> list = new ArrayList<InsertPos>();
+            for (final Position pos : sums.values()) {
+                if (pos instanceof SumPosition) {
+                    list.add(new InsertPos(pos, _parameter, sums, values));
+                }
+            }
+            for (final Entry<Instance, TablePos> entry : values.entrySet()) {
+                for (final BigDecimal amount : entry.getValue().getValues()) {
+                    list.add(new InsertPos(entry.getKey(), amount));
+                }
+            }
+            Collections.sort(list, new Comparator<InsertPos>() {
+                @Override
+                public int compare(final InsertPos _insertPos1,
+                                   final InsertPos _insertPos2)
+                {
+                    return _insertPos1.getSorted().compareTo(_insertPos2.getSorted());
+                }
+            });
+            // Payroll-Configuration
+            final SystemConfiguration config = SystemConfiguration.get(
+                            UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e"));
+
+            final boolean active = config.getAttributeValueAsBoolean("ActivateAccountingTransaction");
+            if (active) {
+                createTransaction(_parameter, list);
+            }
+
+            BigDecimal sumDeduction = BigDecimal.ZERO;
+            BigDecimal sumPayment = BigDecimal.ZERO;
+            BigDecimal sumNeutral = BigDecimal.ZERO;
+            int i = 1;
+            for (final InsertPos pos : list) {
+                final Insert insertPos = new Insert(pos.getType());
+                if (pos.getType().equals(CIPayroll.PositionDeduction.getType())) {
+                    sumDeduction = sumDeduction.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
+                } else if (pos.getType().equals(CIPayroll.PositionNeutral.getType())) {
+                    sumNeutral = sumNeutral.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
+                } else if (pos.getType().equals(CIPayroll.PositionPayment.getType())) {
+                    sumPayment = sumPayment.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
+                }
+                insertPos.add(CIPayroll.PositionAbstract.Amount, pos.getAmount().setScale(8, BigDecimal.ROUND_HALF_UP)
+                                .divide(rates[0], BigDecimal.ROUND_HALF_UP)
+                                .setScale(2, BigDecimal.ROUND_HALF_UP));
+                insertPos.add(CIPayroll.PositionAbstract.CasePositionAbstractLink, pos.getId());
+                insertPos.add(CIPayroll.PositionAbstract.Rate, rate);
+                insertPos.add(CIPayroll.PositionAbstract.CurrencyLink, baseCurIns.getId());
+                insertPos.add(CIPayroll.PositionAbstract.RateCurrencyLink, rateCurrInst.getId());
+                insertPos.add(CIPayroll.PositionAbstract.RateAmount,
+                                pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
+                insertPos.add(CIPayroll.PositionAbstract.Description, pos.getDescription());
+                insertPos.add(CIPayroll.PositionAbstract.DocumentAbstractLink, insert.getInstance().getId());
+                insertPos.add(CIPayroll.PositionAbstract.PositionNumber, i);
+                insertPos.execute();
+                i++;
+            }
+            if (amount2Pay == null && amountCosts == null) {
+                setAmounts(_parameter, insert.getInstance(), list, rates);
+            }
+
+            _parameter.put(ParameterValues.INSTANCE, insert.getInstance());
+            final StandartReport report = new StandartReport();
+            final String fileName = CIPayroll.Payslip.getType().getName() + "_" + name;
+            report.setFileName(fileName);
+            report.getJrParameters().put("sumDeduction", sumDeduction);
+            report.getJrParameters().put("sumPayment", sumPayment);
+            report.getJrParameters().put("sumNeutral", sumNeutral);
+            report.getJrParameters().put("sumTotal", sumPayment.subtract(sumDeduction));
+
+            if (Context.getThreadContext().getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS) != null) {
+                @SuppressWarnings("unchecked")
+                final
+                Map<String, Instance> mapAdv = (Map<String, Instance>) Context.getThreadContext()
+                                .getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS);
+                for (final Instance instAdv : mapAdv.values()) {
+                    final Update updateAdv = new Update(instAdv);
+                    updateAdv.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.uuid, "Paid").getId());
+                    updateAdv.execute();
+
+                    final Insert insertPay2Adv = new Insert(CIPayroll.Payslip2Advance);
+                    insertPay2Adv.add(CIPayroll.Payslip2Advance.FromLink, insert.getId());
+                    insertPay2Adv.add(CIPayroll.Payslip2Advance.ToLink, instAdv.getId());
+                    insertPay2Adv.execute();
+                }
+                Context.getThreadContext().setSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS, null);
+            }
+
+            ret = report.execute(_parameter);
+
+            final Map<?, ?> properties = (Map<?, ?>) _parameter.get(ParameterValues.PROPERTIES);
+            try {
+                final File file = (File) ret.get(ReturnValues.VALUES);
+                final InputStream input = new FileInputStream(file);
+                final Checkin checkin = new Checkin(insert.getInstance());
+                checkin.execute(fileName + "." + properties.get("Mime"), input, ((Long) file.length()).intValue());
+            } catch (final FileNotFoundException e) {
+                throw new EFapsException(Payslip.class, "create.FileNotFoundException", e);
+            }
+
+        } catch (final ParseException e) {
+            throw new EFapsException(Payslip_Base.class, "create.ParseException", e);
         }
-        if (_minFrac != null) {
-            formater.setMinimumFractionDigits(_minFrac);
-        }
-        formater.setRoundingMode(RoundingMode.HALF_UP);
-        formater.setParseBigDecimal(true);
-        return formater;
+
+        return ret;
     }
 
     /**
@@ -157,6 +323,7 @@ public abstract class Payslip_Base
      * @return new Return.
      * @throws EFapsException on error
      */
+    @Override
     public Return getJavaScriptUIValue(final Parameter _parameter)
         throws EFapsException
     {
@@ -182,6 +349,7 @@ public abstract class Payslip_Base
      * @return javascript
      * @throws EFapsException on error
      */
+    @Override
     protected String getSetValuesString(final Instance _instance)
         throws EFapsException
     {
@@ -191,9 +359,9 @@ public abstract class Payslip_Base
                         CIPayroll.Payslip.Note,
                         CIPayroll.Payslip.LaborTime,
                         CIPayroll.Payslip.ExtraLaborTime,
-                        CIPayroll.Payslip.Amount2Pay,
+                        CIPayroll.Payslip.RateCrossTotal,
                         CIPayroll.Payslip.AmountCost,
-                        CIPayroll.Payslip.CurrencyLink);
+                        CIPayroll.Payslip.RateCurrencyId);
         final SelectBuilder selEmpOID = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink).oid();
         final SelectBuilder selEmpNum = new SelectBuilder().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                         .attribute(CIHumanResource.Employee.Number);
@@ -204,7 +372,7 @@ public abstract class Payslip_Base
         print.addSelect(selEmpOID, selEmpLastName, selEmpFirstName, selEmpNum);
         print.execute();
 
-        final BigDecimal amount2Pay = print.<BigDecimal>getAttribute(CIPayroll.Payslip.Amount2Pay);
+        final BigDecimal amount2Pay = print.<BigDecimal>getAttribute(CIPayroll.Payslip.RateCrossTotal);
         final BigDecimal amountCosts = print.<BigDecimal>getAttribute(CIPayroll.Payslip.AmountCost);
         final String empOid = print.<String>getSelect(selEmpOID);
         final String empNum = print.<String>getSelect(selEmpNum);
@@ -217,7 +385,7 @@ public abstract class Payslip_Base
         final BigDecimal extraLaborTimeVal = (BigDecimal) extraLaborTime[0];
         final UoM extraLaborTimeUoM = (UoM) extraLaborTime[1];
 
-        final Long curId = print.<Long>getAttribute(CIPayroll.Payslip.CurrencyLink);
+        final Long curId = print.<Long>getAttribute(CIPayroll.Payslip.RateCurrencyId);
 
         final DecimalFormat formater = getTwoDigitsformater();
 
@@ -290,18 +458,6 @@ public abstract class Payslip_Base
         return js.toString();
     }
 
-    /**
-     * Method to get a formatter for two decimals.
-     *
-     * @return DecimalFormat with the format.
-     * @throws EFapsException on error.
-     */
-    protected DecimalFormat getTwoDigitsformater()
-        throws EFapsException
-    {
-        return getFormater(2, 2);
-    }
-
     public Return createAdvance(final Parameter _parameter)
         throws EFapsException
     {
@@ -327,8 +483,10 @@ public abstract class Payslip_Base
                     insert.add(CIPayroll.Advance.EmployeeAbstractLink, Instance.get(employees[i]).getId());
                     insert.add(CIPayroll.Advance.Status,
                                     ((Long) Status.find(CIPayroll.AdvanceStatus.uuid, "Open").getId()).toString());
-                    insert.add(CIPayroll.Advance.Amount2Pay, pay);
-                    insert.add(CIPayroll.Advance.CurrencyLink, currencyLinks[i]);
+                    insert.add(CIPayroll.Advance.RateCrossTotal, pay);
+                    insert.add(CIPayroll.Advance.RateNetTotal, pay);
+                    insert.add(CIPayroll.Advance.RateCurrencyId, currencyLinks[i]);
+
                     insert.execute();
                 }
             }
@@ -380,9 +538,10 @@ public abstract class Payslip_Base
                     insert.add(CIPayroll.Payslip.EmployeeAbstractLink, Instance.get(employees[i]).getId());
                     insert.add(CIPayroll.Payslip.StatusAbstract,
                                     ((Long) Status.find(CIPayroll.PayslipStatus.uuid, "Open").getId()).toString());
-                    insert.add(CIPayroll.Payslip.Amount2Pay, pay);
+                    insert.add(CIPayroll.Payslip.RateCrossTotal, pay);
+                    insert.add(CIPayroll.Payslip.RateNetTotal, pay);
                     insert.add(CIPayroll.Payslip.AmountCost, cost);
-                    insert.add(CIPayroll.Payslip.CurrencyLink, currencyLinks[i]);
+                    insert.add(CIPayroll.Payslip.RateCurrencyId, currencyLinks[i]);
                     insert.add(CIPayroll.Payslip.LaborTime, new Object[] { time, laborTimeUoMs[i]});
                     insert.execute();
                 }
@@ -390,168 +549,6 @@ public abstract class Payslip_Base
         } catch (final ParseException e) {
             throw new EFapsException(Payslip_Base.class, "createMassive.ParseException", e);
         }
-        return ret;
-    }
-
-    /**
-     * Create a payslip.
-     * @param _parameter Parameter as passed from the eFaps API
-     * @return new Return
-     * @throws EFapsException on error
-     */
-    public Return create(final Parameter _parameter)
-        throws EFapsException
-    {
-        Return ret = new Return();
-        final String name = getDocName4Create(_parameter);
-        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
-        final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
-        final Long employeeid = Instance.get(
-                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.number.name)).getId();
-        final String laborTimes = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
-        final String laborTimeUoMs = _parameter.getParameterValue("laborTimeUoM");
-        final String extraLaborTimes = _parameter
-                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
-        final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
-        final String amount2Pay = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amount2Pay.name);
-        final String amountCosts = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amountCost.name);
-        final String currencyLinks = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.currencyLink.name);
-        final DecimalFormat formater = getFormater(2, 2);
-        try {
-            final Insert insert = new Insert(CIPayroll.Payslip);
-            insert.add(CIPayroll.Payslip.Name, name);
-            insert.add(CIPayroll.Payslip.Date, date);
-            insert.add(CIPayroll.Payslip.DueDate, dueDate);
-            insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
-            insert.add(CIPayroll.Payslip.StatusAbstract,
-                            ((Long) Status.find(CIPayroll.PayslipStatus.uuid, "Open").getId()).toString());
-            final BigDecimal pay = amount2Pay != null && !amount2Pay.isEmpty()
-                                                        ? (BigDecimal) formater.parse(amount2Pay)
-                                                        : BigDecimal.ZERO;
-            final BigDecimal cost = amountCosts != null && !amountCosts.isEmpty()
-                                                        ? (BigDecimal) formater.parse(amountCosts)
-                                                        : BigDecimal.ZERO;
-            final BigDecimal time = laborTimes != null && !laborTimes.isEmpty()
-                                                        ? (BigDecimal) formater.parse(laborTimes)
-                                                        : BigDecimal.ZERO;
-            final BigDecimal extraTime = extraLaborTimes != null && !extraLaborTimes.isEmpty()
-                                                        ? (BigDecimal) formater.parse(extraLaborTimes)
-                                                        : BigDecimal.ZERO;
-            insert.add(CIPayroll.Payslip.Amount2Pay, pay);
-            insert.add(CIPayroll.Payslip.AmountCost, cost);
-            insert.add(CIPayroll.Payslip.CurrencyLink, currencyLinks);
-            insert.add(CIPayroll.Payslip.LaborTime, new Object[] { time, laborTimeUoMs});
-            insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraTime, extraLaborTimeUoMs});
-            insert.execute();
-            final Map<Instance, TablePos> values = new HashMap<Instance, TablePos>();
-            analyseTables(_parameter, values, "Deduction");
-            analyseTables(_parameter, values, "Payment");
-            analyseTables(_parameter, values, "Neutral");
-
-            final Map<Instance, Position> sums = analysePositions(_parameter);
-
-            final List<InsertPos> list = new ArrayList<InsertPos>();
-            for (final Position pos : sums.values()) {
-                if (pos instanceof SumPosition) {
-                    list.add(new InsertPos(pos, _parameter, sums, values));
-                }
-            }
-            for (final Entry<Instance, TablePos> entry : values.entrySet()) {
-                for (final BigDecimal amount : entry.getValue().getValues()) {
-                    list.add(new InsertPos(entry.getKey(), amount));
-                }
-            }
-            Collections.sort(list, new Comparator<InsertPos>() {
-                @Override
-                public int compare(final InsertPos _insertPos1,
-                                   final InsertPos _insertPos2)
-                {
-                    return _insertPos1.getSorted().compareTo(_insertPos2.getSorted());
-                }
-            });
-            // Payroll-Configuration
-            final SystemConfiguration config = SystemConfiguration.get(
-                            UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e"));
-            final Instance currInst = config.getLink("Currency4Payslip");
-
-            if (!currInst.isValid()) {
-                throw new EFapsException(Payslip_Base.class, "create.MissingConfigLink");
-            }
-            int i = 0;
-
-            final boolean active = config.getAttributeValueAsBoolean("ActivateAccountingTransaction");
-            if (active) {
-                createTransaction(_parameter, list);
-            }
-
-            BigDecimal sumDeduction = BigDecimal.ZERO;
-            BigDecimal sumPayment = BigDecimal.ZERO;
-            BigDecimal sumNeutral = BigDecimal.ZERO;
-            for (final InsertPos pos : list) {
-                final Insert insertPos = new Insert(pos.getType());
-                if (pos.getType().equals(CIPayroll.PositionDeduction.getType())) {
-                    sumDeduction  = sumDeduction.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                } else if (pos.getType().equals(CIPayroll.PositionNeutral.getType())) {
-                    sumNeutral  = sumNeutral.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                } else if (pos.getType().equals(CIPayroll.PositionPayment.getType())) {
-                    sumPayment  = sumPayment.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                }
-                insertPos.add(CIPayroll.PositionAbstract.Amount, pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                insertPos.add(CIPayroll.PositionAbstract.CasePositionAbstractLink, pos.getId());
-                insertPos.add(CIPayroll.PositionAbstract.CurrencyLink, currInst.getId());
-                insertPos.add(CIPayroll.PositionAbstract.Description, pos.getDescription());
-                insertPos.add(CIPayroll.PositionAbstract.DocumentAbstractLink, insert.getInstance().getId());
-                insertPos.add(CIPayroll.PositionAbstract.PositionNumber, i);
-                insertPos.execute();
-                i++;
-            }
-            if (amount2Pay == null && amountCosts == null) {
-                setAmounts(_parameter, insert.getInstance(), list);
-            }
-
-            _parameter.put(ParameterValues.INSTANCE, insert.getInstance());
-            final StandartReport report = new StandartReport();
-            final String fileName = CIPayroll.Payslip.getType().getName() + "_" + name;
-            report.setFileName(fileName);
-            report.getJrParameters().put("sumDeduction", sumDeduction);
-            report.getJrParameters().put("sumPayment", sumPayment);
-            report.getJrParameters().put("sumNeutral", sumNeutral);
-            report.getJrParameters().put("sumTotal", sumPayment.subtract(sumDeduction));
-
-            if (Context.getThreadContext().getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS) != null) {
-                @SuppressWarnings("unchecked")
-                final
-                Map<String, Instance> mapAdv = (Map<String, Instance>) Context.getThreadContext()
-                                .getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS);
-                for (final Instance instAdv : mapAdv.values()) {
-                    final Update updateAdv = new Update(instAdv);
-                    updateAdv.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.uuid, "Paid").getId());
-                    updateAdv.execute();
-
-                    final Insert insertPay2Adv = new Insert(CIPayroll.Payslip2Advance);
-                    insertPay2Adv.add(CIPayroll.Payslip2Advance.FromLink, insert.getId());
-                    insertPay2Adv.add(CIPayroll.Payslip2Advance.ToLink, instAdv.getId());
-                    insertPay2Adv.execute();
-                }
-                Context.getThreadContext().setSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS, null);
-            }
-
-            ret = report.execute(_parameter);
-
-            final Map<?, ?> properties = (Map<?, ?>) _parameter.get(ParameterValues.PROPERTIES);
-            try {
-                final File file = (File) ret.get(ReturnValues.VALUES);
-                final InputStream input = new FileInputStream(file);
-                final Checkin checkin = new Checkin(insert.getInstance());
-                checkin.execute(fileName + "." + properties.get("Mime"), input, ((Long) file.length()).intValue());
-            } catch (final FileNotFoundException e) {
-                throw new EFapsException(Payslip.class, "create.FileNotFoundException", e);
-            }
-
-        } catch (final ParseException e) {
-            throw new EFapsException(Payslip_Base.class, "create.ParseException", e);
-        }
-
         return ret;
     }
 
@@ -671,7 +668,6 @@ public abstract class Payslip_Base
                 throw new EFapsException(Payslip_Base.class, "create.MissingConfigLink");
             }
 
-            //final Object[] rateObj = new Object[] {BigDecimal.ONE, BigDecimal.ONE};
             final Object[] rateObj = getRateObject(_instPeriode, currInst);
             final BigDecimal rate = ((BigDecimal) rateObj[0]).divide((BigDecimal) rateObj[1], 12,
                             BigDecimal.ROUND_HALF_UP);
@@ -764,6 +760,7 @@ public abstract class Payslip_Base
                                      final Instance _currInstance)
         throws EFapsException
     {
+
         final Rate rate = getExchangeRate(_periodeInstance, _currInstance.getId(), new DateTime());
         return new Object[] { BigDecimal.ONE, rate.getLabel() };
     }
@@ -777,38 +774,34 @@ public abstract class Payslip_Base
      */
     protected void setAmounts(final Parameter _parameter,
                               final Instance _docInst,
-                              final List<InsertPos> _list)
-          throws EFapsException
+                              final List<InsertPos> _list,
+                              final BigDecimal[] _rates)
+        throws EFapsException
     {
-        BigDecimal amount2pay = BigDecimal.ZERO;
+        BigDecimal ratePay = BigDecimal.ZERO;
         BigDecimal amountCost = BigDecimal.ZERO;
         for (final InsertPos pos : _list) {
             if (pos.caseType.equals(CIPayroll.CasePositionRootSum.getType())) {
-                amount2pay = amount2pay.add(pos.getAmount());
+                ratePay = ratePay.add(pos.getAmount());
             } else if (pos.posType.equals(CIPayroll.PositionNeutral.getType())
                             || pos.posType.equals(CIPayroll.PositionPayment.getType())) {
                 amountCost = amountCost.add(pos.getAmount());
             }
         }
+        final BigDecimal pay = ratePay.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : ratePay
+                        .setScale(8, BigDecimal.ROUND_HALF_UP).divide(_rates[0], BigDecimal.ROUND_HALF_UP)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
+        final BigDecimal cost = amountCost.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : amountCost
+                        .setScale(8, BigDecimal.ROUND_HALF_UP).divide(_rates[0], BigDecimal.ROUND_HALF_UP)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
         final Update update = new Update(_docInst);
-        update.add(CIPayroll.Payslip.Amount2Pay, amount2pay);
-        update.add(CIPayroll.Payslip.AmountCost, amountCost);
+        update.add(CIPayroll.Payslip.RateCrossTotal, ratePay);
+        update.add(CIPayroll.Payslip.RateNetTotal, ratePay);
+        update.add(CIPayroll.Payslip.CrossTotal, pay);
+        update.add(CIPayroll.Payslip.NetTotal, pay);
+        update.add(CIPayroll.Payslip.AmountCost, cost);
         update.execute();
     }
-
-    /**
-     * Get the name for the document on creation.
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @return new Name
-     * @throws EFapsException on error
-     */
-    @Override
-    protected String getDocName4Create(final Parameter _parameter)
-        throws EFapsException
-    {
-        return _parameter.getParameterValue("name");
-    }
-
 
     /**
      * Method for return a first date of month and last date of month.
@@ -1063,42 +1056,6 @@ public abstract class Payslip_Base
             ret.put(multi.getCurrentInstance(), sum);
         }
         return ret;
-    }
-
-    /**
-     * @param _parameter as passed from eFaps API.
-     * @return
-     * @throws EFapsException on error.
-     */
-    public Return rateCurrencyFieldValueUI(final Parameter _parameter)
-        throws EFapsException
-    {
-        final FieldValue fieldValue = (FieldValue) _parameter.get(ParameterValues.UIOBJECT);
-        final QueryBuilder queryBldr = new QueryBuilder(CIERP.Currency);
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIERP.Currency.Name);
-        multi.execute();
-        final Map<String, Long> values = new TreeMap<String, Long>();
-        while (multi.next()) {
-            values.put(multi.<String>getAttribute(CIERP.Currency.Name), multi.getCurrentInstance().getId());
-        }
-        // Sales-Configuration
-        final Instance baseInst = SystemConfiguration.get(UUID.fromString("c9a1cbc3-fd35-4463-80d2-412422a3802f"))
-                        .getLink("CurrencyBase");
-        final StringBuilder html = new StringBuilder();
-        html.append("<select ").append(UIInterface.EFAPSTMPTAG)
-                        .append(" name=\"").append(fieldValue.getField().getName()).append("\" size=\"1\">");
-        for (final Entry<String, Long> entry : values.entrySet()) {
-            html.append("<option value=\"").append(entry.getValue()).append("\"");
-            if (entry.getValue().equals(baseInst.getId())) {
-                html.append(" selected=\"selected\" ");
-            }
-            html.append(">").append(entry.getKey()).append("</option>");
-        }
-        html.append("</select>");
-        final Return retVal = new Return();
-        retVal.put(ReturnValues.SNIPLETT, html.toString());
-        return retVal;
     }
 
     /**

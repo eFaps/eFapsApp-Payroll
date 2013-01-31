@@ -79,6 +79,12 @@
             <sqlcolumn>DESCR</sqlcolumn>
         </attribute>
         <attribute>
+            <name>RateAmount</name>
+            <type>Decimal</type>
+            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqlcolumn>RATEAMOUNT</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>Amount</name>
             <type>Decimal</type>
             <sqltable>Payroll_PositionSQLTable</sqltable>
@@ -96,6 +102,29 @@
                 <property name="Value">Name</property>
                 <property name="Type">ERP_Currency</property>
             </trigger>
+        </attribute>
+        <attribute>
+            <name>RateCurrencyLink</name>
+            <type>LinkWithRanges</type>
+            <typelink>ERP_Currency</typelink>
+            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqlcolumn>RATECURRENCYID</sqlcolumn>
+            <trigger program="org.efaps.esjp.admin.datamodel.RangesValue"
+                name="Payroll_PositionAbstract.RateCurrencyLink.RANGE_VALUE"
+                event="RANGE_VALUE">
+                <property name="Value">Name</property>
+                <property name="Type">ERP_Currency</property>
+            </trigger>
+        </attribute>
+         <attribute>
+            <name>Rate</name>
+            <type>Rate</type>
+            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqlcolumn>RATE,RATEDENOM</sqlcolumn>
+            <trigger program="org.efaps.esjp.erp.Currency" method="getRateValue"
+                name="Payroll_PositionAbstract.Rate.RATE_VALUE" event="RATE_VALUE"/>
+            <property name="CurrencyAttribute4Rate">RateCurrencyLink</property>
+            <property name="TargetCurrencyAttribute4Rate">CurrencyLink</property>
         </attribute>
     </definition>
 </datamodel-type>

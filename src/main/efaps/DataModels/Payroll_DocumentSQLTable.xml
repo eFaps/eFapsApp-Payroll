@@ -36,11 +36,10 @@
         <parent>ERP_DocumentAbstractSQLTable</parent>
         <database>
             <table-name>T_PRDOC</table-name>
+            <parent-table>T_ERPDOC</parent-table>
             <!-- columns -->
             <column name="EMPLOYEEID"       type="INTEGER"   not-null="true"/>
             <column name="AMOUNTCOST"       type="DECIMAL"                      length="10" scale="2"/>
-            <column name="AMOUNTPAY"        type="DECIMAL"                      length="10" scale="2"/>
-            <column name="CURRENCYID"       type="INTEGER" />
             <column name="TIME"             type="DECIMAL"                      length="16" scale="6"/>
             <column name="TIMEUOMID"        type="INTEGER"/>
             <column name="TIMEBASE"         type="REAL"/>
@@ -49,7 +48,6 @@
             <column name="EXTRATIMEBASE"    type="REAL"/>
             <!-- foreign keys -->
             <foreign name="T_PRDOC_EMPLOYEEID"   key="EMPLOYEEID"      reference="T_HREMPLOYEE(ID)"/>
-            <foreign name="T_PRDOC_CURRENCYID"   key="CURRENCYID"      reference="T_ERPCUR(ID)"/>
         </database>
     </definition>
 </datamodel-sqltable>

@@ -139,7 +139,7 @@ public abstract class PayslipCalculator_Base
             queryBlder.addWhereAttrEqValue(CIPayroll.Advance.EmployeeAbstractLink, emplInst.getId());
             queryBlder.addWhereAttrNotInQuery(CIPayroll.Advance.ID, attrQuery);
             final MultiPrintQuery multi = queryBlder.getPrint();
-            multi.addAttribute(CIPayroll.Advance.Amount2Pay);
+            multi.addAttribute(CIPayroll.Advance.RateCrossTotal);
             multi.execute();
             while (multi.next()) {
                 Map<String, Instance> mapAdv = new HashMap<String, Instance>();
@@ -150,7 +150,7 @@ public abstract class PayslipCalculator_Base
                     Context.getThreadContext().setSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS, mapAdv);
                 }
                 mapAdv.put(multi.getCurrentInstance().getOid(), multi.getCurrentInstance());
-                final BigDecimal pay = multi.<BigDecimal>getAttribute(CIPayroll.Advance.Amount2Pay);
+                final BigDecimal pay = multi.<BigDecimal>getAttribute(CIPayroll.Advance.RateCrossTotal);
                 if (pay != null) {
                     ret = ret.add(pay);
                 }
