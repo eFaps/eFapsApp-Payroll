@@ -69,34 +69,63 @@
             <property name="Attribute">LaborTime</property>
             <property name="Label">Payroll_Payslip/LaborTime.Label</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="ModePrint">NONE</property>
             <property name="Align">right</property>
         </field>
-        <field name="rateNetTotal">
-            <property name="Attribute">RateNetTotal</property>
-            <property name="Label">Payroll_Payslip/RateNetTotal.Label</property>
-            <property name="ModeCreate">EDITABLE</property>
+        <field name="laborTime4Print">
+            <property name="Select">attribute[LaborTime].label</property>
+            <property name="Label">Payroll_Payslip/LaborTime.Label</property>
+            <property name="ModeView">NONE</property>
             <property name="Align">right</property>
         </field>
-        <field name="amountCost">
-            <property name="Attribute">AmountCost</property>
-            <property name="Label">Payroll_Payslip/AmountCost.Label</property>
+        <field name="rateCrossTotal">
+            <property name="Attribute">RateCrossTotal</property>
+            <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeView">NONE</property>
+            <property name="Align">right</property>
+        </field>
+        <field name="rateCrossTotal4View">
+            <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModePrint">NONE</property>
+            <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
             <property name="Align">right</property>
         </field>
         <field name="rateCurrencyId">
             <property name="Attribute">RateCurrencyId</property>
             <property name="Label">Payroll_Payslip/RateCurrencyId.Label</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="ModePrint">NONE</property>
             <property name="ModeView">NONE</property>
             <trigger program="org.efaps.esjp.payroll.Payslip"
                 method="rateCurrencyFieldValueUI"
                 name="Sales_InvoiceForm.currencyId.UI_FIELD_VALUE"
                 event="UI_FIELD_VALUE" />
         </field>
-         <field name="rateCurrencyId4Read">
-            <property name="ModeEdit">NONE</property>
+         <field name="rateCurrencyId4Print">
+            <property name="ModeView">NONE</property>
             <property name="Select">linkto[RateCurrencyId].attribute[Name]</property>
             <property name="Label">Payroll_Payslip/RateCurrencyId.Label</property>
+        </field>
+        <field name="amountCost">
+            <property name="Attribute">AmountCost</property>
+            <property name="Label">Payroll_Payslip/AmountCost.Label</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeView">NONE</property>
+            <property name="Align">right</property>
+        </field>
+        <field name="amountCost4View">
+            <property name="Phrase">$&lt;attribute[AmountCost]&gt; $&lt;linkto[CurrencyId].attribute[Symbol]&gt;</property>
+            <property name="Label">Payroll_Payslip/AmountCost.Label</property>
+            <property name="ModePrint">NONE</property>
+            <property name="Align">right</property>
+        </field>
+         <field name="currencyId4Print">
+            <property name="ModeView">NONE</property>
+            <property name="Select">linkto[CurrencyId].attribute[Name]</property>
+            <property name="Label">Payroll_Payslip/CurrencyId.Label</property>
         </field>
          <field name="statusAbstract">
             <property name="ModeEdit">NONE</property>
