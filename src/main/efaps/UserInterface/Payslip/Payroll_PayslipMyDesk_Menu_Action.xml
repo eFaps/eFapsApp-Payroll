@@ -35,10 +35,9 @@
         <!-- childs -->
         <childs>
             <child>Payroll_PayslipMyDesk_Menu_Action_Create</child>
+            <child>Payroll_PayslipMyDesk_Menu_Action_Copy</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_CreateMassive</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_CreateAdvance</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_Copy</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_ActionReport</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_Delete</child>
         </childs>
     </definition>

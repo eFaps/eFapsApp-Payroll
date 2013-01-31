@@ -28,7 +28,7 @@
     <file-revision>$Rev: 6702 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipMyDesk_Menu_Action_ActionReport</name>
+        <name>Payroll_MyDesk_ActionReport</name>
         <access>
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
@@ -42,9 +42,7 @@
         </target>
         <!-- properties -->
         <property name="Target">modal</property>
-        <property name="TargetMode">create</property>
         <property name="TargetShowFile">true</property>
-        <property name="Submit">true</property>
-        <property name="SubmitSelectedRows">-1</property>
+        <property name="TargetMode">create</property>
     </definition>
 </ui-command>
