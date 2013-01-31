@@ -24,61 +24,70 @@
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 7956 $</file-revision>
     <definition>
-        <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AdvanceForm</name>
-        <!-- fields -->
-        <field name="type">
-            <property name="Attribute">Type</property>
-        </field>
-        <field name="name">
-            <property name="ModeSearch">EDITABLE</property>
-            <property name="Attribute">Name</property>
-            <property name="ModeEdit">READONLY</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="Required">true</property>
-        </field>
-        <field name="date">
-            <property name="Attribute">Date</property>
-            <property name="ModeEdit">EDITABLE</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <trigger event="UI_FIELD_VALUE" method="dateValueUI" name="Payroll_PayslipForm.date.UI_FIELD_VALUE" program="org.efaps.esjp.payroll.Payslip"/>
-        </field>
-        <field name="number">
-            <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
-            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Label">Payroll_PayslipForm.number.Label</property>
-            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeEdit">NONE</property>
-            <property name="ModeView">READONLY</property>
-            <property name="Required">true</property>
-            <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee" name="Payroll_PayslipForm.number.UI_FIELD_AUTOCOMPLETE" program="org.efaps.esjp.humanresource.Employee">
-            </trigger>
-            <trigger event="UI_FIELD_UPDATE" method="updateFields4Employee" name="Payroll_PayslipForm.number.UI_FIELD_UPDATE" program="org.efaps.esjp.payroll.Payslip"/>
-        </field>
-        <field name="amount2Pay">
-            <property name="Attribute">Amount2Pay</property>
-            <property name="ModeCreate">NONE</property>
-            <property name="ModeEdit">EDITABLE</property>
-        </field>
-        <field name="currencyLink">
-            <property name="Attribute">CurrencyLink</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeEdit">EDITABLE</property>
-        </field>
-        <field name="status">
-            <property name="Attribute">Status</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeEdit">EDITABLE</property>
-        </field>
-        <field name="payslip">
-            <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>
-            <property name="Select">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].attribute[Name]</property>
-            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Label">Payroll_AdvanceForm.payslip.Label</property>
-            <property name="ModeCreate">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <property name="ModeView">READONLY</property>
-        </field>
-    </definition>
+    <version-expression>(version==latest)</version-expression>
+    <name>Payroll_AdvanceForm</name>
+    <!-- fields -->
+    <field name="type">
+        <property name="Attribute">Type</property>
+    </field>
+    <field name="name">
+        <property name="ModeSearch">EDITABLE</property>
+        <property name="Attribute">Name</property>
+        <property name="ModeEdit">READONLY</property>
+        <property name="ModeCreate">EDITABLE</property>
+        <property name="Required">true</property>
+    </field>
+    <field name="date">
+        <property name="Attribute">Date</property>
+        <property name="ModeEdit">EDITABLE</property>
+        <property name="ModeCreate">EDITABLE</property>
+        <trigger event="UI_FIELD_VALUE" method="dateValueUI"
+            name="Payroll_PayslipForm.date.UI_FIELD_VALUE" program="org.efaps.esjp.payroll.Payslip" />
+    </field>
+    <field name="number">
+        <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
+        <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+        <property name="Label">Payroll_PayslipForm.number.Label</property>
+        <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
+        <property name="ModeCreate">EDITABLE</property>
+        <property name="ModeEdit">NONE</property>
+        <property name="ModeView">READONLY</property>
+        <property name="Required">true</property>
+        <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee"
+            name="Payroll_PayslipForm.number.UI_FIELD_AUTOCOMPLETE"
+            program="org.efaps.esjp.humanresource.Employee">
+        </trigger>
+        <trigger event="UI_FIELD_UPDATE" method="updateFields4Employee"
+            name="Payroll_PayslipForm.number.UI_FIELD_UPDATE" program="org.efaps.esjp.payroll.Payslip" />
+    </field>
+    <field name="rateCrossTotal">
+        <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
+        <property name="ModeCreate">NONE</property>
+        <property name="ModeEdit">NONE</property>
+        <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
+    </field>
+    <field name="rateCurrencyId">
+        <property name="Attribute">RateCurrencyId</property>
+        <property name="ModeCreate">EDITABLE</property>
+        <property name="ModeEdit">NONE</property>
+        <property name="ModeView">NONE</property>
+        <trigger program="org.efaps.esjp.payroll.Payslip"
+            method="rateCurrencyFieldValueUI" name="Sales_InvoiceForm.currencyId.UI_FIELD_VALUE"
+            event="UI_FIELD_VALUE" />
+    </field>
+    <field name="status">
+        <property name="Attribute">Status</property>
+        <property name="ModeCreate">EDITABLE</property>
+        <property name="ModeEdit">EDITABLE</property>
+    </field>
+    <field name="payslip">
+        <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>
+        <property name="Select">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].attribute[Name]</property>
+        <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+        <property name="Label">Payroll_AdvanceForm.payslip.Label</property>
+        <property name="ModeCreate">NONE</property>
+        <property name="ModeEdit">NONE</property>
+        <property name="ModeView">READONLY</property>
+    </field>
+</definition>
 </ui-form>
