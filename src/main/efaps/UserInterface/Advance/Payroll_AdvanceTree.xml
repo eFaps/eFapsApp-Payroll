@@ -36,6 +36,7 @@
         <!-- child -->
         <childs>
             <child>Payroll_AdvanceTree_Payslip</child>
+            <child>Payroll_AdvanceTree_Payment</child>
         </childs>
         <!-- properties -->
         <property name="Target">content</property>
