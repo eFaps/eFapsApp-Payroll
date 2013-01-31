@@ -35,7 +35,7 @@
 
         <!-- target definitions -->
         <target>
-            <form>Sales_PaymentForm</form>
+            <form>Sales_PaymentOutForm</form>
             <execute method="create" program="org.efaps.esjp.sales.Payment">
                 <property name="JasperReport">Sales_PaymentDocumentReport</property>
                 <property name="Mime">pdf</property>

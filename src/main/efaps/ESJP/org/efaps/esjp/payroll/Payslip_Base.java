@@ -150,7 +150,8 @@ public abstract class Payslip_Base
         final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
         final String amount2Pay = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.rateCrossTotal .name);
         final String amountCosts = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amountCost.name);
-        final String currencyLinks = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name);
+        final String currencyLinks = _parameter.getParameterValue(
+                        CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name);
         try {
             final DecimalFormat formater = getFormater(2, 2);
 
@@ -229,14 +230,6 @@ public abstract class Payslip_Base
                     return _insertPos1.getSorted().compareTo(_insertPos2.getSorted());
                 }
             });
-            // Payroll-Configuration
-            final SystemConfiguration config = SystemConfiguration.get(
-                            UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e"));
-
-            final boolean active = config.getAttributeValueAsBoolean("ActivateAccountingTransaction");
-            if (active) {
-                createTransaction(_parameter, list);
-            }
 
             BigDecimal sumDeduction = BigDecimal.ZERO;
             BigDecimal sumPayment = BigDecimal.ZERO;
@@ -1086,7 +1079,7 @@ public abstract class Payslip_Base
 
     /**
      * @param _parameter as passed from eFaps API.
-     * @return
+     * @return Map with positions
      * @throws EFapsException on error.
      */
     protected Map<Instance, Position> analysePositions(final Parameter _parameter)
@@ -1183,8 +1176,8 @@ public abstract class Payslip_Base
     /**
      * Get the values from the tables.
      * @param _parameter    Parameter as passed from the eFaps API
-     * @param _values
-     * @param _postfix
+     * @param _values       values to be analysed
+     * @param _postfix      postfix of the table
      * @throws EFapsException on error.
      */
     protected void analyseTables(final Parameter _parameter,
@@ -1626,10 +1619,10 @@ public abstract class Payslip_Base
                 try {
                     final Class<?> cls = Class.forName(this.esjp, true, Payslip_Base.CLASSLOADER);
                     final Method meth = cls.getMethod(this.method, new Class[] { Parameter.class, Map.class, Map.class,
-                                    Position.class });
+                                                                                    Position.class });
                     ret = (BigDecimal) meth.invoke(cls.newInstance(), _parameter, _sums, _values, this);
                 } catch (final SecurityException e) {
-                   Payslip_Base.LOG.error("SecurityException", e);
+                    Payslip_Base.LOG.error("SecurityException", e);
                 } catch (final ClassNotFoundException e) {
                     Payslip_Base.LOG.error("ClassNotFoundException", e);
                 } catch (final NoSuchMethodException e) {
