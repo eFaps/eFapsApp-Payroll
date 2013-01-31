@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2010 The eFaps Team
+ * Copyright 2003 - 2013 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
@@ -101,6 +102,8 @@ import org.efaps.esjp.payroll.CasePosition_Base.MODE;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -119,6 +122,11 @@ public abstract class Payslip_Base
      * Classloader used for EventDefinition.
      */
     private static final EFapsClassLoader CLASSLOADER =  new EFapsClassLoader(Payslip.class.getClassLoader());
+
+    /**
+     * Logger for this classes.
+     */
+    protected static final Logger LOG = LoggerFactory.getLogger(Payslip_Base.class);
 
     /**
      * @return a formater used to format bigdecimal for the user interface
@@ -291,12 +299,7 @@ public abstract class Payslip_Base
     protected DecimalFormat getTwoDigitsformater()
         throws EFapsException
     {
-        final DecimalFormat formater = (DecimalFormat) NumberFormat.getInstance(Context.getThreadContext().getLocale());
-        formater.setMaximumFractionDigits(2);
-        formater.setMinimumFractionDigits(2);
-        formater.setRoundingMode(RoundingMode.HALF_UP);
-        formater.setParseBigDecimal(true);
-        return formater;
+        return getFormater(2, 2);
     }
 
     public Return createAdvance(final Parameter _parameter)
@@ -445,11 +448,13 @@ public abstract class Payslip_Base
             analyseTables(_parameter, values, "Payment");
             analyseTables(_parameter, values, "Neutral");
 
-            final Map<Instance, SumPosition> sums = analyseSums(_parameter);
+            final Map<Instance, Position> sums = analysePositions(_parameter);
 
             final List<InsertPos> list = new ArrayList<InsertPos>();
-            for (final SumPosition pos : sums.values()) {
-                list.add(new InsertPos(pos, _parameter, sums, values));
+            for (final Position pos : sums.values()) {
+                if (pos instanceof SumPosition) {
+                    list.add(new InsertPos(pos, _parameter, sums, values));
+                }
             }
             for (final Entry<Instance, TablePos> entry : values.entrySet()) {
                 for (final BigDecimal amount : entry.getValue().getValues()) {
@@ -1012,7 +1017,9 @@ public abstract class Payslip_Base
         }
         payBldr.append("}\n");
         dedBldr.append("}\n");
-        neuBldr.append("positionTableColumns(eFapsTable100);\n")
+        neuBldr.append("document.getElementsByName('sums')[0].innerHTML='")
+            .append(StringUtils.repeat("<br/>", _values.size())).append("';")
+            .append("positionTableColumns(eFapsTable100);\n")
             .append("positionTableColumns(eFapsTable200);\n")
             .append("positionTableColumns(eFapsTable300);\n").append("}\n");
 
@@ -1031,10 +1038,10 @@ public abstract class Payslip_Base
      * @return
      * @throws EFapsException on error.
      */
-    protected Map<Instance, SumPosition> analyseSums(final Parameter _parameter)
+    protected Map<Instance, Position> analysePositions(final Parameter _parameter)
         throws EFapsException
     {
-        final Map<Instance, SumPosition> ret = new HashMap<Instance, SumPosition>();
+        final Map<Instance, Position> ret = new HashMap<Instance, Position>();
 
         final String caseOid = _parameter.getParameterValue("case");
         final Instance caseInst = Instance.get(caseOid);
@@ -1110,10 +1117,14 @@ public abstract class Payslip_Base
         analyseTables(_parameter, values, "Payment");
         analyseTables(_parameter, values, "Neutral");
 
-        final Map<Instance, SumPosition> sums = analyseSums(_parameter);
+        final Map<Instance, Position> sums = analysePositions(_parameter);
 
         final List<SumPosition> sort = new ArrayList<SumPosition>();
-        sort.addAll(sums.values());
+        for (final Position pos : sums.values()) {
+            if (pos instanceof SumPosition) {
+                sort.add((SumPosition) pos);
+            }
+        }
         Collections.sort(sort, new Comparator<SumPosition>() {
             @Override
             public int compare(final SumPosition _pos1,
@@ -1353,9 +1364,9 @@ public abstract class Payslip_Base
          * @param value
          * @throws EFapsException
          */
-        public InsertPos(final SumPosition _position,
+        public InsertPos(final Position _position,
                          final Parameter _parameter,
-                         final Map<Instance, SumPosition> _sums,
+                         final Map<Instance, Position> _sums,
                          final Map<Instance, TablePos> _values)
             throws EFapsException
         {
@@ -1431,6 +1442,10 @@ public abstract class Payslip_Base
         }
 
     }
+
+    /**
+     * A position in the currently displayed table.
+     */
     public class TablePos
     {
 
@@ -1487,19 +1502,24 @@ public abstract class Payslip_Base
             return this.values;
         }
     }
+
+    /**
+     * Positions used for calculation.
+     */
     public abstract class Position
     {
-
-
+        /**
+         * Instance of the caseposition.
+         */
         private final Instance instance;
 
+        /**
+         * @param _instance instance of the caseposition
+         */
         public Position(final Instance _instance)
         {
             this.instance = _instance;
         }
-
-
-
 
         /**
          * Getter method for the instance variable {@link #instance}.
@@ -1511,13 +1531,20 @@ public abstract class Payslip_Base
             return this.instance;
         }
 
+        /**
+         * @param _parameter    Parameter as passed by the eFaps API
+         * @param _positions    Positions for calculation
+         * @param _values       values in the form
+         * @return
+         */
         public abstract BigDecimal getResult(final Parameter _parameter,
-                                             final Map<Instance, SumPosition> sums,
+                                             final Map<Instance, Position> _positions,
                                              final Map<Instance, TablePos> _values);
 
     }
 
-    public class CalcPosition extends Position
+    public class CalcPosition
+        extends Position
     {
 
         private Instance relInst;
@@ -1526,8 +1553,9 @@ public abstract class Payslip_Base
         private Instance toInst;
         private final String esjp;
         private final String method;
+
         /**
-         * @param currentInstance
+         * @param _instance currentInstance
          * @throws EFapsException
          */
         public CalcPosition(final Instance _instance)
@@ -1537,21 +1565,20 @@ public abstract class Payslip_Base
 
             final PrintQuery print = new PrintQuery(_instance);
             print.addAttribute(CIPayroll.CasePositionCalc.CalculatorESJP,
-                               CIPayroll.CasePositionCalc.CalculatorMethod);
+                            CIPayroll.CasePositionCalc.CalculatorMethod);
             print.execute();
             this.esjp = print.<String>getAttribute(CIPayroll.CasePositionCalc.CalculatorESJP);
             this.method = print.<String>getAttribute(CIPayroll.CasePositionCalc.CalculatorMethod);
-
 
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.CasePosition2PositionAbstract);
             queryBldr.addWhereAttrEqValue(CIPayroll.CasePosition2PositionAbstract.FromAbstractLink, _instance.getId());
             final MultiPrintQuery multi = queryBldr.getPrint();
 
             final SelectBuilder oidSel = new SelectBuilder()
-                .linkto(CIPayroll.CasePosition2PositionAbstract.ToAbstractLink)
-                .oid();
+                            .linkto(CIPayroll.CasePosition2PositionAbstract.ToAbstractLink)
+                            .oid();
             multi.addAttribute(CIPayroll.CasePosition2PositionAbstract.Denominator,
-                               CIPayroll.CasePosition2PositionAbstract.Numerator);
+                            CIPayroll.CasePosition2PositionAbstract.Numerator);
             multi.addSelect(oidSel);
             multi.execute();
             while (multi.next()) {
@@ -1565,12 +1592,12 @@ public abstract class Payslip_Base
             }
         }
 
-        /* (non-Javadoc)
-         * @see org.efaps.esjp.payroll.Payslip_Base.Position#getResult(java.util.Map)
+        /**
+         * {@inheritDoc}
          */
         @Override
         public BigDecimal getResult(final Parameter _parameter,
-                                    final Map<Instance, SumPosition> _sums,
+                                    final Map<Instance, Position> _sums,
                                     final Map<Instance, TablePos> _values)
         {
             BigDecimal ret = BigDecimal.ZERO;
@@ -1583,34 +1610,27 @@ public abstract class Payslip_Base
             if (this.esjp != null && !this.esjp.isEmpty()) {
                 try {
                     final Class<?> cls = Class.forName(this.esjp, true, Payslip_Base.CLASSLOADER);
-                    final Method meth = cls.getMethod(this.method, new Class[]{Parameter.class, Map.class, Map.class,
+                    final Method meth = cls.getMethod(this.method, new Class[] { Parameter.class, Map.class, Map.class,
                                     Position.class });
                     ret = (BigDecimal) meth.invoke(cls.newInstance(), _parameter, _sums, _values, this);
                 } catch (final SecurityException e) {
-                 // TODO Auto-generated catch block
-                    e.printStackTrace();
+                   Payslip_Base.LOG.error("SecurityException", e);
                 } catch (final ClassNotFoundException e) {
-                 // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Payslip_Base.LOG.error("ClassNotFoundException", e);
                 } catch (final NoSuchMethodException e) {
-                 // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Payslip_Base.LOG.error("NoSuchMethodException", e);
                 } catch (final IllegalArgumentException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Payslip_Base.LOG.error("IllegalArgumentException", e);
                 } catch (final IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Payslip_Base.LOG.error("IllegalAccessException", e);
                 } catch (final InvocationTargetException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Payslip_Base.LOG.error("InvocationTargetException", e);
                 } catch (final InstantiationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Payslip_Base.LOG.error("InvocationTargetException", e);
                 }
             } else if (this.toInst != null && this.toInst.isValid()) {
                 if (_sums.containsKey(this.toInst)) {
-                    final SumPosition sum = _sums.get(this.toInst);
+                    final Position sum = _sums.get(this.toInst);
                     final BigDecimal tmp = sum.getResult(_parameter, _sums, _values);
                     ret = tmp.multiply(new BigDecimal(this.numerator).divide(new BigDecimal(this.denominator),
                                     8, BigDecimal.ROUND_HALF_UP));
@@ -1628,8 +1648,8 @@ public abstract class Payslip_Base
         }
     }
 
-
-    public class SumPosition extends Position
+    public class SumPosition
+        extends Position
     {
 
         private final String name;
@@ -1642,8 +1662,7 @@ public abstract class Payslip_Base
 
         private final Integer mode;
 
-
-        public SumPosition(final Map<Instance, SumPosition> _sums,
+        public SumPosition(final Map<Instance, Position> _sums,
                            final Instance _instance,
                            final String _name,
                            final String _description,
@@ -1661,9 +1680,9 @@ public abstract class Payslip_Base
 
             final MultiPrintQuery multi = queryBldr.getPrint();
             multi.addAttribute(CIPayroll.CasePositionAbstract.Name,
-                                CIPayroll.CasePositionAbstract.Description,
-                                CIPayroll.CasePositionAbstract.Sorted,
-                                CIPayroll.CasePositionAbstract.Mode);
+                            CIPayroll.CasePositionAbstract.Description,
+                            CIPayroll.CasePositionAbstract.Sorted,
+                            CIPayroll.CasePositionAbstract.Mode);
             multi.execute();
             while (multi.next()) {
                 final String childName = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Name);
@@ -1672,19 +1691,20 @@ public abstract class Payslip_Base
                 final Integer mode = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Mode);
                 if (multi.getCurrentInstance().getType().isKindOf(CIPayroll.CasePositionSumAbstract.getType())) {
                     final SumPosition sum = new SumPosition(_sums,
-                                                            multi.getCurrentInstance(),
-                                                            childName,
-                                                            childDescription,
-                                                            sortedTmp,
-                                                            mode);
+                                    multi.getCurrentInstance(),
+                                    childName,
+                                    childDescription,
+                                    sortedTmp,
+                                    mode);
                     _sums.put(multi.getCurrentInstance(), sum);
                     this.children.add(sum);
                 } else {
-                    this.children.add(new CalcPosition(multi.getCurrentInstance()));
+                    final CalcPosition pos = new CalcPosition(multi.getCurrentInstance());
+                    _sums.put(multi.getCurrentInstance(), pos);
+                    this.children.add(pos);
                 }
             }
         }
-
 
         /**
          * Getter method for the instance variable {@link #mode}.
@@ -1733,7 +1753,7 @@ public abstract class Payslip_Base
          */
         @Override
         public BigDecimal getResult(final Parameter _parameter,
-                                    final Map<Instance, SumPosition> _sums,
+                                    final Map<Instance, Position> _sums,
                                     final Map<Instance, TablePos> _values)
         {
             BigDecimal ret = BigDecimal.ZERO;
