@@ -527,8 +527,8 @@ public abstract class Payslip_Base
         print.addSelect(selEmpOID, selEmpLastName, selEmpFirstName, selEmpNum);
         print.execute();
 
-        final BigDecimal amount2Pay = print.<BigDecimal>getAttribute(CIPayroll.Payslip.RateCrossTotal);
-        final BigDecimal amountCosts = print.<BigDecimal>getAttribute(CIPayroll.Payslip.AmountCost);
+        print.<BigDecimal>getAttribute(CIPayroll.Payslip.RateCrossTotal);
+        print.<BigDecimal>getAttribute(CIPayroll.Payslip.AmountCost);
         final String empOid = print.<String>getSelect(selEmpOID);
         final String empNum = print.<String>getSelect(selEmpNum);
         final String empLName = print.<String>getSelect(selEmpLastName);
@@ -545,7 +545,8 @@ public abstract class Payslip_Base
         final DecimalFormat formater = getTwoDigitsformater();
 
         js.append("function setValue() {\n")
-            .append("document.getElementsByName('currencyLink')[0].value=").append(curId).append(";\n")
+            .append("document.getElementsByName('").append(CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name)
+            .append("')[0].value=").append(curId).append(";\n")
             .append(getSetFieldValue(0, "number", empOid)).append("\n")
             .append(getSetFieldValue(0, "numberAutoComplete", empNum)).append("\n")
             .append(getSetFieldValue(0, "employeeData", empLName + ", " + empFName)).append("\n")
@@ -555,10 +556,6 @@ public abstract class Payslip_Base
             .append(getSetFieldValue(0, "extraLaborTime", formater.format(extraLaborTimeVal))).append("\n")
             .append("document.getElementsByName('extraLaborTimeUoM')[0].value=")
             .append(extraLaborTimeUoM.getId()).append(";\n")
-            .append(getSetFieldValue(0, "amount2Pay", amount2Pay == null
-                            ? BigDecimal.ZERO.toString() : formater.format(amount2Pay))).append("\n")
-            .append(getSetFieldValue(0, "amountCost", amountCosts == null
-                            ? BigDecimal.ZERO.toString() : formater.format(amountCosts))).append("\n")
             .append("}\n");
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
@@ -583,7 +580,7 @@ public abstract class Payslip_Base
             final String name = multi.<String>getSelect(selCaseName);
             final String desc = multi.<String> getAttribute(CIPayroll.PositionAbstract.Description);
             final Integer mode = multi.<Integer>getSelect(selCaseMode);
-            final BigDecimal dVal = multi.<BigDecimal> getAttribute( CIPayroll.PositionAbstract.Amount);
+            final BigDecimal dVal = multi.<BigDecimal> getAttribute(CIPayroll.PositionAbstract.Amount);
 
             final Instance instance = multi.<Instance>getSelect(selCaseInst);
             final String oid = instance.getOid();
