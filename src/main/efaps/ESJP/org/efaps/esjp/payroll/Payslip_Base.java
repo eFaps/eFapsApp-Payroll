@@ -63,6 +63,7 @@ import net.sf.jasperreports.engine.JRException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.efaps.admin.common.SystemConfiguration;
+import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
@@ -455,6 +456,9 @@ public abstract class Payslip_Base
                     insert.add(CIPayroll.Advance.Rate, rate);
                     insert.add(CIPayroll.Advance.DiscountTotal, 0);
                     insert.add(CIPayroll.Advance.RateDiscountTotal, 0);
+                    insert.add(CIPayroll.Advance.LaborTime, new Object[] { 0,
+                                    Dimension.get(UUID.fromString("8154e40c-3f2d-4bc0-91e6-b8510eaf642c"))
+                                       .getBaseUoM().getId() });
                     insert.execute();
                 }
             }
