@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_PayslipPositionNeutral" language="groovy" pageWidth="525" pageHeight="407" orientation="Landscape" columnWidth="525" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
-	<property name="ireport.zoom" value="1.5026296018031553"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
-	<import value="org.efaps.admin.datamodel.ui.DecimalUI"/>
-	<parameter name="EFAPS_DEFINITION" class="java.lang.String" isForPrompting="false">
-		<property name="UUID" value="a6501e8d-8316-401a-9683-fc003689f147"/>
-		<property name="Types" value="Payroll_PositionNeutral"/>
-		<property name="LinkFroms" value="PayslipLink"/>
-	</parameter>
-	<field name="Case" class="java.lang.String">
-		<property name="Select" value="linkto[CasePositionAbstractLink].attribute[Name]"/>
-	</field>
-	<field name="Description" class="java.lang.String">
-		<property name="Select" value="attribute[Description]"/>
-	</field>
-	<field name="Amount" class="java.math.BigDecimal">
-		<property name="Select" value="attribute[Amount]"/>
-	</field>
-	<field name="Currency" class="java.lang.String">
-		<property name="Select" value="linkto[CurrencyLink].attribute[Symbol]"/>
-	</field>
-	<detail>
-		<band height="15" splitType="Stretch">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="112" y="0" width="295" height="15" isPrintWhenDetailOverflows="true"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Description}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="439" y="0" width="86" height="15" isPrintWhenDetailOverflows="true"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Amount}.setScale(2, BigDecimal.ROUND_HALF_UP ).toString()]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="112" height="15" isPrintWhenDetailOverflows="true"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Case}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Currency}]]></textFieldExpression>
-			</textField>
-		</band>
-	</detail>
+    <property name="ireport.zoom" value="1.5026296018031553"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+    <import value="org.efaps.admin.datamodel.ui.DecimalUI"/>
+    <parameter name="EFAPS_DEFINITION" class="java.lang.String" isForPrompting="false">
+        <property name="UUID" value="a6501e8d-8316-401a-9683-fc003689f147"/>
+        <property name="Types" value="Payroll_PositionNeutral"/>
+        <property name="LinkFroms" value="PayslipLink"/>
+    </parameter>
+    <field name="Case" class="java.lang.String">
+        <property name="Select" value="linkto[CasePositionAbstractLink].attribute[Name]"/>
+    </field>
+    <field name="Description" class="java.lang.String">
+        <property name="Select" value="attribute[Description]"/>
+    </field>
+    <field name="Amount" class="java.math.BigDecimal">
+        <property name="Select" value="attribute[Amount]"/>
+    </field>
+    <field name="Currency" class="java.lang.String">
+        <property name="Select" value="linkto[RateCurrencyLink].attribute[Symbol]"/>
+    </field>
+    <detail>
+        <band height="15" splitType="Stretch">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="112" y="0" width="295" height="15" isPrintWhenDetailOverflows="true"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{Description}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="439" y="0" width="86" height="15" isPrintWhenDetailOverflows="true"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{Amount}.setScale(2, BigDecimal.ROUND_HALF_UP ).toString()]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="112" height="15" isPrintWhenDetailOverflows="true"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{Case}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{Currency}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
 </jasperReport>
