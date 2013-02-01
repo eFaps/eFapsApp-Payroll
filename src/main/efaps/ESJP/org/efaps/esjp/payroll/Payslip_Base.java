@@ -77,7 +77,6 @@ import org.efaps.admin.program.esjp.EFapsClassLoader;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
-import org.efaps.db.AttributeQuery;
 import org.efaps.db.Checkin;
 import org.efaps.db.Context;
 import org.efaps.db.Insert;
@@ -94,7 +93,6 @@ import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.erp.CurrencyInst;
-import org.efaps.esjp.erp.Rate;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.DocumentSum;
@@ -608,223 +606,10 @@ public abstract class Payslip_Base
     }
 
     /**
-     * @param _parameter as passed from eFaps API.
-     * @param lstPos
-     * @return
-     * @throws EFapsException on error.
-     */
-    private Return createTransaction (final Parameter _parameter,
-                                      final List<InsertPos> lstPos) throws EFapsException {
-        final Instance instEmployee = Instance.get(_parameter.getParameterValue("number"));
-        // Accounting_Periode
-        final QueryBuilder queryBlrd = new QueryBuilder(UUID.fromString("a8ac11ce-feb9-4ba6-bffd-8174906190f5"));
-        queryBlrd.addWhereAttrGreaterValue("ToDate", new DateTime().minusDays(1));
-        queryBlrd.addWhereAttrLessValue("FromDate", new DateTime().plusSeconds(1));
-        final MultiPrintQuery multi = queryBlrd.getPrint();
-        multi.execute();
-        if (multi.next() && instEmployee.isValid()) {
-            final Instance instPer = multi.getCurrentInstance();
-
-            final PrintQuery printEmp = new PrintQuery(instEmployee);
-            printEmp.addAttribute(CIHumanResource.Employee.LastName, CIHumanResource.Employee.FirstName);
-            printEmp.execute();
-
-            final String employee = printEmp.<String>getAttribute(CIHumanResource.Employee.LastName)
-                            + ", " + printEmp.<String>getAttribute(CIHumanResource.Employee.FirstName);
-
-            // Accounting_Transaction
-            final Insert insert = new Insert(UUID.fromString("f1962037-c73b-4b55-94d8-f33e47a219d6"));
-            insert.add("Name", _parameter.getParameterValue("name"));
-            insert.add("Description", _parameter.getParameterValue("name") + " - " + employee);
-            insert.add("Date", _parameter.getParameterValue("transactionDate"));
-            insert.add("PeriodeLink", instPer.getId());
-            // Accounting_TransactionStatus
-            insert.add("Status", Status.find(UUID.fromString("bdd988b5-9e97-4633-9dae-fde41c671d3e"), "Open").getId());
-            insert.execute();
-
-            for (final InsertPos pos : lstPos) {
-                if (pos.getType().equals(CIPayroll.PositionDeduction.getType())
-                                || pos.getType().equals(CIPayroll.PositionNeutral.getType())
-                                || pos.getType().equals(CIPayroll.PositionPayment.getType())) {
-                    final PrintQuery print = new PrintQuery(pos.caseType, pos.getId());
-                    final SelectBuilder selActionOid = new SelectBuilder().linkto("ActionDefinitionLink").oid();
-                    print.addSelect(selActionOid);
-                    print.execute();
-                    final Instance instAction = Instance.get(print.<String>getSelect(selActionOid));
-                    if (instAction.isValid()) {
-                        insertPositions(_parameter, insert.getInstance(), instAction, instPer, pos, "Payment");
-                    }
-                }
-            }
-        }
-
-        return new Return();
-    }
-
-    /**
-     * @param _parameter
-     * @param _instance
-     * @param _instAction
-     * @param _instPeriode
-     * @param _pos
-     * @param _postFix
-     * @throws EFapsException
-     */
-    public void insertPositions(final Parameter _parameter,
-                                final Instance _instance,
-                                final Instance _instAction,
-                                final Instance _instPeriode,
-                                final InsertPos _pos,
-                                final String _postFix)
-        throws EFapsException
-    {
-        // Accounting_CasePayroll
-        final QueryBuilder attrQueryBldr = new QueryBuilder(UUID.fromString("68f1faef-6779-498d-b37d-bc2bd5e9a453"));
-        attrQueryBldr.addWhereAttrEqValue("PeriodeAbstractLink", _instPeriode.getId());
-        final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery("ID");
-
-        // Accounting_ActionDefinition2Case
-        final QueryBuilder attrQueryBldr2 = new QueryBuilder(UUID.fromString("5b4f8626-c8f8-44b5-823d-1ba5817631d1"));
-        attrQueryBldr2.addWhereAttrEqValue("FromLink", _instAction.getId());
-        attrQueryBldr2.addWhereAttrInQuery("ToLink", attrQuery);
-        final AttributeQuery attrQuery2 = attrQueryBldr2.getAttributeQuery("ToLink");
-
-        // Accounting_Account2CaseAbstract
-        final QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("7efe5f1a-4fdc-41d7-8f55-77777212f02b"));
-        queryBldr.addWhereAttrInQuery("ToCaseAbstractLink", attrQuery2);
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute("Numerator", "Denominator");
-        final SelectBuilder selAccountOid = new SelectBuilder().linkto("FromAccountAbstractLink").oid();
-        multi.addSelect(selAccountOid);
-        multi.execute();
-        while (multi.next()) {
-            final String accountOid = multi.<String>getSelect(selAccountOid);
-            final BigDecimal numerator = new BigDecimal(multi.<Integer>getAttribute("Numerator"));
-            final BigDecimal denominator = new BigDecimal(multi.<Integer>getAttribute("Denominator"));
-            Type type = null;
-            // Accounting_Account2CaseCredit
-            if (multi.getCurrentInstance().getType()
-                            .isKindOf(Type.get(UUID.fromString("f6f52802-c362-4e77-9068-ba02303f7b5c")))) {
-                // Accounting_TransactionPositionCredit
-                type = Type.get(UUID.fromString("5336550c-3da0-41da-9b94-0f68788423b1"));
-            // Accounting_Account2CaseDebit
-            } else if (multi.getCurrentInstance().getType()
-                            .isKindOf(Type.get(UUID.fromString("c413ba55-714a-415d-b904-9af49efeb785")))) {
-                // Accounting_TransactionPositionDebit
-                type = Type.get(UUID.fromString("2190cf3c-eb36-4565-9d8a-cd9105451f35"));
-            }
-
-            // Payroll-Configuration
-            final SystemConfiguration config = SystemConfiguration.get(
-                            UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e"));
-            final Instance currInst = config.getLink("Currency4Payslip");
-
-            if (!currInst.isValid()) {
-                throw new EFapsException(Payslip_Base.class, "create.MissingConfigLink");
-            }
-
-            final Object[] rateObj = getRateObject(_instPeriode, currInst);
-            final BigDecimal rate = ((BigDecimal) rateObj[0]).divide((BigDecimal) rateObj[1], 12,
-                            BigDecimal.ROUND_HALF_UP);
-            final Insert insert2 = new Insert(type);
-            insert2.add("TransactionLink", _instance.getId());
-            insert2.add("AccountLink", Instance.get(accountOid).getId());
-            insert2.add("CurrencyLink", currInst.getId());
-            insert2.add("RateCurrencyLink", currInst.getId());
-            insert2.add("Rate", rateObj);
-
-            final BigDecimal rateAmount = _pos.getAmount().setScale(6, BigDecimal.ROUND_HALF_UP);
-            final BigDecimal amount = rateAmount.divide(rate, 12, BigDecimal.ROUND_HALF_UP);
-
-            final BigDecimal rateAmount2 = rateAmount.multiply(numerator
-                                .divide(denominator, 8, BigDecimal.ROUND_HALF_UP));
-            final BigDecimal amount2 = amount.multiply(numerator
-                                .divide(denominator, 8, BigDecimal.ROUND_HALF_UP));
-
-            final boolean isDebitTrans = type.getUUID()
-                            .equals(UUID.fromString("2190cf3c-eb36-4565-9d8a-cd9105451f35"));
-            insert2.add("RateAmount", isDebitTrans ? rateAmount2.negate() : rateAmount2);
-
-            insert2.add("Amount", isDebitTrans ? amount2.negate() : amount2);
-            insert2.execute();
-
-        }
-
-    }
-
-    /**
-     * Get the exchange Rate for a Date inside a periode.
-     *
-     * @param _periodeInst  Instance of the periode
-     * @param _currId       id of the currency
-     * @param _date         date the exchange rate is wanted for
-     * @return rate
-     * @throws EFapsException on error
-     */
-    protected Rate getExchangeRate(final Instance _periodeInst,
-                                   final Long _currId,
-                                   final DateTime _date)
-        throws EFapsException
-    {
-
-        final Rate ret;
-
-        final PrintQuery print = new PrintQuery(_periodeInst);
-        final SelectBuilder selCur = new SelectBuilder().linkto("CurrencyLink").oid();
-        print.addSelect(selCur);
-        print.execute();
-        final CurrencyInst curInstance = new CurrencyInst(Instance.get(print.<String> getSelect(selCur)));
-        if (curInstance.getInstance().getId() == _currId) {
-            ret = new Rate(curInstance, BigDecimal.ONE);
-        } else {
-            // Accounting_ERP_CurrencyRateAccounting
-            final QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("3fecbf3a-4454-40ef-a182-713b211a283f"));
-            queryBldr.addWhereAttrEqValue("CurrencyLink", _currId);
-            queryBldr.addWhereAttrLessValue("ValidFrom",
-                            _date.plusMinutes(1));
-            queryBldr.addWhereAttrGreaterValue("ValidUntil",
-                            _date.minusMinutes(1));
-            final MultiPrintQuery multi = queryBldr.getPrint();
-            final SelectBuilder valSel = new SelectBuilder()
-                            .attribute("Rate").value();
-            final SelectBuilder labSel = new SelectBuilder()
-                            .attribute("Rate").label();
-            final SelectBuilder curSel = new SelectBuilder()
-                            .linkto("CurrencyLink").oid();
-            multi.addSelect(valSel, labSel, curSel);
-            multi.execute();
-            if (multi.next()) {
-                ret = new Rate(new CurrencyInst(Instance.get(multi.<String>getSelect(curSel))),
-                                multi.<BigDecimal>getSelect(valSel),
-                                multi.<BigDecimal>getSelect(labSel));
-            } else {
-                ret = new Rate(new CurrencyInst(Instance.get(CIERP.Currency.getType(), _currId)), BigDecimal.ONE);
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * @param _periodeInstance
-     * @param _currInstance
-     * @return
-     * @throws EFapsException
-     */
-    protected Object[] getRateObject(final Instance _periodeInstance,
-                                     final Instance _currInstance)
-        throws EFapsException
-    {
-
-        final Rate rate = getExchangeRate(_periodeInstance, _currInstance.getId(), new DateTime());
-        return new Object[] { BigDecimal.ONE, rate.getLabel() };
-    }
-
-
-    /**
      * @param _parameter    Parameter as passed by the eFaps API
      * @param _docInst      instance of the document to be updated
      * @param _list         list of positions
+     * @param _rates        Rates
      * @throws EFapsException on error
      */
     protected void setAmounts(final Parameter _parameter,
@@ -1000,6 +785,11 @@ public abstract class Payslip_Base
     }
 
 
+    /**
+     * @param _values values
+     * @return javscript
+     * @throws EFapsException on error
+     */
     protected StringBuilder getJs(final Map<String, Set<Object[]>> _values)
         throws EFapsException
     {
@@ -1269,7 +1059,8 @@ public abstract class Payslip_Base
                     final CrosstabRowGroupBuilder<String> rowGroup = DynamicReports.ctab.rowGroup(
                                     "employee", String.class)
                                     .setTotalHeader("Total");
-                    final CrosstabColumnGroupBuilder<String> colGroup = DynamicReports.ctab.columnGroup("action", String.class);
+                    final CrosstabColumnGroupBuilder<String> colGroup = DynamicReports.ctab.columnGroup("action",
+                                    String.class);
 
                     final CrosstabBuilder crosstab = DynamicReports.ctab
                                     .crosstab()
