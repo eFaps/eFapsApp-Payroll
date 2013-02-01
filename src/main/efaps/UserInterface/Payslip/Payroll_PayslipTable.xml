@@ -34,6 +34,7 @@
         <name>Payroll_PayslipTable</name>
         <!-- fields -->
         <field name="type">
+            <property name="FilterType">PICKLIST</property>
             <property name="Attribute">Type</property>
             <property name="Label">Payroll_Payslip/Type.Label</property>
             <property name="ShowTypeIcon">true</property>
@@ -128,6 +129,7 @@
             <property name="Label">Payroll_Payslip/CurrencyId.Label</property>
         </field>
          <field name="statusAbstract">
+            <property name="FilterType">PICKLIST</property>
             <property name="ModeEdit">NONE</property>
             <property name="Attribute">StatusAbstract</property>
             <property name="Label">Payroll_Payslip/Status.Label</property>
