@@ -60,11 +60,13 @@
             <property name="Label">Payroll_Payslip/employee.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"
-                     name="Payroll_PayslipTable.employeeLink.UI_FIELD_AUTOCOMPLETE"
-                     method="autoComplete4Employee"
-                     event="UI_FIELD_AUTOCOMPLETE" >
-                     <property name="keyValue">Value</property>
-             </trigger>
+                name="Payroll_PayslipTable.employeeLink.UI_FIELD_AUTOCOMPLETE"
+                method="autoComplete4Employee" event="UI_FIELD_AUTOCOMPLETE">
+                <property name="keyValue">Value</property>
+                <property name="Type">HumanResource_EmployeeAbstract</property>
+                <property name="StatusGrp01">HumanResource_EmployeeStatus</property>
+                <property name="Status01">Worker</property>
+            </trigger>
         </field>
         <field name="laborTime">
             <property name="Attribute">LaborTime</property>
