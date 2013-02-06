@@ -44,6 +44,12 @@
             <defaultvalue>false</defaultvalue>
         </attribute>
         <attribute>
+            <name>ExportAFP</name>
+            <type>String</type>
+            <sqltable>Payroll_CasePositionSQLTable</sqltable>
+            <sqlcolumn>EXPORTAFP</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>DefaultValue</name>
             <type>Decimal</type>
             <sqltable>Payroll_CasePositionSQLTable</sqltable>

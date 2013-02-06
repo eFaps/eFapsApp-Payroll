@@ -37,6 +37,7 @@
             <child>Payroll_CaseMyDesk</child>
             <child>Payroll_ReportMyDesk</child>
             <child>Payroll_MyDesk_ActionReport</child>
+            <child>Payroll_MyDesk_ExportAFPReport</child>
         </childs>
     </definition>
 </ui-menu>

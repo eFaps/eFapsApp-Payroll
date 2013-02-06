@@ -106,5 +106,24 @@
             <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
         </field>
+        <field name="exportAFP">
+            <property name="Attribute">ExportAFP</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeView">NONE</property>
+            <property name="Label">Payroll_CasePosition2CalcForm/ExportAFP.Label</property>
+            <trigger program="org.efaps.esjp.payroll.reports.ExportAFPReport"
+                method="dropDownAfpRemuType"
+                name="Payroll_CasePosition2CalcForm.exportAFP.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE">
+            </trigger>
+        </field>
+        <field name="exportAFP4View">
+            <property name="Attribute">ExportAFP</property>
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModeView">READONLY</property>
+            <property name="Label">Payroll_CasePosition2CalcForm/ExportAFP.Label</property>
+        </field>
     </definition>
 </ui-form>
