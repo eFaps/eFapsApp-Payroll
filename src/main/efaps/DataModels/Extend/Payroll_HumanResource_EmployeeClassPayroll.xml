@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+  Copyright 2010 - 2011 moxter.net S.A.C.
+
+  All Rights Reserved.
+  This program contains proprietary and trade secret information of
+  moxter.net S.A.C. Copyright notice is precautionary only and does not
+  evidence any actual or intended publication of such program.
+
+  Author:          moxter.net S.A.C.
+  Revision:        $Rev: 809 $
+  Last Changed:    $Date: 2011-06-14 13:31:14 -0500 (mar, 14 jun 2011) $
+  Last Changed By: $Author: Angel Encalada $
+
+-->
+
+<datamodel-type  xmlns="http://www.efaps.org/xsd"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>484cd38a-0e1d-43e5-81ff-4c6e8474487b</uuid>
+    <file-application>eFapsApp-HumanResource</file-application>
+    <file-revision>$Rev: 809 $</file-revision>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_HumanResource_EmployeeClassPayroll</name>
+        <parent>HumanResource_Class</parent>
+        <purpose classification="true">
+            <LinkColumn>HumanResourceId</LinkColumn>
+        </purpose>
+        <attribute>
+            <name>OID</name>
+            <type>OID</type>
+            <sqltable>Payroll_HumanResource_EmployeeClassPayrollSQLTable</sqltable>
+            <sqlcolumn>ID</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>ID</name>
+            <type>Long</type>
+            <sqltable>Payroll_HumanResource_EmployeeClassPayrollSQLTable</sqltable>
+            <sqlcolumn>ID</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>HumanResourceId</name>
+            <type>Link</type>
+            <typelink>HumanResource_Employee</typelink>
+            <sqltable>Payroll_HumanResource_EmployeeClassPayrollSQLTable</sqltable>
+            <sqlcolumn>HUMANRESOURCEID</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>LaborSystem</name>
+            <type>String</type>
+            <sqltable>Payroll_HumanResource_EmployeeClassPayrollSQLTable</sqltable>
+            <sqlcolumn>LABSYS</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>Security</name>
+            <type>LinkWithRanges</type>
+            <typelink>Payroll_HumanResource_AttributeDefinitionSecurity</typelink>
+            <sqltable>Payroll_HumanResource_EmployeeClassPayrollSQLTable</sqltable>
+            <sqlcolumn>SECURITY</sqlcolumn>
+            <trigger program="org.efaps.esjp.admin.datamodel.RangesValue"
+               name="Contacts_ClassLocation.LocationDistrictLink.RANGE_VALUE"
+               event="RANGE_VALUE">
+                <property name="Value">Value</property>
+                <property name="Type">Payroll_HumanResource_AttributeDefinitionSecurity</property>
+            </trigger>
+        </attribute>
+        <attribute>
+            <name>SecurityNumber</name>
+            <type>String</type>
+            <sqltable>Payroll_HumanResource_EmployeeClassPayrollSQLTable</sqltable>
+            <sqlcolumn>SECURITYNUMBER</sqlcolumn>
+        </attribute>
+    </definition>
+</datamodel-type>

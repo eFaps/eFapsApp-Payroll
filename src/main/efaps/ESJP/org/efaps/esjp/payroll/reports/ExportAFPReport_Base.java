@@ -138,7 +138,16 @@ public abstract class ExportAFPReport_Base
             final SelectBuilder selEmpFName = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                             .attribute(CIHumanResource.Employee.FirstName);
-            multi.addSelect(selDoc, selEmpLName, selEmpFName);
+            final SelectBuilder selSecNumb = new SelectBuilder()
+                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                            .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
+                            .attribute(CIPayroll.HumanResource_EmployeeClassPayroll.SecurityNumber);
+            final SelectBuilder selSec = new SelectBuilder()
+                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                            .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
+                            .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
+                            .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
+            multi.addSelect(selDoc, selEmpLName, selEmpFName, selSecNumb, selSec);
             multi.execute();
             final List<Map<String, Object>> lst = new ArrayList<Map<String, Object>>();
             while (multi.next()) {
@@ -146,9 +155,13 @@ public abstract class ExportAFPReport_Base
                 final String doc = multi.<String>getSelect(selDoc);
                 final String lName = multi.<String>getSelect(selEmpLName);
                 final String fName = multi.<String>getSelect(selEmpFName);
+                final String security = multi.<String>getSelect(selSec);
+                final String securityNumb = multi.<String>getSelect(selSecNumb);
                 map.put("docNum", doc);
                 map.put("lastName", lName);
                 map.put("name", fName);
+                map.put("codCuspp", securityNumb);
+                map.put("afp", security);
 
                 final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
                 queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type,
@@ -172,7 +185,7 @@ public abstract class ExportAFPReport_Base
                 lst.add(map);
             }
             for (final Map<String, Object> map : lst) {
-                dataSource.add("",
+                dataSource.add(map.get("codCuspp") != null ? map.get("codCuspp") : "",
                                 map.get("docNum"),
                                 map.get("lastName"),
                                 "",
@@ -184,7 +197,7 @@ public abstract class ExportAFPReport_Base
                                 map.get("K"),
                                 map.get("L"),
                                 "",
-                                "");
+                                map.get("afp") != null ? map.get("afp") : "");
             }
             return dataSource;
         }

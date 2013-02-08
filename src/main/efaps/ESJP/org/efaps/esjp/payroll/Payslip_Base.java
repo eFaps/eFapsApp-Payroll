@@ -680,12 +680,30 @@ public abstract class Payslip_Base
     {
         final PrintQuery print = new PrintQuery(_instance);
         print.addAttribute(CIHumanResource.EmployeeAbstract.FirstName, CIHumanResource.EmployeeAbstract.LastName);
+        final SelectBuilder selSecNumb = new SelectBuilder()
+                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
+                .attribute(CIPayroll.HumanResource_EmployeeClassPayroll.SecurityNumber);
+        final SelectBuilder selSec = new SelectBuilder()
+                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
+                .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
+                .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
+        final SelectBuilder selSecDesc = new SelectBuilder()
+                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
+                .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
+                .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Description);
+        print.addSelect(selSec, selSecNumb, selSecDesc);
         print.execute();
         final String firstname = print.<String>getAttribute(CIHumanResource.EmployeeAbstract.FirstName);
         final String lastname = print.<String>getAttribute(CIHumanResource.EmployeeAbstract.LastName);
+        final String sec = print.<String>getSelect(selSec);
+        final String secDesc = print.<String>getSelect(selSecDesc);
+        final String secNum = print.<String>getSelect(selSecNumb);
 
         final StringBuilder strBldr = new StringBuilder();
         strBldr.append(lastname).append(", ").append(firstname);
+        if (sec != null && !sec.isEmpty()) {
+            strBldr.append(" - ").append(sec).append("-").append(secDesc).append(": ").append(secNum);
+        }
         return strBldr.toString();
     }
 

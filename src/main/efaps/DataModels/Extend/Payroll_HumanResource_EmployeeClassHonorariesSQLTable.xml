@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+ Copyright 2010 - 2011 moxter.net S.A.C.
+
+ All Rights Reserved.
+ This program contains proprietary and trade secret information of
+ moxter.net S.A.C. Copyright notice is precautionary only and does not
+ evidence any actual or intended publication of such program.
+
+ Author:          moxter.net S.A.C.
+ Revision:        $Rev: 808 $
+ Last Changed:    $Date: 2011-06-14 13:25:44 -0500 (mar, 14 jun 2011) $
+ Last Changed By: $Author: Angel Encalada $
+
+-->
+
+<datamodel-sqltable  xmlns="http://www.efaps.org/xsd"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>1b30c649-c9ea-4f64-80e0-94558f1db555</uuid>
+    <file-application>eFapsApp-HumanResource</file-application>
+    <file-revision>$Rev: 808 $</file-revision>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_HumanResource_EmployeeClassHonorariesSQLTable</name>
+        <database>
+            <table-name>T_PAY_HREMPLOYEECLASSHON</table-name>
+            <!-- columns -->
+            <column name="HUMANRESOURCEID"    type="INTEGER"    not-null="true" />
+            <foreign name="T_PAY_HREMPLOYEECLASSHON_FK_HUMANRESOURCEID" key="HUMANRESOURCEID" reference="T_HREMPLOYEE(ID)" />
+        </database>
+    </definition>
+</datamodel-sqltable>
