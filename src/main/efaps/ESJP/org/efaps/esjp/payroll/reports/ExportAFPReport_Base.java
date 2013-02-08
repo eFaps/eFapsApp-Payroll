@@ -191,7 +191,7 @@ public abstract class ExportAFPReport_Base
                                 "",
                                 map.get("name"),
                                 "",
-                                new DateTime().toDate(),
+                                null,
                                 map.get("I"),
                                 map.get("J"),
                                 map.get("K"),
