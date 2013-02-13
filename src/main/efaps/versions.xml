@@ -2,7 +2,7 @@
 
 <!--
 
-  Copyright 2003 - 2010 The eFaps Team
+  Copyright 2003 - 2013 The eFaps Team
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -72,40 +72,38 @@
             import org.efaps.esjp.admin.ui.UIUpdate;
             import org.efaps.importer.DataImport;
             import org.efaps.db.Insert;
-            import org.efaps.db.SearchQuery;
             import org.efaps.db.Instance;
 
-            import java.net.URL
+            import java.net.URL;
             import java.io.File;
             import java.util.UUID;
 
             RunLevel.init("shell");
             RunLevel.execute();
 
+             UIUpdate update = new UIUpdate();
+
             EFAPS_LOGGER.info("Checking for import of JaasKeys for eFapsApp-Payroll");
-
-            SearchQuery query = new SearchQuery();
-            query.setQueryTypes("Admin_User_JAASKey");
-            query.addWhereExprEqValue("Key", "Payroll_Admin");
-            query.addSelect("OID");
-            query.execute();
+            //Admin_User_JAASKey
+            QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("0e7650c6-8ec3-4c63-b377-f3eb5fb85f16"));
+            queryBldr.addWhereAttrEqValue("Key", "Payroll_Admin");
+            InstanceQuery query = queryBldr.getQuery();
+            query.executeWithoutAccessCheck();
             if (!query.next()) {
-
                 EFAPS_LOGGER.info("    Importing JaasKeys for eFapsApp-Payroll");
                 URL url = new URL(EFAPS_ROOTURL, "Data/IMPORT_UserJAASKey.xml");
                 DataImport imp = DataImport.readFile(url);
                 imp.updateInDB();
 
-                EFAPS_LOGGER.info("    Importing Date for eFapsApp-Payroll");
+                EFAPS_LOGGER.info("    Importing Data for eFapsApp-Payroll");
                 URL url2 = new URL(EFAPS_ROOTURL, "Data/IMPORT_Currency.xml");
                 DataImport imp2 = DataImport.readFile(url2);
                 imp2.updateInDB();
             }
 
-
             // check if accounting is installed
             //Admin_Common_Version
-            QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("1bb051f3-b664-43db-b409-c0c4009f5972"));
+            queryBldr = new QueryBuilder(UUID.fromString("1bb051f3-b664-43db-b409-c0c4009f5972"));
             queryBldr.addWhereAttrEqValue("Name", "eFapsApp-Accounting");
             query = queryBldr.getQuery();
             query.executeWithoutAccessCheck();
@@ -127,9 +125,6 @@
             }
 
 
-
-
-            UIUpdate update = new UIUpdate();
             <!-- connect the Payroll_MyDesk Menu to the main menu from efaps -->
             update.add2Menu("cf354312-fb84-4cf7-9d57-81a8426420e1", "87001cc3-c45c-44de-b8f1-776df507f268", 1);
             <!-- connect the Payroll_HumanResource_EmployeeTree_Payslip to the main menu from HumanResource_EmployeeTree -->
