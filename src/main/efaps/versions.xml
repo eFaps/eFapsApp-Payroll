@@ -67,14 +67,20 @@
         <script type="groovy">
             import org.efaps.admin.runlevel.RunLevel;
             import org.efaps.db.Context;
-            import org.efaps.db.Insert;
-            import org.efaps.db.SearchQuery;
+            import org.efaps.db.QueryBuilder;
+            import org.efaps.db.InstanceQuery;
             import org.efaps.esjp.admin.ui.UIUpdate;
             import org.efaps.importer.DataImport;
+            import org.efaps.db.Insert;
+            import org.efaps.db.SearchQuery;
             import org.efaps.db.Instance;
 
             import java.net.URL
             import java.io.File;
+            import java.util.UUID;
+
+            RunLevel.init("shell");
+            RunLevel.execute();
 
             EFAPS_LOGGER.info("Checking for import of JaasKeys for eFapsApp-Payroll");
 
@@ -84,9 +90,6 @@
             query.addSelect("OID");
             query.execute();
             if (!query.next()) {
-
-                RunLevel.init("shell");
-                RunLevel.execute();
 
                 EFAPS_LOGGER.info("    Importing JaasKeys for eFapsApp-Payroll");
                 URL url = new URL(EFAPS_ROOTURL, "Data/IMPORT_UserJAASKey.xml");
@@ -98,6 +101,33 @@
                 DataImport imp2 = DataImport.readFile(url2);
                 imp2.updateInDB();
             }
+
+
+            // check if accounting is installed
+            //Admin_Common_Version
+            QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("1bb051f3-b664-43db-b409-c0c4009f5972"));
+            queryBldr.addWhereAttrEqValue("Name", "eFapsApp-Accounting");
+            query = queryBldr.getQuery();
+            query.executeWithoutAccessCheck();
+            if (query.next()) {
+                EFAPS_LOGGER.info("Detected Accounting. Check for updates in relation to Payroll");
+
+                <!-- connect the Accounting_Sales_DocumentSumTree_Transaction Menu to the Payroll_PayslipTree  menu -->
+                update.add2Menu("06018fca-1ee8-40df-8030-460f57acb447", "89f26b99-0066-4173-aee8-325bd27d70f1", -1);
+
+                <!-- connect the Accounting_Sales_DocumentSumTree_Transaction Menu to the Payroll_AdvanceTree  menu -->
+                update.add2Menu("06018fca-1ee8-40df-8030-460f57acb447", "4224d4a4-1d4e-4515-972b-4b5845415af2", -1);
+
+                <!-- connect the Accounting_Payroll_PayslipTree_Menu_Action_CreateTransaction to  Payroll_PayslipTree_Menu_Action -->
+                update.add2Menu("3654c7e3-af29-44e8-bdf3-593f8f538584", "b9114815-0d1b-4e21-b1b3-20398c69d1f9", -1);
+
+                 <!-- Accounting_Payroll_PayslipMyDesk_Menu_Action_CreateTransaction,  Payroll_PayslipMyDesk_Menu_Action-->
+                update.add2Menu("8505bbb2-e9d0-45f6-afff-56d2dd2c45b9", "0c8f7631-6d7c-479c-a01c-0d308c976431", -1);
+
+            }
+
+
+
 
             UIUpdate update = new UIUpdate();
             <!-- connect the Payroll_MyDesk Menu to the main menu from efaps -->
