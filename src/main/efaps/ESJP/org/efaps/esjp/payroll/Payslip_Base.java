@@ -60,7 +60,7 @@ import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.Dimension;
@@ -960,7 +960,7 @@ public abstract class Payslip_Base
             if (pos.getMode() != CasePosition_Base.MODE.DEAVTIVATED.ordinal()) {
                 html.append("<tr>")
                     .append("<td style=\"font-weight:bold\">").append(pos.getName()).append("</td>")
-                    .append("<td>").append(StringEscapeUtils.escapeJavaScript(pos.getDescription())).append("</td>")
+                    .append("<td>").append(StringEscapeUtils.escapeEcmaScript(pos.getDescription())).append("</td>")
                     .append("<td style=\"text-align:right\">")
                     .append(formater.format(pos.getResult(_parameter, sums, values))).append("</td></tr>");
             }
