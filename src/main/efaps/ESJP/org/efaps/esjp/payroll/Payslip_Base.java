@@ -550,8 +550,9 @@ public abstract class Payslip_Base
             .append(laborTimeUoM.getId()).append(";")
             .append(getSetFieldValue(0, "extraLaborTime", formater.format(extraLaborTimeVal))).append("\n")
             .append("document.getElementsByName('extraLaborTimeUoM')[0].value=")
-            .append(extraLaborTimeUoM.getId()).append(";\n")
-            .append("}\n");
+            .append(extraLaborTimeUoM.getId()).append(";\n");
+
+        boolean setCase = true;
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
         queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _instance.getId());
@@ -559,7 +560,7 @@ public abstract class Payslip_Base
         multi.addAttribute(CIPayroll.PositionAbstract.PositionNumber,
                         CIPayroll.PositionAbstract.Amount,
                         CIPayroll.PositionAbstract.Description);
-        final SelectBuilder selCaseInst = new SelectBuilder()
+        final SelectBuilder selCasePosInst = new SelectBuilder()
                         .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink).instance();
         final SelectBuilder selCaseName = new SelectBuilder()
                         .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
@@ -567,7 +568,7 @@ public abstract class Payslip_Base
         final SelectBuilder selCaseMode = new SelectBuilder()
             .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
                 .attribute(CIPayroll.CasePositionCalc.Mode);
-        multi.addSelect(selCaseInst, selCaseName, selCaseMode);
+        multi.addSelect(selCasePosInst, selCaseName, selCaseMode);
         multi.execute();
 
         final Map<String, Set<Object[]>> values = new TreeMap<String, Set<Object[]>>();
@@ -577,7 +578,19 @@ public abstract class Payslip_Base
             final Integer mode = multi.<Integer>getSelect(selCaseMode);
             final BigDecimal dVal = multi.<BigDecimal> getAttribute(CIPayroll.PositionAbstract.Amount);
 
-            final Instance instance = multi.<Instance>getSelect(selCaseInst);
+            final Instance instance = multi.<Instance>getSelect(selCasePosInst);
+            if (setCase) {
+                setCase = false;
+                final PrintQuery posPrint = new PrintQuery(instance);
+                final SelectBuilder selCaseInst = new SelectBuilder()
+                    .linkto(CIPayroll.CasePositionAbstract.CaseAbstractLink).instance();
+                posPrint.addSelect(selCaseInst);
+                posPrint.executeWithoutAccessCheck();
+                final Instance caseInst = posPrint.<Instance>getSelect(selCaseInst);
+                if (caseInst.isValid()) {
+                    js.append("document.getElementsByName('case')[0].value='").append(caseInst.getOid()).append("'");
+                }
+            }
             final String oid = instance.getOid();
             String postFix = null;
             if (instance.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
@@ -599,7 +612,8 @@ public abstract class Payslip_Base
                 values.put(name, set);
             }
         }
-        js.append("Wicket.Event.add(window, \"domready\", function(event) {\n")
+        js.append("}\n")
+            .append("Wicket.Event.add(window, \"domready\", function(event) {\n")
             .append(getJs(values)).append("\n setValue();\n")
             .append(" });");
         return js.toString();
