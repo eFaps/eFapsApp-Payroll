@@ -64,10 +64,14 @@ public abstract class ExportAFPReport_Base
     private static final List<DropDownPosition> REMUTYPE_LST = new ArrayList<DropDownPosition>();
     static {
         ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("", ""));
-        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("I", "Remuneración asegurable "));
-        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("J", "Aporte voluntario con fin previsional "));
-        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("K", "Aporte voluntario sin fin previsional "));
-        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("L", "Aporte voluntario del empleador "));
+        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("I",
+                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuI")));
+        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("J",
+                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuJ")));
+        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("K",
+                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuK")));
+        ExportAFPReport_Base.REMUTYPE_LST.add(new DropDownPosition("L",
+                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuL")));
     }
 
     public Return dropDownAfpRemuType(final Parameter _parameter)
