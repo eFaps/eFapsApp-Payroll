@@ -34,6 +34,7 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PositionAbstract</name>
+        <purpose abstract="true"/>
         <attribute>
             <name>Type</name>
             <type>Type</type>
