@@ -484,7 +484,7 @@ public abstract class Payslip_Base
 
         js.append("<script type=\"text/javascript\">");
         if (inst != null && inst.isValid()) {
-            js.append(getSetValuesString(inst));
+            js.append(getSetValuesString(_parameter, inst));
         }
         js.append("</script>");
         final Return ret = new Return();
