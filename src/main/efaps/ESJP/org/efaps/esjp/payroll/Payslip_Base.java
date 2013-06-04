@@ -500,7 +500,8 @@ public abstract class Payslip_Base
      * @throws EFapsException on error
      */
     @Override
-    protected String getSetValuesString(final Instance _instance)
+    protected String getSetValuesString(final Parameter _parameter,
+                                        final Instance _instance)
         throws EFapsException
     {
         final StringBuilder js = new StringBuilder();
