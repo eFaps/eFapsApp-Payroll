@@ -62,6 +62,7 @@ import net.sf.jasperreports.engine.JRException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Dimension.UoM;
@@ -590,6 +591,7 @@ public abstract class Payslip_Base
                 final Instance caseInst = posPrint.<Instance>getSelect(selCaseInst);
                 if (caseInst.isValid()) {
                     js.append("document.getElementsByName('case')[0].value='").append(caseInst.getOid()).append("'");
+                    Context.getThreadContext().setSessionAttribute(Case_Base.CASE_SESSIONKEY, caseInst.getOid());
                 }
             }
             final String oid = instance.getOid();
@@ -1277,6 +1279,12 @@ public abstract class Payslip_Base
             return this.id;
         }
 
+
+        @Override
+        public String toString()
+        {
+            return ToStringBuilder.reflectionToString(this);
+        }
     }
 
     /**
@@ -1336,6 +1344,13 @@ public abstract class Payslip_Base
         public List<BigDecimal> getValues()
         {
             return this.values;
+        }
+
+
+        @Override
+        public String toString()
+        {
+            return ToStringBuilder.reflectionToString(this);
         }
     }
 
@@ -1482,6 +1497,12 @@ public abstract class Payslip_Base
             }
             return ret.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
+
+        @Override
+        public String toString()
+        {
+            return ToStringBuilder.reflectionToString(this);
+        }
     }
 
     public class SumPosition
@@ -1603,6 +1624,12 @@ public abstract class Payslip_Base
                 }
             }
             return ret.setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+
+        @Override
+        public String toString()
+        {
+            return ToStringBuilder.reflectionToString(this);
         }
     }
 }
