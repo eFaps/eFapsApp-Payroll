@@ -121,7 +121,7 @@ public abstract class Case_Base
         final Boolean caseActive = print.<Boolean>getAttribute(CIPayroll.CasePayslip.Active);
 
         final Insert insert = new Insert(CIPayroll.CasePayslip);
-        insert.add(CIPayroll.CasePayslip.Name, caseName);
+        insert.add(CIPayroll.CasePayslip.Name, caseName + " _copy");
         insert.add(CIPayroll.CasePayslip.Description, caseDesc);
         insert.add(CIPayroll.CasePayslip.Active, caseActive);
         insert.execute();
@@ -142,7 +142,7 @@ public abstract class Case_Base
             final Insert insertRoot = new Insert(CIPayroll.CasePositionRootSum);
             insertRoot.add(CIPayroll.CasePositionRootSum.CaseLink, newCaseInst.getId());
             insertRoot.add(CIPayroll.CasePositionRootSum.Name,
-                            multi.<String>getAttribute(CIPayroll.CasePositionRootSum.Name) + " _copy");
+                            multi.<String>getAttribute(CIPayroll.CasePositionRootSum.Name));
             insertRoot.add(CIPayroll.CasePositionRootSum.Description,
                             multi.getAttribute(CIPayroll.CasePositionRootSum.Description));
             insertRoot.add(CIPayroll.CasePositionRootSum.Mode, multi.getAttribute(CIPayroll.CasePositionRootSum.Mode));

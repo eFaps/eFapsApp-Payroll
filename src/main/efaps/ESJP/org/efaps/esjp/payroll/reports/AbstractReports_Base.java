@@ -20,11 +20,12 @@
 package org.efaps.esjp.payroll.reports;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.esjp.erp.util.ERP;
+import org.efaps.esjp.erp.util.ERPSettings;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -81,10 +82,9 @@ public abstract class AbstractReports_Base
         final String year = "" + _date.getYear();
         final String month = _date.getMonthOfYear() < 10
                         ? "0" + _date.getMonthOfYear() : "" + _date.getMonthOfYear();
-        // Payroll-Configuration
-        final SystemConfiguration config = SystemConfiguration
-                        .get(UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e"));
-        final String ruc = config.getAttributeValue("TaxNumber");
+
+        final SystemConfiguration config = ERP.getSysConfig();
+        final String ruc = config.getAttributeValue(ERPSettings.COMPANYTAX);
         final String name = _format.concat(year).concat(month).concat(ruc);
         return name;
     }

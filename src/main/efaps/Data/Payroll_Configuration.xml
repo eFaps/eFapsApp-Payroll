@@ -31,10 +31,5 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll-Configuration</name>
-        <attribute>
-            <key>TaxNumber</key>
-            <value>*************</value>
-            <description>TaxNumber of the current company.</description>
-        </attribute>
     </definition>
 </common-systemconfiguration>
