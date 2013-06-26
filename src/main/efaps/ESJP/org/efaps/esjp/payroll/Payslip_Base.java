@@ -458,6 +458,9 @@ public abstract class Payslip_Base
                     insert.add(CIPayroll.Advance.LaborTime, new Object[] { 0,
                                     Dimension.get(UUID.fromString("8154e40c-3f2d-4bc0-91e6-b8510eaf642c"))
                                        .getBaseUoM().getId() });
+                    insert.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { 0,
+                                    Dimension.get(UUID.fromString("8154e40c-3f2d-4bc0-91e6-b8510eaf642c"))
+                                       .getBaseUoM().getId() });
                     insert.execute();
                 }
             }
