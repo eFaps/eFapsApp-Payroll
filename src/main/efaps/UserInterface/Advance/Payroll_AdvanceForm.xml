@@ -48,7 +48,7 @@
         <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
         <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
         <property name="Label">Payroll_PayslipForm.number.Label</property>
-        <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
+        <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
         <property name="ModeCreate">EDITABLE</property>
         <property name="ModeEdit">NONE</property>
         <property name="ModeView">READONLY</property>

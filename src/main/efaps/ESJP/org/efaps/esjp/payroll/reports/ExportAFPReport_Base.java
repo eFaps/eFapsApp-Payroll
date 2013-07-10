@@ -139,6 +139,9 @@ public abstract class ExportAFPReport_Base
             final SelectBuilder selEmpLName = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                             .attribute(CIHumanResource.Employee.LastName);
+            final SelectBuilder selEmpSLName = new SelectBuilder()
+                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                            .attribute(CIHumanResource.Employee.SecondLastName);
             final SelectBuilder selEmpFName = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                             .attribute(CIHumanResource.Employee.FirstName);
@@ -151,18 +154,20 @@ public abstract class ExportAFPReport_Base
                             .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
                             .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
                             .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
-            multi.addSelect(selDoc, selEmpLName, selEmpFName, selSecNumb, selSec);
+            multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName, selSecNumb, selSec);
             multi.execute();
             final List<Map<String, Object>> lst = new ArrayList<Map<String, Object>>();
             while (multi.next()) {
                 final Map<String, Object> map = new HashMap<String, Object>();
                 final String doc = multi.<String>getSelect(selDoc);
                 final String lName = multi.<String>getSelect(selEmpLName);
+                final String slName = multi.<String>getSelect(selEmpSLName);
                 final String fName = multi.<String>getSelect(selEmpFName);
                 final String security = multi.<String>getSelect(selSec);
                 final String securityNumb = multi.<String>getSelect(selSecNumb);
                 map.put("docNum", doc);
                 map.put("lastName", lName);
+                map.put("lastName2", slName);
                 map.put("name", fName);
                 map.put("codCuspp", securityNumb);
                 map.put("afp", security);
