@@ -26,6 +26,17 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_ExportAFPReportForm</name>
+        <field name="mime">
+            <property name="ModeCreate">READONLY</property>
+            <property name="Label">Sales_Document_ReportForm.mime.Label</property>
+            <trigger program="org.efaps.esjp.ui.print.UserInterface"
+                method="getMimeFieldValueUI"
+                name="Sales_Document_ReportForm.mime.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE">
+                <property name="DefaultMime">txt</property>
+                <property name="IgnoreMime">pdf</property>
+            </trigger>
+        </field>
         <field name="dateFrom">
             <property name="Label">Payroll_PayslipActionReportForm.dateFrom.Label</property>
             <property name="ModeCreate">EDITABLE</property>

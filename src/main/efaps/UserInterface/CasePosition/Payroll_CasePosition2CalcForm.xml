@@ -124,6 +124,11 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">READONLY</property>
             <property name="Label">Payroll_CasePosition2CalcForm/ExportAFP.Label</property>
+            <trigger program="org.efaps.esjp.payroll.reports.ExportAFPReport"
+                method="formatAfpRemuType"
+                name="Payroll_CasePosition2CalcForm.exportAFP4View.UI_FIELD_FORMAT"
+                event="UI_FIELD_FORMAT">
+            </trigger>
         </field>
     </definition>
 </ui-form>
