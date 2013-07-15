@@ -181,19 +181,12 @@ public abstract class ExportAFPReport_Base
                             .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateTo.name));
 
             final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-            attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom);
-            attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo);
+            attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusMinutes(1));
+            attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
             final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID);
-
-            final QueryBuilder attrQueryBldr2 = new QueryBuilder(CIPayroll.Payslip);
-            attrQueryBldr2.addWhereAttrEqValue(CIPayroll.Payslip.Date, dateFrom);
-            attrQueryBldr2.addWhereAttrEqValue(CIPayroll.Payslip.DueDate, dateTo);
-            final AttributeQuery attrQuery2 = attrQueryBldr2.getAttributeQuery(CIPayroll.Payslip.ID);
 
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
             queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
-            queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery2);
-            queryBldr.setOr(true);
 
             final MultiPrintQuery multi = queryBldr.getPrint();
             final SelectBuilder selDoc = new SelectBuilder()
@@ -402,19 +395,12 @@ public abstract class ExportAFPReport_Base
                                 .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateTo.name));
 
                 final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-                attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom);
-                attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo);
+                attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusMinutes(1));
+                attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
                 final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID);
-
-                final QueryBuilder attrQueryBldr2 = new QueryBuilder(CIPayroll.Payslip);
-                attrQueryBldr2.addWhereAttrEqValue(CIPayroll.Payslip.Date, dateFrom);
-                attrQueryBldr2.addWhereAttrEqValue(CIPayroll.Payslip.DueDate, dateTo);
-                final AttributeQuery attrQuery2 = attrQueryBldr2.getAttributeQuery(CIPayroll.Payslip.ID);
 
                 final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
                 queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
-                queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery2);
-                queryBldr.setOr(true);
 
                 final MultiPrintQuery multi = queryBldr.getPrint();
                 final SelectBuilder selDoc = new SelectBuilder()
