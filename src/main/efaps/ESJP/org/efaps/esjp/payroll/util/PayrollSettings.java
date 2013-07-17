@@ -30,5 +30,8 @@ package org.efaps.esjp.payroll.util;
  */
 public interface PayrollSettings
 {
-
+    /**
+     * String with the name of the selected company.
+     */
+    String MOVEMENTTYPE_ENDDATE = "org.efaps.payroll.MovementTypeEndDate";
 }

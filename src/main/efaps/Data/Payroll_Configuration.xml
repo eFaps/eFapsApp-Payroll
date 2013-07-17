@@ -31,5 +31,10 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll-Configuration</name>
+        <attribute>
+            <key>org.efaps.payroll.MovementTypeEndDate</key>
+            <value></value>
+            <description>OIDs of the movement type attribute definition that should be added with the end date in the afp report.</description>
+        </attribute>
     </definition>
 </common-systemconfiguration>

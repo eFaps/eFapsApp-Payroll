@@ -152,6 +152,7 @@ public abstract class Payslip_Base
         final String amountCosts = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amountCost.name);
         final String currencyLinks = _parameter.getParameterValue(
                         CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name);
+        final String movementType = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.movementType.name);
         try {
             final DecimalFormat formater = getFormater(2, 2);
 
@@ -203,6 +204,7 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.RateCurrencyId, currencyLinks);
             insert.add(CIPayroll.Payslip.LaborTime, new Object[] { time, laborTimeUoMs });
             insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraTime, extraLaborTimeUoMs });
+            insert.add(CIPayroll.Payslip.MovementType, movementType);
             insert.execute();
             final Map<Instance, TablePos> values = new HashMap<Instance, TablePos>();
             analyseTables(_parameter, values, "Deduction");

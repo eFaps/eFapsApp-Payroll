@@ -46,6 +46,7 @@
             <column name="EXTRATIME"        type="DECIMAL"                      length="16" scale="6"/>
             <column name="EXTRATIMEUOMID"   type="INTEGER"/>
             <column name="EXTRATIMEBASE"    type="REAL"/>
+            <column name="MOVEMENTTYPE"     type="INTEGER"/>
             <!-- foreign keys -->
             <foreign name="T_PRDOC_EMPLOYEEID"   key="EMPLOYEEID"      reference="T_HREMPLOYEE(ID)"/>
         </database>

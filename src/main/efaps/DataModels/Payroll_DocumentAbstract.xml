@@ -63,5 +63,18 @@
             <sqlcolumn>EXTRATIME,EXTRATIMEUOMID,EXTRATIMEBASE</sqlcolumn>
             <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
         </attribute>
+        <attribute>
+            <name>MovementType</name>
+            <type>LinkWithRanges</type>
+            <typelink>Payroll_AttributeDefinitionMovementType</typelink>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>MOVEMENTTYPE</sqlcolumn>
+            <trigger program="org.efaps.esjp.admin.datamodel.RangesValue"
+               name="Contacts_ClassLocation.LocationDistrictLink.RANGE_VALUE"
+               event="RANGE_VALUE">
+                <property name="Value">$&lt;attribute[Value]&gt; - $&lt;attribute[Description]&gt;</property>
+                <property name="Type">Payroll_AttributeDefinitionMovementType</property>
+            </trigger>
+        </attribute>
     </definition>
 </datamodel-type>

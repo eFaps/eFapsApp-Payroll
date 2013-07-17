@@ -27,14 +27,17 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.jasperreports.engine.JRDataSource;
 
+import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.ui.FieldValue;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
@@ -47,6 +50,7 @@ import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
 import org.efaps.admin.ui.field.Field.Display;
 import org.efaps.db.AttributeQuery;
 import org.efaps.db.Context;
+import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
@@ -58,6 +62,8 @@ import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
 import org.efaps.esjp.common.jasperreport.EFapsTextReport;
 import org.efaps.esjp.common.uiform.Field;
 import org.efaps.esjp.common.uiform.Field_Base.DropDownPosition;
+import org.efaps.esjp.payroll.util.Payroll;
+import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
@@ -180,6 +186,19 @@ public abstract class ExportAFPReport_Base
             final DateTime dateTo = new DateTime(_parameter
                             .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateTo.name));
 
+            final SystemConfiguration config = Payroll.getSysConfig();
+            final String movTypeEndDateOids = config.getAttributeValue(PayrollSettings.MOVEMENTTYPE_ENDDATE);
+            final Set<String> setMovTypeEndDate = new HashSet<String>();
+            if (movTypeEndDateOids != null && !movTypeEndDateOids.isEmpty()) {
+                final String[] movTypeEndDateStr = movTypeEndDateOids.split(";");
+                for (final String movTypeOid : movTypeEndDateStr) {
+                    final Instance instMovType = Instance.get(movTypeOid);
+                    if (instMovType.isValid()) {
+                        setMovTypeEndDate.add(instMovType.getOid());
+                    }
+                }
+            }
+
             final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
             attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusMinutes(1));
             attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
@@ -189,6 +208,8 @@ public abstract class ExportAFPReport_Base
             queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
 
             final MultiPrintQuery multi = queryBldr.getPrint();
+            multi.addAttribute(CIPayroll.Payslip.Date,
+                                CIPayroll.Payslip.DueDate);
             final SelectBuilder selDoc = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
             final SelectBuilder selEmpLName = new SelectBuilder()
@@ -209,7 +230,13 @@ public abstract class ExportAFPReport_Base
                             .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
                             .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
                             .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
-            multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName, selSecNumb, selSec);
+            final SelectBuilder selMovTypeInst = new SelectBuilder()
+                            .linkto(CIPayroll.Payslip.MovementType).instance();
+            final SelectBuilder selMovType = new SelectBuilder()
+                            .linkto(CIPayroll.Payslip.MovementType)
+                            .attribute(CIPayroll.AttributeDefinitionMovementType.Value);
+            multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName,
+                            selSecNumb, selSec, selMovTypeInst, selMovType);
             multi.execute();
             final List<Map<String, Object>> lst = new ArrayList<Map<String, Object>>();
             while (multi.next()) {
@@ -220,12 +247,20 @@ public abstract class ExportAFPReport_Base
                 final String fName = multi.<String>getSelect(selEmpFName);
                 final String security = multi.<String>getSelect(selSec);
                 final String securityNumb = multi.<String>getSelect(selSecNumb);
+                final Instance movTypeInst = multi.<Instance>getSelect(selMovTypeInst);
+                final String movType = multi.<String>getSelect(selMovType);
+                DateTime movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.Date);
+                if (setMovTypeEndDate.contains(movTypeInst.getOid())) {
+                    movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.DueDate);
+                }
                 map.put("docNum", doc);
                 map.put("lastName", lName);
                 map.put("lastName2", slName);
                 map.put("name", fName);
                 map.put("codCuspp", securityNumb);
                 map.put("afp", security);
+                map.put("movType", movType);
+                map.put("movDate", movDate.toDate());
 
                 final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
                 queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type,
@@ -254,8 +289,8 @@ public abstract class ExportAFPReport_Base
                                 map.get("lastName"),
                                 map.get("lastName2"),
                                 map.get("name"),
-                                "",
-                                null,
+                                map.get("movType"),
+                                map.get("movDate"),
                                 map.get("I"),
                                 map.get("J"),
                                 map.get("K"),
@@ -389,6 +424,19 @@ public abstract class ExportAFPReport_Base
             {
                 final List<List<Object>> lst = new ArrayList<List<Object>>();
 
+                final SystemConfiguration config = Payroll.getSysConfig();
+                final String movTypeEndDateOids = config.getAttributeValue(PayrollSettings.MOVEMENTTYPE_ENDDATE);
+                final Set<String> setMovTypeEndDate = new HashSet<String>();
+                if (movTypeEndDateOids != null && !movTypeEndDateOids.isEmpty()) {
+                    final String[] movTypeEndDateStr = movTypeEndDateOids.split(";");
+                    for (final String movTypeOid : movTypeEndDateStr) {
+                        final Instance instMovType = Instance.get(movTypeOid);
+                        if (instMovType.isValid()) {
+                            setMovTypeEndDate.add(instMovType.getOid());
+                        }
+                    }
+                }
+
                 final DateTime dateFrom = new DateTime(_parameter
                                 .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateFrom.name));
                 final DateTime dateTo = new DateTime(_parameter
@@ -403,6 +451,8 @@ public abstract class ExportAFPReport_Base
                 queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
 
                 final MultiPrintQuery multi = queryBldr.getPrint();
+                multi.addAttribute(CIPayroll.Payslip.Date,
+                                CIPayroll.Payslip.DueDate);
                 final SelectBuilder selDoc = new SelectBuilder()
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
                 final SelectBuilder selEmpLName = new SelectBuilder()
@@ -423,7 +473,13 @@ public abstract class ExportAFPReport_Base
                                 .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
                                 .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
                                 .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
-                multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName, selSecNumb, selSec);
+                final SelectBuilder selMovTypeInst = new SelectBuilder()
+                                .linkto(CIPayroll.Payslip.MovementType).instance();
+                final SelectBuilder selMovType = new SelectBuilder()
+                                .linkto(CIPayroll.Payslip.MovementType)
+                                .attribute(CIPayroll.AttributeDefinitionMovementType.Value);
+                multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName,
+                                selSecNumb, selSec, selMovType, selMovTypeInst);
                 multi.execute();
                 final List<Map<String, Object>> lstMap = new ArrayList<Map<String, Object>>();
                 while (multi.next()) {
@@ -434,12 +490,20 @@ public abstract class ExportAFPReport_Base
                     final String fName = multi.<String>getSelect(selEmpFName);
                     final String security = multi.<String>getSelect(selSec);
                     final String securityNumb = multi.<String>getSelect(selSecNumb);
+                    final Instance movTypeInst = multi.<Instance>getSelect(selMovTypeInst);
+                    final String movType = multi.<String>getSelect(selMovType);
+                    DateTime movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.Date);
+                    if (setMovTypeEndDate.contains(movTypeInst.getOid())) {
+                        movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.DueDate);
+                    }
                     map.put("docNum", doc);
                     map.put("lastName", lName);
                     map.put("lastName2", slName);
                     map.put("name", fName);
                     map.put("codCuspp", securityNumb);
                     map.put("afp", security);
+                    map.put("movType", movType);
+                    map.put("movDate", movDate);
 
                     final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
                     queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type,
@@ -471,8 +535,8 @@ public abstract class ExportAFPReport_Base
                     rowLst.add(map.get("lastName"));
                     rowLst.add(map.get("lastName2"));
                     rowLst.add(map.get("name"));
-                    rowLst.add("");
-                    rowLst.add(null);
+                    rowLst.add(map.get("movType"));
+                    rowLst.add(map.get("movDate"));
                     rowLst.add(map.get("I"));
                     rowLst.add(map.get("J"));
                     rowLst.add(map.get("K"));
