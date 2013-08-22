@@ -25,9 +25,9 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_HumanResource_EmployeeClassPayroll</name>
-        <parent>HumanResource_Class</parent>
         <purpose classification="true">
             <LinkColumn>HumanResourceId</LinkColumn>
+            <parent>HumanResource_Class</parent>
         </purpose>
         <attribute>
             <name>OID</name>
