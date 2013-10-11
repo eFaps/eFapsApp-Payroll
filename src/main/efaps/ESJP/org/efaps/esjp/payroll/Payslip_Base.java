@@ -97,6 +97,8 @@ import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.DocumentSum;
+import org.efaps.esjp.sales.util.Sales;
+import org.efaps.esjp.sales.util.SalesSettings;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
@@ -156,8 +158,7 @@ public abstract class Payslip_Base
         try {
             final DecimalFormat formater = getFormater(2, 2);
 
-            final Instance baseCurIns = SystemConfiguration.get(
-                            UUID.fromString("c9a1cbc3-fd35-4463-80d2-412422a3802f")).getLink("CurrencyBase");
+            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
 
             final Instance rateCurrInst = Instance.get(CIERP.Currency.getType(), currencyLinks);
 
@@ -338,8 +339,7 @@ public abstract class Payslip_Base
                         .getParameterValues(CITablePayroll.Payroll_PayslipTable.rateCurrencyId.name);
         final DecimalFormat formater = getFormater(2, 2);
         try {
-            final Instance baseCurIns = SystemConfiguration.get(
-                            UUID.fromString("c9a1cbc3-fd35-4463-80d2-412422a3802f")).getLink("CurrencyBase");
+            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
             final PriceUtil util = new PriceUtil();
 
             for (int i = 0; i < employees.length; i++) {
@@ -419,8 +419,7 @@ public abstract class Payslip_Base
                         .getParameterValues(CITablePayroll.Payroll_AdvanceTable.rateCurrencyId.name);
         final DecimalFormat formater = getFormater(2, 2);
         try {
-            final Instance baseCurIns = SystemConfiguration.get(
-                            UUID.fromString("c9a1cbc3-fd35-4463-80d2-412422a3802f")).getLink("CurrencyBase");
+            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
             final PriceUtil util = new PriceUtil();
             for (int i = 0; i < employees.length; i++) {
                 if (employees[i] != null && !employees[i].isEmpty()) {
