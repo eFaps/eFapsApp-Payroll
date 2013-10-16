@@ -70,7 +70,6 @@
             import org.efaps.db.QueryBuilder;
             import org.efaps.db.InstanceQuery;
             import org.efaps.esjp.admin.ui.UIUpdate;
-            import org.efaps.importer.DataImport;
             import org.efaps.db.Insert;
             import org.efaps.db.Instance;
 
@@ -81,31 +80,13 @@
             RunLevel.init("shell");
             RunLevel.execute();
 
-             UIUpdate update = new UIUpdate();
+            UIUpdate update = new UIUpdate();
 
-            EFAPS_LOGGER.info("Checking for import of JaasKeys for eFapsApp-Payroll");
-            //Admin_User_JAASKey
-            QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("0e7650c6-8ec3-4c63-b377-f3eb5fb85f16"));
-            queryBldr.addWhereAttrEqValue("Key", "Payroll_Admin");
-            InstanceQuery query = queryBldr.getQuery();
-            query.executeWithoutAccessCheck();
-            if (!query.next()) {
-                EFAPS_LOGGER.info("    Importing JaasKeys for eFapsApp-Payroll");
-                URL url = new URL(EFAPS_ROOTURL, "Data/IMPORT_UserJAASKey.xml");
-                DataImport imp = DataImport.readFile(url);
-                imp.updateInDB();
-
-                EFAPS_LOGGER.info("    Importing Data for eFapsApp-Payroll");
-                URL url2 = new URL(EFAPS_ROOTURL, "Data/IMPORT_Currency.xml");
-                DataImport imp2 = DataImport.readFile(url2);
-                imp2.updateInDB();
-            }
-
-            // check if accounting is installed
+            EFAPS_LOGGER.info("Check if accounting is installed");
             //Admin_Common_Version
-            queryBldr = new QueryBuilder(UUID.fromString("1bb051f3-b664-43db-b409-c0c4009f5972"));
+            QueryBuilder queryBldr = new QueryBuilder(UUID.fromString("1bb051f3-b664-43db-b409-c0c4009f5972"));
             queryBldr.addWhereAttrEqValue("Name", "eFapsApp-Accounting");
-            query = queryBldr.getQuery();
+            InstanceQuery query = queryBldr.getQuery();
             query.executeWithoutAccessCheck();
             if (query.next()) {
                 EFAPS_LOGGER.info("Detected Accounting. Check for updates in relation to Payroll");
