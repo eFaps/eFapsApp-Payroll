@@ -21,6 +21,9 @@
 
 package org.efaps.esjp.payroll.util;
 
+import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsUUID;
+
 
 /**
  * TODO comment!
@@ -28,6 +31,9 @@ package org.efaps.esjp.payroll.util;
  * @author The eFaps Team
  * @version $Id$
  */
+
+@EFapsUUID("00a55935-6b51-4982-ad22-79067ff170c3")
+@EFapsRevision("$Rev$")
 public interface PayrollSettings
 {
     /**

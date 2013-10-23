@@ -24,6 +24,8 @@ package org.efaps.esjp.payroll.util;
 import java.util.UUID;
 
 import org.efaps.admin.common.SystemConfiguration;
+import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.util.cache.CacheReloadException;
 
 
@@ -33,6 +35,9 @@ import org.efaps.util.cache.CacheReloadException;
  * @author The eFaps Team
  * @version $Id$
  */
+@EFapsUUID("e773a372-0d29-41bf-b064-c2fd1f84b279")
+@EFapsRevision("$Rev$")
+
 public final class Payroll
 {
     /**
