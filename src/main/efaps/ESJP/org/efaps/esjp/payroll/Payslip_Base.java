@@ -63,7 +63,6 @@ import net.sf.jasperreports.engine.JRException;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
@@ -94,6 +93,7 @@ import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.erp.CurrencyInst;
+import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.DocumentSum;
@@ -156,7 +156,7 @@ public abstract class Payslip_Base
                         CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name);
         final String movementType = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.movementType.name);
         try {
-            final DecimalFormat formater = getFormater(2, 2);
+            final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
 
             final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
 
@@ -337,7 +337,7 @@ public abstract class Payslip_Base
         final String[] amountCosts = _parameter.getParameterValues(CITablePayroll.Payroll_PayslipTable.amountCost.name);
         final String[] currencyLinks = _parameter
                         .getParameterValues(CITablePayroll.Payroll_PayslipTable.rateCurrencyId.name);
-        final DecimalFormat formater = getFormater(2, 2);
+        final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
         try {
             final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
             final PriceUtil util = new PriceUtil();
@@ -417,7 +417,7 @@ public abstract class Payslip_Base
                         .getParameterValues(CITablePayroll.Payroll_AdvanceTable.rateCrossTotal.name);
         final String[] currencyLinks = _parameter
                         .getParameterValues(CITablePayroll.Payroll_AdvanceTable.rateCurrencyId.name);
-        final DecimalFormat formater = getFormater(2, 2);
+        final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
         try {
             final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
             final PriceUtil util = new PriceUtil();
@@ -543,7 +543,7 @@ public abstract class Payslip_Base
 
         final Long curId = print.<Long>getAttribute(CIPayroll.Payslip.RateCurrencyId);
 
-        final DecimalFormat formater = getTwoDigitsformater();
+        final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
 
         js.append("function setValue() {\n")
             .append("document.getElementsByName('").append(CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name)
@@ -849,7 +849,7 @@ public abstract class Payslip_Base
         int deb = 0;
         int cred = 0;
         int neu = 0;
-        final DecimalFormat formater = getFormater(2, 2);
+        final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
         for (final Set<Object[]> set : _values.values()) {
             for (final Object[] value : set) {
                 final int count;
@@ -974,7 +974,7 @@ public abstract class Payslip_Base
                 return _pos1.getSorted().compareTo(_pos2.getSorted());
             }
         });
-        final DecimalFormat formater = getFormater(2, 2);
+        final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
         final StringBuilder html = new StringBuilder();
         html.append("document.getElementsByName('sums')[0].innerHTML='<table style=\"width:50%\">");
         for (final SumPosition pos : sort) {
@@ -1021,7 +1021,7 @@ public abstract class Payslip_Base
         try {
             final String[] posDed = _parameter.getParameterValues("casePosition_" + _postfix);
             final String[] amountDed = _parameter.getParameterValues("amount_" + _postfix);
-            final DecimalFormat formater = getFormater(2, 2);
+            final DecimalFormat formater = NumberFormatter.get().getTwoDigitsFormatter();
             if (posDed != null) {
                 for (int i = 0; i < posDed.length; i++) {
                     if (posDed[i] != null && !posDed[i].isEmpty()) {

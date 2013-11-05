@@ -39,6 +39,7 @@ import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.Payslip_Base.Position;
 import org.efaps.esjp.payroll.Payslip_Base.TablePos;
 import org.efaps.util.EFapsException;
@@ -83,7 +84,8 @@ public abstract class PayslipCalculator_Base
         BigDecimal ret = BigDecimal.ZERO;
         final String overtime = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
         if (overtime != null && !overtime.isEmpty()) {
-            final DecimalFormat formater = new Payslip().getFormater(0, 2);
+
+            final DecimalFormat formater = NumberFormatter.get().getFormatter(0, 2);
             try {
                 ret = (BigDecimal) formater.parse(overtime);
             } catch (final ParseException e) {
