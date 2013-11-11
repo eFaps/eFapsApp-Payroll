@@ -124,11 +124,6 @@ public abstract class Payslip_Base
     protected static final Logger LOG = LoggerFactory.getLogger(Payslip_Base.class);
 
     /**
-     * Classloader used for EventDefinition.
-     */
-    protected static final EFapsClassLoader CLASSLOADER =  new EFapsClassLoader(Payslip.class.getClassLoader());
-
-    /**
      * Create a payslip.
      * @param _parameter Parameter as passed from the eFaps API
      * @return new Return
@@ -1464,7 +1459,7 @@ public abstract class Payslip_Base
 
             if (this.esjp != null && !this.esjp.isEmpty()) {
                 try {
-                    final Class<?> cls = Class.forName(this.esjp, true, Payslip_Base.CLASSLOADER);
+                    final Class<?> cls = Class.forName(this.esjp, true, EFapsClassLoader.getInstance());
                     final Method meth = cls.getMethod(this.method, new Class[] { Parameter.class, Map.class, Map.class,
                                                                                     Position.class });
                     ret = (BigDecimal) meth.invoke(cls.newInstance(), _parameter, _sums, _values, this);
