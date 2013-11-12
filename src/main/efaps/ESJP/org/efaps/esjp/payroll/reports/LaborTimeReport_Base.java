@@ -40,6 +40,7 @@ import org.efaps.db.AttributeQuery;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.esjp.ci.CIContacts;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.file.FileUtil;
@@ -226,7 +227,7 @@ public abstract class LaborTimeReport_Base
         final SelectBuilder selDocType = new SelectBuilder()
                         .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                         .linkto(CIHumanResource.Employee.NumberTypeLink)
-                        .attribute(CIHumanResource.AttributeDefinitionNumberType.Value);
+                        .attribute(CIContacts.AttributeDefinitionDOIType.Value);
         multi.addSelect(selDoc, selDocType);
         multi.execute();
         while (multi.next()) {
