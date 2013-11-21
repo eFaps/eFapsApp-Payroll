@@ -77,6 +77,7 @@ import org.efaps.admin.program.esjp.EFapsClassLoader;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
+import org.efaps.admin.ui.field.Field;
 import org.efaps.db.Checkin;
 import org.efaps.db.Context;
 import org.efaps.db.Insert;
@@ -733,15 +734,21 @@ public abstract class Payslip_Base
     public Return updateFields4Employee(final Parameter _parameter)
         throws EFapsException
     {
-        final Instance instance = Instance.get(_parameter.getParameterValue("number"));
         final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         final Map<String, String> map = new HashMap<String, String>();
-        if (instance.getId() > 0) {
-            map.put("employeeData", getFieldValue4Employee(instance));
-        } else {
-            map.put("employeeData", "????");
+
+        final Field field = (Field) _parameter.get(ParameterValues.UIOBJECT);
+
+        if (field != null) {
+            final Instance instance = Instance.get(_parameter.getParameterValue(field.getName()));
+
+            if (instance.getId() > 0) {
+                map.put("employeeData", getFieldValue4Employee(instance));
+            } else {
+                map.put("employeeData", "????");
+            }
+            list.add(map);
         }
-        list.add(map);
         final Return retVal = new Return();
         retVal.put(ReturnValues.VALUES, list);
         return retVal;
