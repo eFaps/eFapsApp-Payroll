@@ -221,22 +221,22 @@ public abstract class ExportAFPReport_Base
             final SelectBuilder selEmpFName = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                             .attribute(CIHumanResource.Employee.FirstName);
-            final SelectBuilder selSecNumb = new SelectBuilder()
+            final SelectBuilder selCuspp = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
-                            .attribute(CIPayroll.HumanResource_EmployeeClassPayroll.SecurityNumber);
-            final SelectBuilder selSec = new SelectBuilder()
+                            .clazz(CIHumanResource.ClassTR_Health)
+                            .attribute(CIHumanResource.ClassTR_Health.CUSPP);
+            final SelectBuilder selRegime = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
-                            .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
-                            .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
+                            .clazz(CIHumanResource.ClassTR_Health)
+                            .linkto(CIHumanResource.ClassTR_Health.HealthRegimeLink)
+                            .attribute(CIHumanResource.AttributeDefinitionHealthRegime.Value);
             final SelectBuilder selMovTypeInst = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.MovementType).instance();
             final SelectBuilder selMovType = new SelectBuilder()
                             .linkto(CIPayroll.Payslip.MovementType)
                             .attribute(CIPayroll.AttributeDefinitionMovementType.Value);
             multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName,
-                            selSecNumb, selSec, selMovTypeInst, selMovType);
+                            selCuspp, selRegime, selMovTypeInst, selMovType);
             multi.execute();
             final List<Map<String, Object>> lst = new ArrayList<Map<String, Object>>();
             while (multi.next()) {
@@ -245,8 +245,8 @@ public abstract class ExportAFPReport_Base
                 final String lName = multi.<String>getSelect(selEmpLName);
                 final String slName = multi.<String>getSelect(selEmpSLName);
                 final String fName = multi.<String>getSelect(selEmpFName);
-                final String security = multi.<String>getSelect(selSec);
-                final String securityNumb = multi.<String>getSelect(selSecNumb);
+                final String security = multi.<String>getSelect(selRegime);
+                final String securityNumb = multi.<String>getSelect(selCuspp);
                 final Instance movTypeInst = multi.<Instance>getSelect(selMovTypeInst);
                 final String movType = multi.<String>getSelect(selMovType);
                 DateTime movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.Date);
@@ -464,22 +464,22 @@ public abstract class ExportAFPReport_Base
                 final SelectBuilder selEmpFName = new SelectBuilder()
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                                 .attribute(CIHumanResource.Employee.FirstName);
-                final SelectBuilder selSecNumb = new SelectBuilder()
+                final SelectBuilder selCuspp = new SelectBuilder()
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
-                                .attribute(CIPayroll.HumanResource_EmployeeClassPayroll.SecurityNumber);
-                final SelectBuilder selSec = new SelectBuilder()
+                                .clazz(CIHumanResource.ClassTR_Health)
+                                .attribute(CIHumanResource.ClassTR_Health.CUSPP);
+                final SelectBuilder selRegime = new SelectBuilder()
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
-                                .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
-                                .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
+                                .clazz(CIHumanResource.ClassTR_Health)
+                                .linkto(CIHumanResource.ClassTR_Health.HealthRegimeLink)
+                                .attribute(CIHumanResource.AttributeDefinitionHealthRegime.Value);
                 final SelectBuilder selMovTypeInst = new SelectBuilder()
                                 .linkto(CIPayroll.Payslip.MovementType).instance();
                 final SelectBuilder selMovType = new SelectBuilder()
                                 .linkto(CIPayroll.Payslip.MovementType)
                                 .attribute(CIPayroll.AttributeDefinitionMovementType.Value);
                 multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName,
-                                selSecNumb, selSec, selMovType, selMovTypeInst);
+                                selCuspp, selRegime, selMovType, selMovTypeInst);
                 multi.execute();
                 final List<Map<String, Object>> lstMap = new ArrayList<Map<String, Object>>();
                 while (multi.next()) {
@@ -488,8 +488,8 @@ public abstract class ExportAFPReport_Base
                     final String lName = multi.<String>getSelect(selEmpLName);
                     final String slName = multi.<String>getSelect(selEmpSLName);
                     final String fName = multi.<String>getSelect(selEmpFName);
-                    final String security = multi.<String>getSelect(selSec);
-                    final String securityNumb = multi.<String>getSelect(selSecNumb);
+                    final String security = multi.<String>getSelect(selRegime);
+                    final String securityNumb = multi.<String>getSelect(selCuspp);
                     final Instance movTypeInst = multi.<Instance>getSelect(selMovTypeInst);
                     final String movType = multi.<String>getSelect(selMovType);
                     DateTime movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.Date);
