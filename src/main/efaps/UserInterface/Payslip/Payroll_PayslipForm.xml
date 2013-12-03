@@ -58,6 +58,7 @@
             <property name="Attribute">Date</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
             <trigger program="org.efaps.esjp.payroll.Payslip"
                      method="dateValueUI"
                      name="Payroll_PayslipForm.date.UI_FIELD_VALUE"
@@ -68,6 +69,7 @@
             <property name="Attribute">DueDate</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
             <trigger program="org.efaps.esjp.payroll.Payslip"
                      method="dateValueUI"
                      name="Payroll_PayslipForm.duedate.UI_FIELD_VALUE"
@@ -111,11 +113,13 @@
             <property name="Attribute">LaborTime</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
         </field>
         <field name="extraLaborTime">
             <property name="Attribute">ExtraLaborTime</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
         </field>
         <field name="rateCrossTotal">
             <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>

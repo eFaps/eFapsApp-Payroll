@@ -46,16 +46,16 @@
         <property name="Select" value="linkto[EmployeeAbstractLink].attribute[Number]"/>
     </field>
     <field name="startDate" class="org.joda.time.DateTime">
-        <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_Class].attribute[EntryDate]"/>
+        <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR].attribute[StartDate]"/>
     </field>
     <field name="laborSystem" class="java.lang.String">
-        <property name="Select" value="linkto[EmployeeAbstractLink].class[Payroll_HumanResource_EmployeeClassPayroll].attribute[LaborSystem]"/>
+        <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Labor].linkto[RegimeLink].attribute[Value]"/>
     </field>
     <field name="afp" class="java.lang.String">
-        <property name="Select" value="linkto[EmployeeAbstractLink].class[Payroll_HumanResource_EmployeeClassPayroll].linkto[Security].attribute[Value]"/>
+        <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].linkto[InsuranceLink].attribute[Value]"/>
     </field>
     <field name="cuspp" class="java.lang.String">
-        <property name="Select" value="linkto[EmployeeAbstractLink].class[Payroll_HumanResource_EmployeeClassPayroll].attribute[SecurityNumber]"/>
+        <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].attribute[CUSPP]"/>
     </field>
     <field name="laborTimeValue" class="java.lang.Object">
         <property name="Select" value="attribute[LaborTime].value"/>
