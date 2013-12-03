@@ -154,9 +154,10 @@ public abstract class CasePosition_Base
                             CIFormPayroll.Payroll_CasePosition2CalcForm.defaultValue.name));
             insert.add(CIPayroll.CasePositionCalc.ExportReport, _parameter.getParameterValue(
                             CIFormPayroll.Payroll_CasePosition2CalcForm.exportReport.name));
+            insert.add(CIPayroll.CasePositionCalc.ExportAFP, _parameter.getParameterValue(
+                            CIFormPayroll.Payroll_CasePosition2CalcForm.exportAFP.name));
         }
-        insert.add(CIPayroll.CasePositionCalc.ExportAFP, _parameter.getParameterValue(
-                        CIFormPayroll.Payroll_CasePosition2CalcForm.exportAFP.name));
+
         insert.execute();
 
         return new Return();
