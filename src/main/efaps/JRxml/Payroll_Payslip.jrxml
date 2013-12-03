@@ -52,7 +52,7 @@
         <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Labor].linkto[RegimeLink].attribute[Value]"/>
     </field>
     <field name="afp" class="java.lang.String">
-        <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].linkto[InsuranceLink].attribute[Value]"/>
+        <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].linkto[PensionRegimeLink].attribute[Value]"/>
     </field>
     <field name="cuspp" class="java.lang.String">
         <property name="Select" value="linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].attribute[CUSPP]"/>

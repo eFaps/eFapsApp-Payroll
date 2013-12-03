@@ -698,16 +698,16 @@ public abstract class Payslip_Base
         final PrintQuery print = new PrintQuery(_instance);
         print.addAttribute(CIHumanResource.EmployeeAbstract.FirstName, CIHumanResource.EmployeeAbstract.LastName);
         final SelectBuilder selSecNumb = new SelectBuilder()
-                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
-                .attribute(CIPayroll.HumanResource_EmployeeClassPayroll.SecurityNumber);
+                .clazz(CIHumanResource.ClassTR_Health)
+                .attribute(CIHumanResource.ClassTR_Health.CUSPP);
         final SelectBuilder selSec = new SelectBuilder()
-                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
-                .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
-                .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Value);
+                .clazz(CIHumanResource.ClassTR_Health)
+                .linkto(CIHumanResource.ClassTR_Health.PensionRegimeLink)
+                .attribute(CIHumanResource.AttributeDefinitionPensionRegime.Value);
         final SelectBuilder selSecDesc = new SelectBuilder()
-                .clazz(CIPayroll.HumanResource_EmployeeClassPayroll)
-                .linkto(CIPayroll.HumanResource_EmployeeClassPayroll.Security)
-                .attribute(CIPayroll.HumanResource_AttributeDefinitionSecurity.Description);
+                .clazz(CIHumanResource.ClassTR_Health)
+                .linkto(CIHumanResource.ClassTR_Health.InsuranceLink)
+                .attribute(CIHumanResource.AttributeDefinitionInsurance.Description);
         print.addSelect(selSec, selSecNumb, selSecDesc);
         print.execute();
         final String firstname = print.<String>getAttribute(CIHumanResource.EmployeeAbstract.FirstName);
