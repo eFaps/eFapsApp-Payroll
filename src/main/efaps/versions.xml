@@ -109,7 +109,7 @@
             <!-- connect the Payroll_MyDesk Menu to the main menu from efaps -->
             update.add2Menu("cf354312-fb84-4cf7-9d57-81a8426420e1", "87001cc3-c45c-44de-b8f1-776df507f268", 2);
             <!-- connect the Payroll_HumanResource_EmployeeTree_Payslip to the main menu from HumanResource_EmployeeTree -->
-            update.add2Menu("e8cbbebe-2a81-4979-bcb3-e8cb6f6b3ecd", "136a5437-7642-4e09-8182-23fc97fedbab", 0);
+            update.add2Menu("e8cbbebe-2a81-4979-bcb3-e8cb6f6b3ecd", "136a5437-7642-4e09-8182-23fc97fedbab", 2);
             <!-- connect the Payroll_HumanResource_AttributeDefinitionAbstractMyDesk_Menu_Action_CreateSecurity to the main menu from HumanResource_AttributeDefinitionAbstractMyDesk_Menu_Action -->
             update.add2Menu("30e3b85e-5b32-45d3-998e-bf7729a57eeb", "e02c020f-6418-4f22-a5b7-49459212cc27", 0);
             <!-- Payroll_Payroll, Admin_Help_MainMenu -->
