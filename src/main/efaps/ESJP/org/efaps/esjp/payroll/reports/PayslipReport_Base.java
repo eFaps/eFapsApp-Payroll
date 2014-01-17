@@ -39,7 +39,6 @@ import org.efaps.db.AttributeQuery;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
-import org.efaps.esjp.ci.CIContacts;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.file.FileUtil;
@@ -221,7 +220,7 @@ public abstract class PayslipReport_Base
         final SelectBuilder selDocType = new SelectBuilder()
                         .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                         .linkto(CIHumanResource.Employee.NumberTypeLink)
-                        .attribute(CIContacts.AttributeDefinitionDOIType.Value);
+                        .attribute(CIHumanResource.AttributeDefinitionDOIType.MappingKey);
         multi.addSelect(selDoc, selDocType);
         multi.execute();
         while (multi.next()) {
