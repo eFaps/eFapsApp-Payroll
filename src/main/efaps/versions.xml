@@ -114,9 +114,16 @@
             update.add2Menu("30e3b85e-5b32-45d3-998e-bf7729a57eeb", "e02c020f-6418-4f22-a5b7-49459212cc27", 0);
             <!-- Payroll_Payroll, Admin_Help_MainMenu -->
             update.add2Help("68acacc0-cf4f-4260-bf16-2a0dfb2edbe0", "dead549e-5cc6-49f9-9a79-8e33aa139f6d", -1);
+            
+            
+            <!-- Define attribute definition -->
             <!-- Payroll_AttributeDefinitionAbstractMyDesk_Menu_Action, ERP_AttributeDefinitionMyDesk_Menu-->
             update.add2Menu("df804de0-e679-4629-aa0c-660b9f5c8c9d", "69e0b34a-2483-4662-9a45-1ce5d4e420e6", 1);
-
+            
+            <!-- add to Payroll_Admin role -->
+            RoleUpdate rolUp = new RoleUpdate("57d96363-1728-4bb9-afab-77cfcd1a6618");
+            <!-- ERP_AttributeDefinitionMyDesk -->
+            rolUp.addUI("1c506850-7e64-439f-ad65-9c82dc762db8");
         </script>
     </version>
 </install>
