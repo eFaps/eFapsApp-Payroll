@@ -64,7 +64,7 @@
                 method="autoComplete4Employee" event="UI_FIELD_AUTOCOMPLETE">
                 <property name="keyValue">Value</property>
                 <property name="Type">HumanResource_EmployeeAbstract</property>
-                <property name="StatusGrp01">HumanResource_EmployeeStatus</property>
+                <property name="StatusGroup01">HumanResource_EmployeeStatus</property>
                 <property name="Status01">Worker</property>
             </trigger>
         </field>

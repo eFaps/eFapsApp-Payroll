@@ -44,7 +44,7 @@
             program="org.efaps.esjp.humanresource.Employee">
             <property name="keyValue">Value</property>
             <property name="Type">HumanResource_Employee</property>
-            <property name="StatusGrp">HumanResource_EmployeeStatus</property>
+            <property name="StatusGroup">HumanResource_EmployeeStatus</property>
             <property name="Status">Worker</property>
         </trigger>
     </field>
