@@ -97,7 +97,7 @@ import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
 import org.efaps.esjp.sales.PriceUtil;
-import org.efaps.esjp.sales.document.DocumentSum;
+import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.sales.util.Sales;
 import org.efaps.esjp.sales.util.SalesSettings;
 import org.efaps.ui.wicket.util.EFapsKey;
@@ -116,7 +116,7 @@ import org.slf4j.LoggerFactory;
 @EFapsUUID("f1c7d3d5-23d2-4d72-a5d4-3c811a159062")
 @EFapsRevision("$Rev$")
 public abstract class Payslip_Base
-    extends DocumentSum
+    extends AbstractDocumentSum
 {
 
     /**
