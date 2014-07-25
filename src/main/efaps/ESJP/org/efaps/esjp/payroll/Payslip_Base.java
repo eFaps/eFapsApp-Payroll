@@ -544,8 +544,7 @@ public abstract class Payslip_Base
         js.append("function setValue() {\n")
             .append("document.getElementsByName('").append(CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name)
             .append("')[0].value=").append(curId).append(";\n")
-            .append(getSetFieldValue(0, "number", empOid)).append("\n")
-            .append(getSetFieldValue(0, "numberAutoComplete", empNum)).append("\n")
+            .append(getSetFieldValue(0, "number", empOid, empNum)).append("\n")
             .append(getSetFieldValue(0, "employeeData", empLName + ", " + empFName)).append("\n")
             .append(getSetFieldValue(0, "laborTime", formater.format(laborTimeVal))).append("\n")
             .append("document.getElementsByName('laborTimeUoM')[0].value=")
@@ -617,7 +616,7 @@ public abstract class Payslip_Base
         }
         js.append("}\n")
             .append("Wicket.Event.add(window, \"domready\", function(event) {\n")
-            .append(getJs(values)).append("\n setValue();\n")
+            .append(getJs(_parameter, values)).append("\n setValue();\n")
             .append(" });");
         return js.toString();
     }
@@ -821,7 +820,7 @@ public abstract class Payslip_Base
             set.add(value);
             values.put(name, set);
         }
-        ret.put(ReturnValues.SNIPLETT, getJs(values).toString());
+        ret.put(ReturnValues.SNIPLETT, getJs(_parameter, values).toString());
         return ret;
     }
 
@@ -831,7 +830,8 @@ public abstract class Payslip_Base
      * @return javscript
      * @throws EFapsException on error
      */
-    protected StringBuilder getJs(final Map<String, Set<Object[]>> _values)
+    protected StringBuilder getJs(final Parameter _parameter,
+                                  final Map<String, Set<Object[]>> _values)
         throws EFapsException
     {
         final StringBuilder js = new StringBuilder();
@@ -869,14 +869,11 @@ public abstract class Payslip_Base
                     count = neu;
                     neu++;
                 }
-                bldr.append(getSetFieldValue(count, "casePosition" + value[3] + "AutoComplete", value[1].toString()))
-                    .append("\n")
-                    .append(getSetFieldValue(count, "casePosition" + value[3], value[0].toString())).append("\n")
+                bldr.append(getSetFieldValue(count, "casePosition" + value[3], value[0].toString(),
+                                    value[1].toString())).append("\n")
                     .append(getSetFieldValue(count, "description" + value[3], value[2].toString())).append("\n");
                 if (!value[4].equals(MODE.OPTIONAL_DEFAULT.ordinal())) {
-                    bldr.append("var x = document.getElementsByName('casePosition").append(value[3])
-                        .append("AutoComplete')[").append(count).append("];\n")
-                        .append("x.disabled = true;\n")
+                    bldr.append(getSetFieldReadOnlyScript(_parameter,count, "casePosition" + value[3]))
                         .append("require([\"dojo/query\",\"dojo/dom-construct\"], function(query,domConstruct){\n")
                         .append("var rows=query(\".eFapsTableRemoveRowCell > *\", x.parentNode.parentNode);\n")
                         .append("rows.forEach(function(row){\n")
