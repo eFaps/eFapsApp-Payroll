@@ -845,6 +845,9 @@ public abstract class Payslip_Base
         final StringBuilder dedBldr = new StringBuilder();
         final StringBuilder payBldr = new StringBuilder();
         final StringBuilder neuBldr = new StringBuilder();
+        final StringBuilder dedBldr2 = new StringBuilder();
+        final StringBuilder payBldr2 = new StringBuilder();
+        final StringBuilder neuBldr2 = new StringBuilder();
         dedBldr.append("function setDeduction(){\n");
         payBldr.append("function setPayment(){\n");
         neuBldr.append("function setNeutral(){\n");
@@ -856,16 +859,20 @@ public abstract class Payslip_Base
             for (final Object[] value : set) {
                 final int count;
                 final StringBuilder bldr;
+                final StringBuilder bldr2;
                 if ("_Deduction".equals(value[3])) {
                     bldr = dedBldr;
+                    bldr2 = dedBldr2;
                     count = deb;
                     deb++;
                 } else if ("_Payment".equals(value[3])) {
                     bldr = payBldr;
+                    bldr2 = payBldr2;
                     count = cred;
                     cred++;
                 } else {
                     bldr = neuBldr;
+                    bldr2 = neuBldr2;
                     count = neu;
                     neu++;
                 }
@@ -873,8 +880,10 @@ public abstract class Payslip_Base
                                     value[1].toString())).append("\n")
                     .append(getSetFieldValue(count, "description" + value[3], value[2].toString())).append("\n");
                 if (!value[4].equals(MODE.OPTIONAL_DEFAULT.ordinal())) {
-                    bldr.append(getSetFieldReadOnlyScript(_parameter,count, "casePosition" + value[3]))
+                    bldr2.append(getSetFieldReadOnlyScript(_parameter,count, "casePosition" + value[3])).append("\n")
                         .append("require([\"dojo/query\",\"dojo/dom-construct\"], function(query,domConstruct){\n")
+                        .append("var x = document.getElementsByName('amount").append(value[3]).append("')[")
+                        .append(count).append("];").append("\n")
                         .append("var rows=query(\".eFapsTableRemoveRowCell > *\", x.parentNode.parentNode);\n")
                         .append("rows.forEach(function(row){\n")
                         .append("domConstruct.destroy(row);\n")
@@ -882,17 +891,18 @@ public abstract class Payslip_Base
                         .append("});\n");
                 }
                 if (value[4].equals(MODE.REQUIRED_NOEDITABLE.ordinal())) {
-                    bldr .append("x = document.getElementsByName('amount").append(value[3]).append("')[")
-                        .append(count).append("];")
-                        .append("x.readOnly = true;\n");
+                    bldr2.append(getSetFieldReadOnlyScript(_parameter,count, "amount" + value[3])).append("\n");
                 }
                 if (value[5] != null) {
                     bldr.append(getSetFieldValue(count, "amount" + value[3], formater.format(value[5]))).append("\n");
                 }
             }
         }
+        payBldr.append(payBldr2);
         payBldr.append("}\n");
+        dedBldr.append(dedBldr2);
         dedBldr.append("}\n");
+        neuBldr.append(neuBldr2);
         neuBldr.append("document.getElementsByName('sums')[0].innerHTML='")
             .append(StringUtils.repeat("<br/>", _values.size())).append("';")
             .append("positionTableColumns(eFapsTable100);\n")
