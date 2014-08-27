@@ -84,27 +84,35 @@
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
         </field>
-        <field name="actionDefinitionLink">
-            <property name="Attribute">ActionDefinitionLink</property>
+         <field name="action">
             <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModePrint">NONE</property>
             <property name="ModeView">NONE</property>
-            <property name="Label">Payroll_CasePosition2CalcForm/ActionDefinitionLink.Label</property>
+            <property name="Label">Payroll_CasePosition2CalcForm.action.Label</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.common.uiform.Field"
                 method="dropDownFieldValue"
-                name="Sales_AccountPettyCashReceiptForm.actionDefinitionLink.UI_FIELD_VALUE"
+                name="Sales_PettyCashReceiptForm.action.UI_FIELD_VALUE"
                 event="UI_FIELD_VALUE">
-                <property name="Type">Accounting_ActionDefinitionPayrollCasePosition</property>
-                <property name="WhereAttrEqValue">Active|true</property>
+                <property name="Type">Payroll_ActionDefinitionCasePosition</property>
+                <property name="ValueSelect">oid</property>
                 <property name="Phrase">$&lt;attribute[Name]&gt; - $&lt;attribute[Description]&gt;</property>
-                <property name="SetSelected">true</property>
+                <property name="OrderSelect">attribute[Name]</property>
+                <property name="StatusGroup">ERP_ActionDefinitionStatus</property>
+                <property name="Status">Active</property>
             </trigger>
         </field>
-        <field name="actionDefinitionLink4View">
-            <property name="Select">linkto[ActionDefinitionLink].attribute[Name]</property>
-            <property name="Label">Payroll_CasePosition2CalcForm/ActionDefinitionLink.Label</property>
+        <field name="action4View">
+            <property name="SelectAlternateOID">linkto[ActionDefinitionAbstractLink].oid</property>
+            <property name="Select">linkto[ActionDefinitionAbstractLink].attribute[Name]</property>
+            <property name="HRef">TREE</property>
             <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
+            <property name="ModePrint">READONLY</property>
+            <property name="ModeView">READONLY</property>
+            <property name="Label">Payroll_CasePosition2CalcForm.action.Label</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="exportAFP">
             <property name="Attribute">ExportAFP</property>

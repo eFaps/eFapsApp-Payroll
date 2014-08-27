@@ -136,14 +136,14 @@ public abstract class CasePosition_Base
         if (!parent.getType().isKindOf(CIPayroll.CaseAbstract.getType())) {
             insert.add(CIPayroll.CasePositionAbstract.ParentAbstractLink, parent.getId());
         }
-        if (_parameter.getParameterValue(CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name) != null
+        if (_parameter.getParameterValue(CIFormPayroll.Payroll_CasePosition2CalcForm.action.name) != null
                         && !_parameter.getParameterValue(
-                                        CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name)
+                                        CIFormPayroll.Payroll_CasePosition2CalcForm.action.name)
                                         .isEmpty()
                         && !"null".equals(_parameter.getParameterValue(
-                                        CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name))) {
+                                        CIFormPayroll.Payroll_CasePosition2CalcForm.action.name))) {
             insert.add(CIPayroll.CasePositionCalc.ActionDefinitionLink, _parameter.getParameterValue(
-                            CIFormPayroll.Payroll_CasePosition2CalcForm.actionDefinitionLink.name));
+                            CIFormPayroll.Payroll_CasePosition2CalcForm.action.name));
         }
         if (_parameter.getParameterValue(CIFormPayroll.Payroll_CasePosition2CalcForm.calculatorESJP.name) != null) {
             insert.add(CIPayroll.CasePositionCalc.CalculatorESJP, _parameter.getParameterValue(

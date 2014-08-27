@@ -93,7 +93,7 @@
         <attribute>
             <name>ActionDefinitionAbstractLink</name>
             <type>Link</type>
-            <typelink>Accounting_ActionDefinitionPayrollCasePosition</typelink>
+            <typelink>Payroll_ActionDefinitionCasePosition</typelink>
             <sqltable>Payroll_CasePositionSQLTable</sqltable>
             <sqlcolumn>ACTIONDEFID</sqlcolumn>
         </attribute>

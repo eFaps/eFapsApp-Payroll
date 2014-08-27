@@ -37,8 +37,8 @@
             <menu>Payroll_CaseTree_Position_Menu</menu>
             <table>Payroll_CasePositionTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_CasePositionRootSum</property>
-                <property name="LinkFroms">CaseLink</property>
+                <property name="Type">Payroll_CasePositionRootSum</property>
+                <property name="LinkFrom">CaseLink</property>
             </evaluate>
         </target>
         <!-- properties -->

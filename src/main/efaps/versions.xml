@@ -106,6 +106,8 @@
 
             }
 
+            <!-- connect Payroll_ActionDefinitionMyDesk_Menu_Action  to  ERP_ActionDefinitionMyDesk_Menu-->
+            update.add2Menu("4ee3b35b-3212-4c50-b497-438850723d88", "7432b23b-a2b7-4f2f-aed9-d0ceef9c9a89", -1);
 
             <!-- connect the Payroll_MyDesk Menu to the main menu from efaps -->
             update.add2Menu("cf354312-fb84-4cf7-9d57-81a8426420e1", "87001cc3-c45c-44de-b8f1-776df507f268", 2);
