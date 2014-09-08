@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-<!--
-
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2014 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,22 +20,17 @@
  Last Changed By: $Author$
 
 -->
-
 <ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>cf354312-fb84-4cf7-9d57-81a8426420e1</uuid>
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>0edd50f1-6141-4fd1-aa22-37e5fa9d9e26</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_MyDesk</name>
+        <name>Payroll_TemplateMyDesk_Menu_Action</name>
         <childs>
-            <child>Payroll_PayslipMyDesk</child>
-            <child>Payroll_CaseMyDesk</child>
-            <child>Payroll_ReportMyDesk</child>
-            <child>Payroll_MyDesk_ActionReport</child>
-            <child>Payroll_MyDesk_ExportAFPReport</child>
-            <child>Payroll_MyDesk_Admin</child>
+            <child>Payroll_TemplateMyDesk_Menu_Action_CreatePayslip</child>
+            <child>Payroll_TemplateMyDesk_Menu_Action_Delete</child>
         </childs>
     </definition>
 </ui-menu>

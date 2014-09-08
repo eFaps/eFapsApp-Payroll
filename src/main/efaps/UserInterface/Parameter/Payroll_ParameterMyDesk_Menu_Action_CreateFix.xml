@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-<!--
-
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2014 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,30 +20,24 @@
  Last Changed By: $Author$
 
 -->
-
-<ui-command xmlns="http://www.efaps.org/xsd"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>71b9d48f-afc2-455a-a657-5f8a1a7f67ba</uuid>
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>f2184e96-3ac9-4fce-a368-556970bae549</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipTree_Position</name>
+        <name>Payroll_ParameterMyDesk_Menu_Action_CreateFix</name>
         <access>
             <role>Payroll_Admin</role>
+            <role>Payroll_Modifier</role>
         </access>
         <target>
-            <menu>Payroll_PayslipTree_Position_Menu</menu>
-            <table>Payroll_PayslipPositionTable</table>
-            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Type">Payroll_PositionAbstract</property>
-                <property name="LinkFrom">DocumentAbstractLink</property>
-            </evaluate>
+            <form>Payroll_ParameterFixForm</form>
+            <execute program="org.efaps.esjp.common.uiform.Create"/>
         </target>
-        <!-- properties -->
-        <property name="Target">content</property>
-        <property name="TargetShowCheckBoxes">true</property>
-        <property name="TargetMode">view</property>
+        <property name="Target">modal</property>
+        <property name="TargetCreateType">Payroll_ParameterFix</property>
+        <property name="TargetMode">create</property>
     </definition>
 </ui-command>
