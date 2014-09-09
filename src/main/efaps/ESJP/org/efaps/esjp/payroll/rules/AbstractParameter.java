@@ -25,6 +25,7 @@ import java.util.Map;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.db.Instance;
 import org.efaps.util.EFapsException;
 
 /**
@@ -33,7 +34,8 @@ import org.efaps.util.EFapsException;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: AbstractParameter.java 13971 2014-09-08 21:03:58Z
+ *          jan@moxter.net $
  */
 @EFapsUUID("f36f2d26-3dc2-44f1-ba12-c7e099762484")
 @EFapsRevision("$Rev$")
@@ -41,9 +43,16 @@ public abstract class AbstractParameter<T>
     extends AbstractParameter_Base<T>
 {
 
-    protected static Map<String, Object> getParameters(final Parameter _parameter)
+    public static Map<String, Object> getParameters(final Parameter _parameter)
         throws EFapsException
     {
         return AbstractParameter_Base.getParameters(_parameter);
+    }
+
+    public static Map<String, Object> getParameters(final Parameter _parameter,
+                                                    final Instance _employeeInst)
+        throws EFapsException
+    {
+        return AbstractParameter_Base.getParameters(_parameter, _employeeInst);
     }
 }

@@ -73,7 +73,8 @@ public abstract class Template_Base
         while (multi.next()) {
             ruleInsts.add(multi.<Instance>getSelect(ruleInst));
         }
-        final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts);
+        final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts.toArray(new Instance[ruleInsts
+                        .size()]));
 
         Calculator.evaluate(_parameter, rules);
         for (final AbstractRule<?> rule : rules) {

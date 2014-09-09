@@ -37,7 +37,8 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: AbstractRule_Base.java 13971 2014-09-08 21:03:58Z
+ *          jan@moxter.net $
  */
 @EFapsUUID("d31dd0ee-9396-4233-a4fe-bad8780cc931")
 @EFapsRevision("$Rev$")
@@ -59,7 +60,6 @@ public abstract class AbstractRule_Base<T>
 
     private Object result;
 
-
     protected void init()
         throws EFapsException
     {
@@ -69,10 +69,16 @@ public abstract class AbstractRule_Base<T>
             print.addAttribute(CIPayroll.RuleAbstract.Key, CIPayroll.RuleAbstract.Description,
                             CIPayroll.RuleAbstract.Expression);
             print.execute();
-            setExpression(print.<String>getAttribute(CIPayroll.RuleAbstract.Expression));
+            initInternal(print);
             setKey(print.<String>getAttribute(CIPayroll.RuleAbstract.Key));
             setDescription(print.<String>getAttribute(CIPayroll.RuleAbstract.Description));
         }
+    }
+
+    protected void initInternal(final PrintQuery _print)
+        throws EFapsException
+    {
+        setExpression(_print.<String>getAttribute(CIPayroll.RuleAbstract.Expression));
     }
 
     protected abstract T getThis();
@@ -138,7 +144,9 @@ public abstract class AbstractRule_Base<T>
      * @return value of instance variable {@link #key}
      */
     public String getKey()
+        throws EFapsException
     {
+        init();
         return this.key;
     }
 
@@ -148,6 +156,7 @@ public abstract class AbstractRule_Base<T>
      * @return value of instance variable {@link #key}
      */
     public String getKey4Expression()
+        throws EFapsException
     {
         String ret;
         if (Character.isDigit(getKey().charAt(0))) {
@@ -175,7 +184,9 @@ public abstract class AbstractRule_Base<T>
      * @return value of instance variable {@link #expression}
      */
     public String getExpression()
+        throws EFapsException
     {
+        init();
         return this.expression;
     }
 
@@ -196,7 +207,9 @@ public abstract class AbstractRule_Base<T>
      * @return value of instance variable {@link #description}
      */
     public String getDescription()
+        throws EFapsException
     {
+        init();
         return this.description;
     }
 
@@ -232,10 +245,10 @@ public abstract class AbstractRule_Base<T>
         return getThis();
     }
 
-    protected static List<? extends AbstractRule<?>> getRules(final List<Instance> _instances)
+    protected static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
     {
         final List<AbstractRule<?>> ret = new ArrayList<>();
-        for (final Instance inst : _instances) {
+        for (final Instance inst : _ruleInsts) {
             if (inst.getType().isCIType(CIPayroll.RuleInput)) {
                 ret.add(new InputRule().setInstance(inst));
             } else if (inst.getType().isCIType(CIPayroll.RuleExpression)) {
@@ -248,8 +261,15 @@ public abstract class AbstractRule_Base<T>
     @Override
     public String toString()
     {
+        String keyTmp = null;
+        try {
+            keyTmp = getKey();
+        } catch (final EFapsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return new ToStringBuilder(this)
-                        .append("key", getKey())
+                        .append("key", keyTmp)
                         .append("result", getResult()).toString();
     }
 }

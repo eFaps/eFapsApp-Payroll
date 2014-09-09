@@ -131,7 +131,7 @@ public abstract class PayslipCalculator_Base
         BigDecimal ret = BigDecimal.ZERO;
         // get the instance of the employee the payslip belongs to
         final Instance emplInst = Instance.get(_parameter
-                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.number.name));
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.employee.name));
 
         if (emplInst.isValid() && emplInst.getType().isKindOf(CIHumanResource.EmployeeAbstract.getType())) {
             final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip2Advance);

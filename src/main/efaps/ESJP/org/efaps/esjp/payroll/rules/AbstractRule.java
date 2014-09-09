@@ -41,8 +41,8 @@ import org.efaps.db.Instance;
 public abstract class AbstractRule<T>
     extends AbstractRule_Base<T>
 {
-    public static List<? extends AbstractRule<?>> getRules(final List<Instance> _instances)
+    public static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
     {
-       return AbstractRule_Base.getRules(_instances);
+       return AbstractRule_Base.getRules(_ruleInsts);
     }
 }

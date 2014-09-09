@@ -38,6 +38,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,9 +94,14 @@ import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
+import org.efaps.esjp.common.util.InterfaceUtils;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.CasePosition_Base.MODE;
+import org.efaps.esjp.payroll.rules.AbstractRule;
+import org.efaps.esjp.payroll.rules.Calculator;
+import org.efaps.esjp.payroll.rules.ExpressionRule;
+import org.efaps.esjp.payroll.rules.InputRule;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.sales.util.Sales;
@@ -124,6 +130,68 @@ public abstract class Payslip_Base
      */
     protected static final Logger LOG = LoggerFactory.getLogger(Payslip_Base.class);
 
+
+    /**
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return Return containing map for autocomplete
+     * @throws EFapsException on error
+     */
+    public Return autoComplete4Rule(final Parameter _parameter)
+        throws EFapsException
+    {
+        final String input = (String) _parameter.get(ParameterValues.OTHERS);
+        final QueryBuilder queryBldr = getQueryBldrFromProperties(_parameter);
+        queryBldr.addWhereAttrMatchValue(CIPayroll.RuleAbstract.Key, input + "*").setIgnoreCase(true);
+        InterfaceUtils.addMaxResult2QueryBuilder4AutoComplete(_parameter, queryBldr);
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        multi.addAttribute(CIPayroll.RuleAbstract.Key,
+                        CIPayroll.RuleAbstract.Description);
+        multi.execute();
+        final Map<String, Map<String, Object>> sortMap = new TreeMap<>();
+        while (multi.next()) {
+            final String key = multi.getAttribute(CIPayroll.RuleAbstract.Key);
+            final String descr = multi.getAttribute(CIPayroll.RuleAbstract.Description);
+            final String oid = multi.getCurrentInstance().getOid();
+            final Map<String, Object> map = new HashMap<>();
+            final String choice = key + " - " + descr;
+            map.put(EFapsKey.AUTOCOMPLETE_KEY.getKey(), oid);
+            map.put(EFapsKey.AUTOCOMPLETE_VALUE.getKey(), key);
+            map.put(EFapsKey.AUTOCOMPLETE_CHOICE.getKey(), choice);
+            sortMap.put(choice, map);
+        }
+
+        final List<Map<String, Object>> list = new ArrayList<>();
+        list.addAll(sortMap.values());
+        final Return retVal = new Return();
+        retVal.put(ReturnValues.VALUES, list);
+        return retVal;
+    }
+
+    /**
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return Return containing map for autocomplete
+     * @throws EFapsException on error
+     */
+    public Return update4Rule(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Return ret = new Return();
+        final List<Map<String, Object>> list = new ArrayList<>();
+        final Map<String, Object> map = new HashMap<>();
+
+        final Field field = (Field) _parameter.get(ParameterValues.UIOBJECT);
+        final int idx = getSelectedRow(_parameter);
+        if (field != null) {
+            final Instance ruleInstance = Instance.get(_parameter.getParameterValues(field.getName())[idx]);
+            final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInstance);
+            final AbstractRule<?> rule = rules.get(0);
+            map.put(CITablePayroll.Payroll_PositionRuleTable.ruleDescription.name, rule.getDescription());
+            list.add(map);
+        }
+        ret.put(ReturnValues.VALUES, list);
+        return ret;
+    }
+
     /**
      * Create a payslip.
      * @param _parameter Parameter as passed from the eFaps API
@@ -140,7 +208,7 @@ public abstract class Payslip_Base
         final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
         final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
         final Long employeeid = Instance.get(
-                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.number.name)).getId();
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.employee.name)).getId();
         final String laborTimes = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
         final String laborTimeUoMs = _parameter.getParameterValue("laborTimeUoM");
         final String extraLaborTimes = _parameter
@@ -753,23 +821,6 @@ public abstract class Payslip_Base
         return retVal;
     }
 
-
-    /**
-     * Executed as update event form the case field.
-     * @param _parameter Parameter as passed from the eFaps API
-     * @return new Return
-     * @throws EFapsException on error
-     */
-    public Return update4Case(final Parameter _parameter)
-        throws EFapsException
-    {
-        final Return ret = new Return();
-        final String caseOid = _parameter.getParameterValue("case");
-        Context.getThreadContext().setSessionAttribute(Case_Base.CASE_SESSIONKEY, caseOid);
-        return ret;
-    }
-
-
     /**
      * Executed the command on the button.
      * @param _parameter Parameter as passed from the eFaps API
@@ -962,58 +1013,57 @@ public abstract class Payslip_Base
         throws EFapsException
     {
         final Return ret = new Return();
-        final Map<Instance, TablePos> values = new HashMap<Instance, TablePos>();
-        analyseTables(_parameter, values, "Deduction");
-        analyseTables(_parameter, values, "Payment");
-        analyseTables(_parameter, values, "Neutral");
-
-        final Map<Instance, Position> sums = analysePositions(_parameter);
-
-        final List<SumPosition> sort = new ArrayList<SumPosition>();
-        for (final Position pos : sums.values()) {
-            if (pos instanceof SumPosition) {
-                sort.add((SumPosition) pos);
+        final Map<Instance, Integer> ruleInsts = getRuleInstFromUI(_parameter);
+        final String[] amounts = _parameter
+                        .getParameterValues(CITablePayroll.Payroll_PositionRuleTable.ruleAmount.name);
+        final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts.keySet().toArray(
+                        new Instance[ruleInsts.size()]));
+        for (final AbstractRule<?> rule : rules) {
+            if (rule instanceof InputRule) {
+                rule.setExpression(amounts[ruleInsts.get(rule.getInstance())]);
             }
         }
-        Collections.sort(sort, new Comparator<SumPosition>() {
-            @Override
-            public int compare(final SumPosition _pos1,
-                               final SumPosition _pos2)
-            {
-                return _pos1.getSorted().compareTo(_pos2.getSorted());
-            }
-        });
-        final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
-        final StringBuilder html = new StringBuilder();
-        html.append("document.getElementsByName('sums')[0].innerHTML='<table style=\"width:50%\">");
-        for (final SumPosition pos : sort) {
-            if (pos.getMode() != CasePosition_Base.MODE.DEAVTIVATED.ordinal()) {
-                html.append("<tr>")
-                    .append("<td style=\"font-weight:bold\">").append(pos.getName()).append("</td>")
-                    .append("<td>").append(StringEscapeUtils.escapeEcmaScript(pos.getDescription())).append("</td>")
-                    .append("<td style=\"text-align:right\">")
-                    .append(formater.format(pos.getResult(_parameter, sums, values))).append("</td></tr>");
-            }
-        }
-        html.append("</table>';");
+        Calculator.evaluate(_parameter, rules);
 
-        for (final TablePos pos : values.values()) {
-            if (pos.isSetValue()) {
-                for (int i = 0; i < pos.getValues().size(); i++) {
-                    html.append("document.getElementsByName('amount_").append(pos.postfix).append("')[")
-                        .append(pos.pos.get(i)).append("].value='").append(formater.format(pos.getValues().get(i)))
-                        .append("';");
-                }
-            }
-        }
-
-        final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put(EFapsKey.FIELDUPDATE_JAVASCRIPT.getKey(), html.toString());
+        final List<Map<String, Object>> list = new ArrayList<>();
+        final Map<String, Object> map = new HashMap<>();
+        final String html = Calculator.getHtml4Rules(_parameter, rules);
+        final StringBuilder js = new StringBuilder().append("document.getElementsByName('sums')[0].innerHTML='")
+                        .append(StringEscapeUtils.escapeEcmaScript(html)).append("';");
+        map.put(EFapsKey.FIELDUPDATE_JAVASCRIPT.getKey(), js.toString());
         list.add(map);
+
+        for (final AbstractRule<?> rule : rules) {
+            if (rule instanceof ExpressionRule) {
+                final Map<String, Object> map2 = new HashMap<>();
+                list.add(map2);
+                map2.put(EFapsKey.FIELDUPDATE_USEIDX.getKey(), ruleInsts.get(rule.getInstance()));
+                map2.put(CITablePayroll.Payroll_PositionRuleTable.ruleAmount.name, rule.getResult());
+            }
+        }
+
         ret.put(ReturnValues.VALUES, list);
         return ret;
     }
+
+    protected Map<Instance, Integer> getRuleInstFromUI(final Parameter _parameter)
+    {
+        final Map<Instance, Integer> ret = new LinkedHashMap<>();
+        final String[] oids = _parameter.getParameterValues(CITablePayroll.Payroll_PositionRuleTable.rulePosition.name);
+
+        if (oids != null) {
+            int idx = 0;
+            for (final String oid : oids) {
+                final Instance ruleInstance = Instance.get(oid);
+                if (ruleInstance.isValid()) {
+                    ret.put(ruleInstance, idx);
+                }
+                idx++;
+            }
+        }
+        return ret;
+    }
+
 
     /**
      * Get the values from the tables.
@@ -1310,7 +1360,6 @@ public abstract class Payslip_Base
         private final List<Integer> pos = new ArrayList<Integer>();
 
         private boolean setValue = false;
-        private final String postfix;
         public TablePos(final BigDecimal _amount,
                         final Integer _pos,
                         final String _postfix)
@@ -1318,7 +1367,6 @@ public abstract class Payslip_Base
         {
             getValues().add(_amount);
             this.pos.add(_pos);
-            this.postfix = _postfix;
         }
 
         public void add(final BigDecimal _amount,

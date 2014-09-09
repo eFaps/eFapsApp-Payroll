@@ -145,7 +145,15 @@ public abstract class AbstractParameter_Base<T>
     protected static Map<String, Object> getParameters(final Parameter _parameter)
         throws EFapsException
     {
-        final Instance employeeInst = Instance.get("13743.1");
+        final Instance employeeInst = Instance.get(_parameter.getParameterValue("employee"));
+        return getParameters(_parameter, employeeInst);
+    }
+
+    protected static Map<String, Object> getParameters(final Parameter _parameter,
+                                                       final Instance _employeeInst)
+        throws EFapsException
+    {
+
         final Map<String, Object> ret = new HashMap<>();
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.ParameterAbstract);
         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -158,12 +166,13 @@ public abstract class AbstractParameter_Base<T>
                                 .setKey(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Key))
                                 .setValue(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Value));
                 ret.put(para.getKey(), para.getValue());
-            } else if (multi.getCurrentInstance().getType().isCIType(CIPayroll.ParameterEmployee)) {
+            } else if (multi.getCurrentInstance().getType().isCIType(CIPayroll.ParameterEmployee)
+                            && _employeeInst.isValid()) {
                 final EmployeeParameter para = new EmployeeParameter()
                                 .setInstance(multi.getCurrentInstance())
                                 .setKey(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Key))
                                 .setSelect(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Value))
-                                .setEmployeeInstance(employeeInst);
+                                .setEmployeeInstance(_employeeInst);
                 ret.put(para.getKey(), para.getValue());
             }
         }

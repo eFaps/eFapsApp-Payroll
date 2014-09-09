@@ -59,4 +59,11 @@ public class Calculator
     {
         return Calculator_Base.getJexlEngine();
     }
+
+    public static String getHtml4Rules(final Parameter _parameter,
+                                       final List<? extends AbstractRule<?>> _rules)
+        throws EFapsException
+    {
+        return Calculator_Base.getHtml4Rules(_parameter, _rules);
+    }
 }

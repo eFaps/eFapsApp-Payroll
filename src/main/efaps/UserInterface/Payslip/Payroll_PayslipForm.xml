@@ -32,7 +32,6 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PayslipForm</name>
-        <!-- fields -->
         <field name="type">
             <property name="Attribute">Type</property>
         </field>
@@ -80,10 +79,10 @@
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
         </field>
-        <field name="number">
+        <field name="employee">
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Label">Payroll_PayslipForm.number.Label</property>
+            <property name="Label">Payroll_PayslipForm.employee.Label</property>
             <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeEdit">NONE</property>
@@ -162,22 +161,22 @@
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">NONE</property>
         </field>
-        <field name="case">
+        <field name="template">
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">NONE</property>
-            <property name="Label">Payroll_PayslipForm.case.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
-            <trigger program="org.efaps.esjp.payroll.Case"
-                method="getCaseFieldValue"
-                name="Payroll_PayslipForm.case.UI_FIELD_VALUE"
+            <property name="Label">Payroll_PayslipForm.template.Label</property>
+            <property name="UIType">DROPDOWN</property>
+            <trigger program="org.efaps.esjp.common.uiform.Field"
+                method="getOptionListFieldValue"
+                name="Payroll_PayslipForm.template.UI_FIELD_VALUE"
                 event="UI_FIELD_VALUE">
-                <property name="Type">Payroll_CasePayslip</property>
+                <property name="Type">Payroll_TemplatePayslip</property>
+                <property name="StatusGroup">Payroll_TemplateStatus</property>
+                <property name="Status">Active</property>
+                <property name="Select">attribute[Name]</property>
+                <property name="ValueSelect">oid</property>
             </trigger>
-            <trigger program="org.efaps.esjp.payroll.Payslip"
-                method="update4Case"
-                name="Payroll_PayslipForm.case.UI_FIELD_UPDATE"
-                event="UI_FIELD_UPDATE"/>
         </field>
         <field name="updateButton" character="Command">
             <property name="ModeCreate">READONLY</property>
@@ -191,69 +190,21 @@
                 event="UI_FIELD_CMD">
             </trigger>
         </field>
-        <field name="transactionDate">
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
-            <property name="Label">Payroll_PayslipForm.transactionDate.Label</property>
-            <trigger program="org.efaps.esjp.admin.access.AccessOnField"
-                     method="configCheck"
-                     name="Products_ProductForm.nameQuo.UI_ACCESSCHECK"
-                     event="UI_ACCESSCHECK" >
-                <property name="SystemConfig">Payroll-Configuration</property>
-                <property name="Attribute">ActivateAccountingTransaction</property>
-            </trigger>
-        </field>
-        <field name="paymentHeading" character="Heading">
+        <field name="ruleHeading" character="Heading">
             <property name="ModeCreate">READONLY</property>
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">NONE</property>
             <property name="Level">2</property>
-            <property name="Label">Payroll_PayslipForm.paymentHeading.Label</property>
+            <property name="Label">Payroll_PayslipForm.ruleHeading.Heading</property>
         </field>
-        <field name="paymentTable" character="Target">
+        <field name="ruleTable" character="Target">
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">NONE</property>
-            <table>Payroll_PositionPaymentTable</table>
+            <table>Payroll_PositionRuleTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_PositionPayment</property>
-                <property name="LinkFroms">PayslipLink</property>
-            </evaluate>
-        </field>
-        <field name="deductionHeading" character="Heading">
-            <property name="ModeCreate">READONLY</property>
-            <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <property name="Level">2</property>
-            <property name="Label">Payroll_PayslipForm.deductionHeading.Label</property>
-        </field>
-        <field name="deductionTable" character="Target">
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <table>Payroll_PositionDeductionTable</table>
-            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_PositionDeduction</property>
-                <property name="LinkFroms">PayslipLink</property>
-            </evaluate>
-        </field>
-        <field name="neutralHeading" character="Heading">
-            <property name="ModeCreate">READONLY</property>
-            <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <property name="Level">2</property>
-            <property name="Label">Payroll_PayslipForm.neutralHeading.Label</property>
-        </field>
-        <field name="neutralTable" character="Target">
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <table>Payroll_PositionNeutralTable</table>
-            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_PositionNeutral</property>
-                <property name="LinkFroms">PayslipLink</property>
+                <property name="Type">Payroll_PositionPayment</property>
+                <property name="LinkFrom">PayslipLink</property>
             </evaluate>
         </field>
         <field name="sums">

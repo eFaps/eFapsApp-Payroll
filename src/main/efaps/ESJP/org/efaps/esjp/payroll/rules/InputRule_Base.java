@@ -25,6 +25,7 @@ import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.db.PrintQuery;
 import org.efaps.util.EFapsException;
 
 /**
@@ -44,7 +45,13 @@ public abstract class InputRule_Base
         throws EFapsException
     {
         init();
-        setExpression("1500");
+    }
+
+    @Override
+    protected void initInternal(final PrintQuery _print)
+        throws EFapsException
+    {
+
     }
 
     @Override

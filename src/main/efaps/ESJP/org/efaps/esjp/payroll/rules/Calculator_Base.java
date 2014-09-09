@@ -28,13 +28,15 @@ import org.apache.commons.jexl2.MapContext;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.esjp.ui.html.Table;
 import org.efaps.util.EFapsException;
 
 /**
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: Calculator_Base.java 13971 2014-09-08 21:03:58Z jan@moxter.net
+ *          $
  */
 @EFapsUUID("a18eb023-438e-442b-853e-3b5b61517ca8")
 @EFapsRevision("$Rev$")
@@ -46,6 +48,7 @@ public abstract class Calculator_Base
         JEXL.setDebug(true);
         JEXL.setSilent(false);
     }
+
     /**
      * @param _parameter
      * @param _rules
@@ -66,5 +69,17 @@ public abstract class Calculator_Base
     protected static JexlEngine getJexlEngine()
     {
         return JEXL;
+    }
+
+    protected static String getHtml4Rules(final Parameter _parameter,
+                                          final List<? extends AbstractRule<?>> _rules)
+        throws EFapsException
+    {
+        final Table table = new Table();
+        for (final AbstractRule<?> rule : _rules) {
+            table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+                            .addColumn(String.valueOf(rule.getResult()));
+        }
+        return table.toHtml().toString();
     }
 }
