@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2014 The eFaps Team
+ Copyright 2003 - 2010 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,18 +20,14 @@
  Last Changed By: $Author$
 
 -->
-<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<datamodel-type xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>79bb5d97-2b66-4793-95d0-9936fdf84bae</uuid>
+    <uuid>ecc78071-9f20-4bf9-8602-d6a46d9884ca</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_ParameterMyDesk_Menu_Action</name>
-        <childs>
-            <child>Payroll_ParameterMyDesk_Menu_Action_CreateFix</child>
-            <child>Payroll_ParameterMyDesk_Menu_Action_CreateEmployee</child>
-            <child>Payroll_ParameterMyDesk_Menu_Action_Delete</child>
-        </childs>
+        <name>Payroll_ParameterEmployee</name>
+        <parent>Payroll_ParameterAbstract</parent>
     </definition>
-</ui-menu>
+</datamodel-type>

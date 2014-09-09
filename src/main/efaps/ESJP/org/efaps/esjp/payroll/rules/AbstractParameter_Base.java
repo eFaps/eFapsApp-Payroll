@@ -36,12 +36,14 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: AbstractParameter_Base.java 13971 2014-09-08 21:03:58Z
+ *          jan@moxter.net $
  */
 @EFapsUUID("45fcf09d-d676-4ac1-8f15-5f790f2eaf03")
 @EFapsRevision("$Rev$")
 public abstract class AbstractParameter_Base<T>
 {
+
     /**
      * Instance of the rule.
      */
@@ -82,6 +84,7 @@ public abstract class AbstractParameter_Base<T>
      * @return value of instance variable {@link #value}
      */
     public Object getValue()
+        throws EFapsException
     {
         return this.value;
     }
@@ -139,10 +142,10 @@ public abstract class AbstractParameter_Base<T>
         return getThis();
     }
 
-
     protected static Map<String, Object> getParameters(final Parameter _parameter)
         throws EFapsException
     {
+        final Instance employeeInst = Instance.get("13743.1");
         final Map<String, Object> ret = new HashMap<>();
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.ParameterAbstract);
         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -150,11 +153,18 @@ public abstract class AbstractParameter_Base<T>
         multi.execute();
         while (multi.next()) {
             if (multi.getCurrentInstance().getType().isCIType(CIPayroll.ParameterFix)) {
-               final FixParameter para = new FixParameter()
-                    .setInstance(multi.getCurrentInstance())
-                    .setKey(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Key))
-                    .setValue(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Value));
-               ret.put(para.getKey(), para.getValue());
+                final FixParameter para = new FixParameter()
+                                .setInstance(multi.getCurrentInstance())
+                                .setKey(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Key))
+                                .setValue(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Value));
+                ret.put(para.getKey(), para.getValue());
+            } else if (multi.getCurrentInstance().getType().isCIType(CIPayroll.ParameterEmployee)) {
+                final EmployeeParameter para = new EmployeeParameter()
+                                .setInstance(multi.getCurrentInstance())
+                                .setKey(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Key))
+                                .setSelect(multi.<String>getAttribute(CIPayroll.ParameterAbstract.Value))
+                                .setEmployeeInstance(employeeInst);
+                ret.put(para.getKey(), para.getValue());
             }
         }
         return ret;

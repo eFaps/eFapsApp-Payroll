@@ -18,38 +18,25 @@
  * Last Changed By: $Author$
  */
 
+
 package org.efaps.esjp.payroll.rules;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.MapContext;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
-import org.efaps.util.EFapsException;
+
 
 /**
- * TODO comment!
+ * This class must be replaced for customization, therefore it is left empty.
+ * Functional description can be found in the related "<code>_Base</code>"
+ * class.
  *
  * @author The eFaps Team
- * @version $Id: FixParameter_Base.java 13971 2014-09-08 21:03:58Z
- *          jan@moxter.net $
+ * @version $Id$
  */
-@EFapsUUID("6f768e9c-b423-46f9-8e32-cfcdc774dee5")
+@EFapsUUID("b9d07114-c113-4992-becc-95e319181259")
 @EFapsRevision("$Rev$")
-public abstract class FixParameter_Base
-    extends AbstractParameter<FixParameter>
+public class EmployeeParameter
+    extends EmployeeParameter_Base
 {
 
-    @Override
-    protected FixParameter getThis()
-    {
-        return (FixParameter) this;
-    }
-
-    @Override
-    public Object getValue()
-        throws EFapsException
-    {
-        final Expression expr = Calculator.getJexlEngine().createExpression(super.getValue().toString());
-        return expr.evaluate(new MapContext());
-    }
 }
