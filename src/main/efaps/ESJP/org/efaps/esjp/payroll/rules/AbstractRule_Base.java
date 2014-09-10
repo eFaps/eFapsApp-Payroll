@@ -31,6 +31,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.PrintQuery;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.payroll.util.Payroll.RuleType;
 import org.efaps.util.EFapsException;
 
 /**
@@ -61,6 +62,8 @@ public abstract class AbstractRule_Base<T>
 
     private Object result;
 
+    private RuleType ruleType;
+
     protected void init()
         throws EFapsException
     {
@@ -68,11 +71,12 @@ public abstract class AbstractRule_Base<T>
             setInitialized(true);
             final PrintQuery print = new PrintQuery(getInstance());
             print.addAttribute(CIPayroll.RuleAbstract.Key, CIPayroll.RuleAbstract.Description,
-                            CIPayroll.RuleAbstract.Expression);
+                            CIPayroll.RuleAbstract.Expression, CIPayroll.RuleAbstract.RuleType);
             print.execute();
             initInternal(print);
             setKey(print.<String>getAttribute(CIPayroll.RuleAbstract.Key));
             setDescription(print.<String>getAttribute(CIPayroll.RuleAbstract.Description));
+            setRuleType(print.<RuleType>getAttribute(CIPayroll.RuleAbstract.RuleType));
         }
     }
 
@@ -264,6 +268,26 @@ public abstract class AbstractRule_Base<T>
     public void setMessage(final String _message)
     {
         this.message = _message;
+    }
+
+    /**
+     * Getter method for the instance variable {@link #ruletype}.
+     *
+     * @return value of instance variable {@link #ruletype}
+     */
+    public RuleType getRuleType()
+    {
+        return this.ruleType;
+    }
+
+    /**
+     * Setter method for instance variable {@link #ruletype}.
+     *
+     * @param _ruletype value for instance variable {@link #ruletype}
+     */
+    public void setRuleType(final RuleType _ruletype)
+    {
+        this.ruleType = _ruletype;
     }
 
     protected static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)

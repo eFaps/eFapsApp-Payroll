@@ -18,7 +18,6 @@
  * Last Changed By: $Author$
  */
 
-
 package org.efaps.esjp.payroll.rules;
 
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.List;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
-
 
 /**
  * This class must be replaced for customization, therefore it is left empty.
@@ -41,8 +39,9 @@ import org.efaps.db.Instance;
 public abstract class AbstractRule<T>
     extends AbstractRule_Base<T>
 {
+
     public static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
     {
-       return AbstractRule_Base.getRules(_ruleInsts);
+        return AbstractRule_Base.getRules(_ruleInsts);
     }
 }

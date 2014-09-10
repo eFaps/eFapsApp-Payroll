@@ -270,7 +270,6 @@ public abstract class ExportAFPReport_Base
                 final MultiPrintQuery multi2 = queryBldr2.getPrint();
                 multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
                 final SelectBuilder selCaseExp = new SelectBuilder()
-                                .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
                                 .attribute(CIPayroll.CasePositionCalc.ExportAFP);
                 multi2.addSelect(selCaseExp);
                 multi2.execute();
@@ -513,7 +512,6 @@ public abstract class ExportAFPReport_Base
                     final MultiPrintQuery multi2 = queryBldr2.getPrint();
                     multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
                     final SelectBuilder selCaseExp = new SelectBuilder()
-                                    .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
                                     .attribute(CIPayroll.CasePositionCalc.ExportAFP);
                     multi2.addSelect(selCaseExp);
                     multi2.execute();

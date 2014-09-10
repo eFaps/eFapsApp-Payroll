@@ -22,11 +22,7 @@
 package org.efaps.esjp.payroll;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -34,15 +30,13 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -79,10 +73,12 @@ import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
 import org.efaps.admin.ui.field.Field;
-import org.efaps.db.Checkin;
+import org.efaps.ci.CIType;
 import org.efaps.db.Context;
+import org.efaps.db.Delete;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
+import org.efaps.db.InstanceQuery;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
@@ -101,10 +97,12 @@ import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
 import org.efaps.esjp.payroll.rules.ExpressionRule;
 import org.efaps.esjp.payroll.rules.InputRule;
+import org.efaps.esjp.payroll.util.Payroll.RuleType;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.sales.util.Sales;
 import org.efaps.esjp.sales.util.SalesSettings;
+import org.efaps.esjp.ui.html.Table;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
@@ -200,7 +198,7 @@ public abstract class Payslip_Base
     public Return create(final Parameter _parameter)
         throws EFapsException
     {
-        Return ret = new Return();
+        final Return ret = new Return();
 
         final String name = getDocName4Create(_parameter);
 
@@ -254,8 +252,7 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.Date, date);
             insert.add(CIPayroll.Payslip.DueDate, dueDate);
             insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
-            insert.add(CIPayroll.Payslip.StatusAbstract,
-                            ((Long) Status.find(CIPayroll.PayslipStatus.uuid, "Open").getId()).toString());
+            insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
             insert.add(CIPayroll.Payslip.RateCrossTotal, ratePay);
             insert.add(CIPayroll.Payslip.RateNetTotal, ratePay);
             insert.add(CIPayroll.Payslip.Rate, rate);
@@ -270,103 +267,9 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraTime, extraLaborTimeUoMs });
             insert.add(CIPayroll.Payslip.MovementType, movementType);
             insert.execute();
-            final Map<Instance, TablePos> values = new HashMap<Instance, TablePos>();
-            analyseTables(_parameter, values, "Deduction");
-            analyseTables(_parameter, values, "Payment");
-            analyseTables(_parameter, values, "Neutral");
 
-            final Map<Instance, Position> sums = analysePositions(_parameter);
-
-            final List<InsertPos> list = new ArrayList<InsertPos>();
-            for (final Position pos : sums.values()) {
-                if (pos instanceof SumPosition) {
-                    list.add(new InsertPos(pos, _parameter, sums, values));
-                }
-            }
-            for (final Entry<Instance, TablePos> entry : values.entrySet()) {
-                for (final BigDecimal amount : entry.getValue().getValues()) {
-                    list.add(new InsertPos(entry.getKey(), amount));
-                }
-            }
-            Collections.sort(list, new Comparator<InsertPos>() {
-                @Override
-                public int compare(final InsertPos _insertPos1,
-                                   final InsertPos _insertPos2)
-                {
-                    return _insertPos1.getSorted().compareTo(_insertPos2.getSorted());
-                }
-            });
-
-            BigDecimal sumDeduction = BigDecimal.ZERO;
-            BigDecimal sumPayment = BigDecimal.ZERO;
-            BigDecimal sumNeutral = BigDecimal.ZERO;
-            int i = 1;
-            for (final InsertPos pos : list) {
-                final Insert insertPos = new Insert(pos.getType());
-                if (pos.getType().equals(CIPayroll.PositionDeduction.getType())) {
-                    sumDeduction = sumDeduction.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                } else if (pos.getType().equals(CIPayroll.PositionNeutral.getType())) {
-                    sumNeutral = sumNeutral.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                } else if (pos.getType().equals(CIPayroll.PositionPayment.getType())) {
-                    sumPayment = sumPayment.add(pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                }
-                insertPos.add(CIPayroll.PositionAbstract.Amount, pos.getAmount().setScale(8, BigDecimal.ROUND_HALF_UP)
-                                .divide(rates[0], BigDecimal.ROUND_HALF_UP)
-                                .setScale(2, BigDecimal.ROUND_HALF_UP));
-                insertPos.add(CIPayroll.PositionAbstract.CasePositionAbstractLink, pos.getId());
-                insertPos.add(CIPayroll.PositionAbstract.Rate, rate);
-                insertPos.add(CIPayroll.PositionAbstract.CurrencyLink, baseCurIns.getId());
-                insertPos.add(CIPayroll.PositionAbstract.RateCurrencyLink, rateCurrInst.getId());
-                insertPos.add(CIPayroll.PositionAbstract.RateAmount,
-                                pos.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP));
-                insertPos.add(CIPayroll.PositionAbstract.Description, pos.getDescription());
-                insertPos.add(CIPayroll.PositionAbstract.DocumentAbstractLink, insert.getInstance().getId());
-                insertPos.add(CIPayroll.PositionAbstract.PositionNumber, i);
-                insertPos.execute();
-                i++;
-            }
-            if (amount2Pay == null && amountCosts == null) {
-                setAmounts(_parameter, insert.getInstance(), list, rates);
-            }
-
-            _parameter.put(ParameterValues.INSTANCE, insert.getInstance());
-            final StandartReport report = new StandartReport();
-            final String fileName = CIPayroll.Payslip.getType().getName() + "_" + name;
-            report.setFileName(fileName);
-            report.getJrParameters().put("sumDeduction", sumDeduction);
-            report.getJrParameters().put("sumPayment", sumPayment);
-            report.getJrParameters().put("sumNeutral", sumNeutral);
-            report.getJrParameters().put("sumTotal", sumPayment.subtract(sumDeduction));
-
-            if (Context.getThreadContext().getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS) != null) {
-                @SuppressWarnings("unchecked")
-                final
-                Map<String, Instance> mapAdv = (Map<String, Instance>) Context.getThreadContext()
-                                .getSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS);
-                for (final Instance instAdv : mapAdv.values()) {
-                    final Update updateAdv = new Update(instAdv);
-                    updateAdv.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.uuid, "Paid").getId());
-                    updateAdv.execute();
-
-                    final Insert insertPay2Adv = new Insert(CIPayroll.Payslip2Advance);
-                    insertPay2Adv.add(CIPayroll.Payslip2Advance.FromLink, insert.getId());
-                    insertPay2Adv.add(CIPayroll.Payslip2Advance.ToLink, instAdv.getId());
-                    insertPay2Adv.execute();
-                }
-                Context.getThreadContext().setSessionAttribute(PayslipCalculator_Base.ADVANCE_PAYMENTS, null);
-            }
-
-            ret = report.execute(_parameter);
-
-            final Map<?, ?> properties = (Map<?, ?>) _parameter.get(ParameterValues.PROPERTIES);
-            try {
-                final File file = (File) ret.get(ReturnValues.VALUES);
-                final InputStream input = new FileInputStream(file);
-                final Checkin checkin = new Checkin(insert.getInstance());
-                checkin.execute(fileName + "." + properties.get("Mime"), input, ((Long) file.length()).intValue());
-            } catch (final FileNotFoundException e) {
-                throw new EFapsException(Payslip.class, "create.FileNotFoundException", e);
-            }
+            final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
+            updatePositions(_parameter, insert.getInstance(), rules);
 
         } catch (final ParseException e) {
             throw new EFapsException(Payslip_Base.class, "create.ParseException", e);
@@ -374,6 +277,66 @@ public abstract class Payslip_Base
 
         return ret;
     }
+
+    protected void updatePositions(final Parameter _parameter,
+                                   final Instance _docInst,
+                                   final List<? extends AbstractRule<?>> _rules)
+        throws EFapsException
+    {
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
+        final InstanceQuery query = queryBldr.getQuery();
+        final List<Instance> posInsts = query.executeWithoutAccessCheck();
+        final Iterator<Instance> posIter = posInsts.iterator();
+        int idx = 1;
+        for (final AbstractRule<?> rule : _rules) {
+            CIType ciType;
+            switch (rule.getRuleType()) {
+                case PAYMENT:
+                    ciType = CIPayroll.PositionPayment;
+                    break;
+                case DEDUCTION:
+                    ciType = CIPayroll.PositionDeduction;
+                    break;
+                case NEUTRAL:
+                    ciType = CIPayroll.PositionNeutral;
+                    break;
+                default:
+                    ciType = CIPayroll.PositionSum;
+            }
+
+            Update update;
+            Instance posInst = null;
+            if (posIter.hasNext()) {
+                posInst = posIter.next();
+
+                if (posInst.getType().isCIType(ciType)) {
+                    update = new Update(posInst);
+                } else {
+                    update = new Insert(ciType);
+                    new Delete(posInst).execute();
+                }
+            } else {
+                update = new Insert(ciType);
+                update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
+            }
+
+            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+
+            update.add(CIPayroll.PositionAbstract.PositionNumber, idx);
+            update.add(CIPayroll.PositionAbstract.Description, rule.getDescription());
+            update.add(CIPayroll.PositionAbstract.Key, rule.getKey());
+            update.add(CIPayroll.PositionAbstract.RateAmount, rule.getResult());
+            update.add(CIPayroll.PositionAbstract.Rate, new Object[]{ BigDecimal.ONE, BigDecimal.ONE });
+            update.add(CIPayroll.PositionAbstract.Amount, BigDecimal.ONE);
+            update.add(CIPayroll.PositionAbstract.CurrencyLink, baseCurIns);
+            update.add(CIPayroll.PositionAbstract.RateCurrencyLink,baseCurIns);
+            update.execute();
+
+            idx++;
+        }
+    }
+
 
     /**
      * Create massive payslips.
@@ -620,67 +583,7 @@ public abstract class Payslip_Base
             .append("document.getElementsByName('extraLaborTimeUoM')[0].value=")
             .append(extraLaborTimeUoM.getId()).append(";\n");
 
-        boolean setCase = true;
 
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
-        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _instance.getId());
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIPayroll.PositionAbstract.PositionNumber,
-                        CIPayroll.PositionAbstract.Amount,
-                        CIPayroll.PositionAbstract.Description);
-        final SelectBuilder selCasePosInst = new SelectBuilder()
-                        .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink).instance();
-        final SelectBuilder selCaseName = new SelectBuilder()
-                        .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                        .attribute(CIPayroll.CasePositionCalc.Name);
-        final SelectBuilder selCaseMode = new SelectBuilder()
-            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                .attribute(CIPayroll.CasePositionCalc.Mode);
-        multi.addSelect(selCasePosInst, selCaseName, selCaseMode);
-        multi.execute();
-
-        final Map<String, Set<Object[]>> values = new TreeMap<String, Set<Object[]>>();
-        while (multi.next()) {
-            final String name = multi.<String>getSelect(selCaseName);
-            final String desc = multi.<String> getAttribute(CIPayroll.PositionAbstract.Description);
-            final Integer mode = multi.<Integer>getSelect(selCaseMode);
-            final BigDecimal dVal = multi.<BigDecimal> getAttribute(CIPayroll.PositionAbstract.Amount);
-
-            final Instance instance = multi.<Instance>getSelect(selCasePosInst);
-            if (setCase) {
-                setCase = false;
-                final PrintQuery posPrint = new PrintQuery(instance);
-                final SelectBuilder selCaseInst = new SelectBuilder()
-                    .linkto(CIPayroll.CasePositionAbstract.CaseAbstractLink).instance();
-                posPrint.addSelect(selCaseInst);
-                posPrint.executeWithoutAccessCheck();
-                final Instance caseInst = posPrint.<Instance>getSelect(selCaseInst);
-                if (caseInst.isValid()) {
-                    js.append("document.getElementsByName('case')[0].value='").append(caseInst.getOid()).append("'");
-                    Context.getThreadContext().setSessionAttribute(Case_Base.CASE_SESSIONKEY, caseInst.getOid());
-                }
-            }
-            final String oid = instance.getOid();
-            String postFix = null;
-            if (instance.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                postFix = "_Deduction";
-            } else if (instance.getType().equals(CIPayroll.CasePositionPayment.getType())) {
-                postFix = "_Payment";
-            } else if (instance.getType().equals(CIPayroll.CasePositionNeutral.getType())) {
-                postFix = "_Neutral";
-            }
-            if (postFix != null) {
-                final Object[] value = new Object[] { oid, name, desc, postFix, mode, dVal};
-                Set<Object[]> set;
-                if (values.containsKey(name)) {
-                    set = values.get(name);
-                } else {
-                    set = new HashSet<Object[]>();
-                }
-                set.add(value);
-                values.put(name, set);
-            }
-        }
         js.append("}\n")
             .append("Wicket.Event.add(window, \"domready\", function(event) {\n")
             .append(" });");
@@ -907,20 +810,12 @@ public abstract class Payslip_Base
     {
         final Return ret = new Return();
         final Map<Instance, Integer> ruleInsts = getRuleInstFromUI(_parameter);
-        final String[] amounts = _parameter
-                        .getParameterValues(CITablePayroll.Payroll_PositionRuleTable.ruleAmount.name);
-        final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts.keySet().toArray(
-                        new Instance[ruleInsts.size()]));
-        for (final AbstractRule<?> rule : rules) {
-            if (rule instanceof InputRule) {
-                rule.setExpression(amounts[ruleInsts.get(rule.getInstance())]);
-            }
-        }
-        Calculator.evaluate(_parameter, rules);
+        final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, ruleInsts);
 
         final List<Map<String, Object>> list = new ArrayList<>();
         final Map<String, Object> map = new HashMap<>();
-        final String html = Calculator.getHtml4Rules(_parameter, rules);
+        final String html = Calculator.getHtml4Rules(_parameter, rules) + "<br/>"
+                        + getHtml4Positions(_parameter, rules);
         final StringBuilder js = new StringBuilder().append("document.getElementsByName('sums')[0].innerHTML='")
                         .append(StringEscapeUtils.escapeEcmaScript(html)).append("';");
         map.put(EFapsKey.FIELDUPDATE_JAVASCRIPT.getKey(), js.toString());
@@ -938,6 +833,65 @@ public abstract class Payslip_Base
         ret.put(ReturnValues.VALUES, list);
         return ret;
     }
+
+    protected List<? extends AbstractRule<?>> analyseRulesFomUI(final Parameter _parameter,
+                                                                final Map<Instance, Integer> _ruleInsts)
+        throws EFapsException
+    {
+        final String[] amounts = _parameter
+                        .getParameterValues(CITablePayroll.Payroll_PositionRuleTable.ruleAmount.name);
+        final List<? extends AbstractRule<?>> ret = AbstractRule.getRules(_ruleInsts.keySet().toArray(
+                        new Instance[_ruleInsts.size()]));
+        for (final AbstractRule<?> rule : ret) {
+            if (rule instanceof InputRule) {
+                rule.setExpression(amounts[_ruleInsts.get(rule.getInstance())]);
+            }
+        }
+        Calculator.evaluate(_parameter, ret);
+        return ret;
+    }
+
+
+    protected CharSequence getHtml4Positions(final Parameter _parameter,
+                                             final List<? extends AbstractRule<?>> rules)
+        throws EFapsException
+    {
+        final Table table = new Table();
+        table.addRow().addColumn(CIPayroll.PositionPayment.getType().getLabel())
+            .getCurrentColumn().setStyle("font-weight: bold;");
+        for (final AbstractRule<?> rule : rules) {
+            if (RuleType.PAYMENT.equals(rule.getRuleType())) {
+                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+                                .addColumn(String.valueOf(rule.getResult()));
+            }
+        }
+        table.addRow().addColumn(CIPayroll.PositionDeduction.getType().getLabel())
+            .getCurrentColumn().setStyle("font-weight: bold;");
+        for (final AbstractRule<?> rule : rules) {
+            if (RuleType.DEDUCTION.equals(rule.getRuleType())) {
+                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+                                .addColumn(String.valueOf(rule.getResult()));
+            }
+        }
+        table.addRow().addColumn(CIPayroll.PositionNeutral.getType().getLabel())
+            .getCurrentColumn().setStyle("font-weight: bold;");
+        for (final AbstractRule<?> rule : rules) {
+            if (RuleType.NEUTRAL.equals(rule.getRuleType())) {
+                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+                                .addColumn(String.valueOf(rule.getResult()));
+            }
+        }
+        table.addRow().addColumn(CIPayroll.PositionSum.getType().getLabel())
+            .getCurrentColumn().setStyle("font-weight: bold;");
+        for (final AbstractRule<?> rule : rules) {
+            if (RuleType.SUM.equals(rule.getRuleType())) {
+                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+                                .addColumn(String.valueOf(rule.getResult()));
+            }
+        }
+        return table.toHtml();
+    }
+
 
     protected Map<Instance, Integer> getRuleInstFromUI(final Parameter _parameter)
     {
@@ -1099,34 +1053,15 @@ public abstract class Payslip_Base
         multi.addSelect(selFEmp, selLEmp);
         multi.execute();
         while (multi.next()) {
-            final String empName = multi.<String>getSelect(selLEmp) + ", " + multi.<String>getSelect(selFEmp);
+            multi.<String>getSelect(selLEmp);
+            multi.<String>getSelect(selFEmp);
             final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
             queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type, CIPayroll.PositionSum.getType().getId());
             queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
                             multi.getCurrentInstance().getId());
             final MultiPrintQuery multi2 = queryBldr2.getPrint();
             multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
-            final SelectBuilder selAction = new SelectBuilder()
-                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                            .linkto(CIPayroll.CasePositionAbstract.ActionDefinitionAbstractLink).oid();
-            final SelectBuilder selActionName = new SelectBuilder()
-                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                            .linkto(CIPayroll.CasePositionAbstract.ActionDefinitionAbstractLink).attribute("Name");
-            multi2.addSelect(selAction, selActionName);
-            multi2.execute();
-            while (multi2.next())
-            {
-                BigDecimal amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
-                if (multi2.getCurrentInstance().getType().isKindOf(CIPayroll.PositionDeduction.getType())) {
-                    amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount).negate();
-                }
-                final Instance actInst = Instance.get(multi2.<String>getSelect(selAction));
-                final String actName = multi2.<String>getSelect(selActionName);
-                if (actInst.isValid()) {
 
-                }
-                ret.add(empName, actName, amount);
-            }
         }
         return ret;
     }
@@ -1218,23 +1153,6 @@ public abstract class Payslip_Base
         {
             return this.amount;
         }
-
-        /**
-         * @return
-         */
-        private String getDescription()
-        {
-            return this.description;
-        }
-
-        /**
-         * @return
-         */
-        private Long getId()
-        {
-            return this.id;
-        }
-
 
         @Override
         public String toString()

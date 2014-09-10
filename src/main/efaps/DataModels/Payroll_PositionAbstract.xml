@@ -61,17 +61,16 @@
             <sqlcolumn>DOCID</sqlcolumn>
         </attribute>
         <attribute>
-            <name>CasePositionAbstractLink</name>
-            <type>Link</type>
-            <typelink>Payroll_CasePositionAbstract</typelink>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
-            <sqlcolumn>CASEPOSID</sqlcolumn>
-        </attribute>
-        <attribute>
             <name>PositionNumber</name>
             <type>Integer</type>
             <sqltable>Payroll_PositionSQLTable</sqltable>
             <sqlcolumn>POS</sqlcolumn>
+        </attribute>
+         <attribute>
+            <name>Key</name>
+            <type>String</type>
+            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqlcolumn>KEY</sqlcolumn>
         </attribute>
         <attribute>
             <name>Description</name>

@@ -233,12 +233,8 @@ public abstract class PayslipReport_Base
                             multi.getCurrentInstance().getId());
             final MultiPrintQuery multi2 = queryBldr2.getPrint();
             multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
-            final SelectBuilder selCaseName = new SelectBuilder()
-                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                            .attribute(CIPayroll.CasePositionAbstract.Name);
-            final SelectBuilder selCaseExp = new SelectBuilder()
-                            .linkto(CIPayroll.PositionAbstract.CasePositionAbstractLink)
-                            .attribute(CIPayroll.CasePositionCalc.ExportReport);
+            final SelectBuilder selCaseName = new SelectBuilder();
+            final SelectBuilder selCaseExp = new SelectBuilder();
             multi2.addSelect(selCaseName, selCaseExp);
             multi2.execute();
             while (multi2.next()) {

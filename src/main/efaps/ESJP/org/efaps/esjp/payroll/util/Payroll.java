@@ -51,7 +51,7 @@ public final class Payroll
     public enum RuleType
         implements IEnum
     {
-        NONE,
+        SUM,
         PAYMENT,
         DEDUCTION,
         NEUTRAL;

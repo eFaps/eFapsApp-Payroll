@@ -42,16 +42,13 @@
             <property name="Attribute">PositionNumber</property>
             <property name="Label">Payroll_PositionAbstract/PositionNumber.Label</property>
         </field>
+        <field name="key">
+            <property name="Attribute">Key</property>
+            <property name="Label">Payroll_PositionAbstract/Key.Label</property>
+        </field>
         <field name="description">
             <property name="Attribute">Description</property>
-            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_PositionAbstract/Description.Label</property>
-        </field>
-        <field name="casePositionAbstractLink">
-            <property name="SelectAlternateOID">linkto[CasePositionAbstractLink].oid</property>
-            <property name="Select">linkto[CasePositionAbstractLink].attribute[Name]</property>
-            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Label">Payroll_PositionAbstract/CasePositionAbstractLink.Label</property>
         </field>
         <field name="amount">
             <property name="Attribute">Amount</property>

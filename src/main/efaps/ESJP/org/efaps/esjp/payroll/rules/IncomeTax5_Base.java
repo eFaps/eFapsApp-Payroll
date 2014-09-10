@@ -229,8 +229,7 @@ public abstract class IncomeTax5_Base
 
                 final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
                 queryBldr2.addWhereAttrEqValue(CIPayroll.PositionPayment.DocumentAbstractLink, ids);
-                queryBldr2.addWhereAttrEqValue(CIPayroll.PositionPayment.CasePositionAbstractLink,
-                                _position.getInstance().getId());
+
                 final MultiPrintQuery multi = queryBldr2.getPrint();
                 multi.addAttribute(CIPayroll.PositionPayment.Amount);
                 multi.execute();

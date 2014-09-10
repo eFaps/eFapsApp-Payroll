@@ -29,26 +29,23 @@
     <uuid>4336a844-3cb5-4e21-b4ad-478e2f42990c</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
-
     <definition>
-
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PayslipStatus</name>
         <parent>Admin_DataModel_StatusAbstract</parent>
-
+        <status key="Draft">
+            <description>Invoice was printed, but needs to be payed for.</description>
+        </status>
         <status key="Open">
             <description>Invoice was printed, but needs to be payed for.
             </description>
         </status>
-
         <status key="Paid">
             <description>Invoice was payed.</description>
         </status>
-
         <status key="Booked">
             <description>Invoice was booked.</description>
         </status>
-
         <status key="Canceled">
             <description>Invoice was replaced by another Invoice or Receipt.
             </description>
