@@ -72,6 +72,13 @@
             <sqlcolumn>NOTE</sqlcolumn>
         </attribute>
         <attribute>
+            <name>RuleType</name>
+            <type>Enum</type>
+            <className>org.efaps.esjp.payroll.util.Payroll$RuleType</className>
+            <sqltable>Payroll_RuleSQLTable</sqltable>
+            <sqlcolumn>RULETYPE</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>Creator</name>
             <type>CreatorLink</type>
             <sqltable>Payroll_RuleSQLTable</sqltable>
