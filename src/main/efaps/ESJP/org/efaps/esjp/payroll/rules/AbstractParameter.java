@@ -42,6 +42,9 @@ import org.efaps.util.EFapsException;
 public abstract class AbstractParameter<T>
     extends AbstractParameter_Base<T>
 {
+    public static final String PARAKEY4EMPLOYINST = AbstractParameter_Base.PARAKEY4EMPLOYINST;
+
+    public static final String PARAKEY4DATE = AbstractParameter_Base.PARAKEY4DATE;
 
     public static Map<String, Object> getParameters(final Parameter _parameter)
         throws EFapsException
@@ -54,5 +57,12 @@ public abstract class AbstractParameter<T>
         throws EFapsException
     {
         return AbstractParameter_Base.getParameters(_parameter, _employeeInst);
+    }
+
+    public static void addDate(final Parameter _parameter,
+                                  final Map<String, Object> _map)
+        throws EFapsException
+    {
+        AbstractParameter_Base.addDate(_parameter, _map);
     }
 }

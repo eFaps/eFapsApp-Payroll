@@ -20,16 +20,30 @@
 
 package org.efaps.esjp.payroll.rules;
 
+import java.math.MathContext;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.jexl2.JexlArithmetic;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.JexlInfo;
 import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.jexl2.introspection.JexlMethod;
+import org.apache.commons.jexl2.introspection.JexlPropertyGet;
+import org.apache.commons.jexl2.introspection.JexlPropertySet;
+import org.apache.commons.jexl2.introspection.UberspectImpl;
+import org.apache.commons.logging.LogFactory;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.esjp.payroll.util.Payroll;
+import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.esjp.ui.html.Table;
 import org.efaps.util.EFapsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO comment!
@@ -42,8 +56,15 @@ import org.efaps.util.EFapsException;
 @EFapsRevision("$Rev$")
 public abstract class Calculator_Base
 {
+    protected static final String PARAKEY4CONTEXT = "Context";
 
-    private static final JexlEngine JEXL = new JexlEngine();
+    /**
+     * Logger for this classes.
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(Calculator.class);
+
+    private static final JexlEngine JEXL = new JexlEngine(new SandBoxUberspect(),
+                    new JexlArithmetic(true, MathContext.DECIMAL128, 2), null, null);
     static {
         JEXL.setDebug(true);
         JEXL.setSilent(false);
@@ -61,6 +82,7 @@ public abstract class Calculator_Base
             rule.prepare(_parameter);
         }
         final JexlContext context = new MapContext(AbstractParameter.getParameters(_parameter));
+        context.set(Calculator.PARAKEY4CONTEXT, context);
         for (final AbstractRule<?> rule : _rules) {
             rule.evaluate(_parameter, context);
         }
@@ -82,4 +104,102 @@ public abstract class Calculator_Base
         }
         return table.toHtml().toString();
     }
+
+    private static final class SandBoxUberspect
+        extends UberspectImpl
+    {
+
+        private final Set<String> classNames = new HashSet<>();
+
+        /**
+         * @param _runtimeLogger
+         * @param _theSandbox
+         */
+        public SandBoxUberspect()
+        {
+            super(LogFactory.getLog(JexlEngine.class));
+            try {
+                final String whiteLstStr = Payroll.getSysConfig().getAttributeValue(
+                                PayrollSettings.RULESANDBOXWHITELIST);
+                if (whiteLstStr != null && !whiteLstStr.isEmpty()) {
+                    for (final String white : whiteLstStr.split("\n")) {
+                        this.classNames.add(white.trim());
+                    }
+                }
+            } catch (final EFapsException e) {
+                LOG.error("Error", e);
+            }
+        }
+
+        @Override
+        public JexlMethod getConstructorMethod(final Object ctorHandle,
+                                               final Object[] args,
+                                               final JexlInfo info)
+        {
+            final String className;
+            if (ctorHandle instanceof Class<?>) {
+                final Class<?> clazz = (Class<?>) ctorHandle;
+                className = clazz.getName();
+            } else if (ctorHandle != null) {
+                className = ctorHandle.toString();
+            } else {
+                return null;
+            }
+            if (this.classNames.contains(className)) {
+                return super.getConstructorMethod(className, args, info);
+            }
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JexlMethod getMethod(final Object obj,
+                                    final String method,
+                                    final Object[] args,
+                                    final JexlInfo info)
+        {
+            if (obj != null && method != null) {
+                if (this.classNames.contains(obj.getClass().getName())) {
+                    return getMethodExecutor(obj, method, args);
+                }
+            }
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JexlPropertyGet getPropertyGet(final Object obj,
+                                              final Object identifier,
+                                              final JexlInfo info)
+        {
+            if (obj != null && identifier != null) {
+                if (this.classNames.contains(obj.getClass().getName())) {
+                    return super.getPropertyGet(obj, identifier.toString(), info);
+                }
+            }
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JexlPropertySet getPropertySet(final Object obj,
+                                              final Object identifier,
+                                              final Object arg,
+                                              final JexlInfo info)
+        {
+            if (obj != null && identifier != null) {
+                if (this.classNames.contains(obj.getClass().getName())) {
+                    return super.getPropertySet(obj, identifier.toString(), arg, info);
+                }
+            }
+            return null;
+        }
+    }
+
 }

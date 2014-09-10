@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2013 The eFaps Team
+ * Copyright 2003 - 2014 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,30 +19,25 @@
  */
 
 
-package org.efaps.esjp.payroll.util;
+package org.efaps.esjp.payroll.rules;
 
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
 /**
- * TODO comment!
+ * This class must be replaced for customization, therefore it is left empty.
+ * Functional description can be found in the related "<code>_Base</code>"
+ * class.
  *
  * @author The eFaps Team
  * @version $Id$
  */
-
-@EFapsUUID("00a55935-6b51-4982-ad22-79067ff170c3")
+@EFapsUUID("92b96ec0-a0c7-4303-b529-123784d8651b")
 @EFapsRevision("$Rev$")
-public interface PayrollSettings
+public class IncomeTax5
+    extends IncomeTax5_Base
 {
-    /**
-     * String with the name of the selected company.
-     */
-    String MOVEMENTTYPE_ENDDATE = "org.efaps.payroll.MovementTypeEndDate";
-
-    /**
-     * String with the name of the selected company.
-     */
-    String RULESANDBOXWHITELIST = "org.efaps.payroll.WhiteList4RuleSandbox";
+    public final static String KEYS4PAYMENT = IncomeTax5_Base.KEYS4PAYMENT;
+    public final static String KEYS4EXTRA = IncomeTax5_Base.KEYS4EXTRA;
 }

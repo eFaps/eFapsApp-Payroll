@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -62,7 +63,6 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Dimension.UoM;
@@ -97,7 +97,6 @@ import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.common.util.InterfaceUtils;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
-import org.efaps.esjp.payroll.CasePosition_Base.MODE;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
 import org.efaps.esjp.payroll.rules.ExpressionRule;
@@ -684,7 +683,6 @@ public abstract class Payslip_Base
         }
         js.append("}\n")
             .append("Wicket.Event.add(window, \"domready\", function(event) {\n")
-            .append(getJs(_parameter, values)).append("\n setValue();\n")
             .append(" });");
         return js.toString();
     }
@@ -831,144 +829,39 @@ public abstract class Payslip_Base
         throws EFapsException
     {
         final Return ret = new Return();
-        final String caseOid = _parameter.getParameterValue("case");
-        final Instance caseInst = Instance.get(caseOid);
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.CasePositionCalc);
-        queryBldr.addWhereAttrEqValue(CIPayroll.CasePositionCalc.CaseAbstractLink, caseInst.getId());
-        queryBldr.addWhereAttrNotEqValue(CIPayroll.CasePositionCalc.Mode, CasePosition.MODE.DEAVTIVATED.ordinal(),
-                                                                          CasePosition.MODE.OPTIONAL.ordinal());
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIPayroll.CasePositionCalc.Name,
-                           CIPayroll.CasePositionCalc.Description,
-                           CIPayroll.CasePositionCalc.Mode,
-                           CIPayroll.CasePositionCalc.DefaultValue);
-        multi.execute();
+        final Instance templInst = Instance.get(_parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name));
+        if (templInst.isValid()) {
+            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2Rule);
+            queryBldr.addWhereAttrEqValue(CIPayroll.Template2Rule.FromLink, templInst);
+            queryBldr.addOrderByAttributeAsc(CIPayroll.Template2Rule.Sequence);
 
-        final Map<String, Set<Object[]>> values = new TreeMap<String, Set<Object[]>>();
-        while (multi.next()) {
-            final String name = multi.<String> getAttribute(CIPayroll.CasePositionCalc.Name);
-            final String desc = multi.<String> getAttribute(CIPayroll.CasePositionCalc.Description);
-            final Integer mode = multi.<Integer> getAttribute(CIPayroll.CasePositionCalc.Mode);
-            final BigDecimal dflt = multi.<BigDecimal> getAttribute(CIPayroll.CasePositionCalc.DefaultValue);
+            final MultiPrintQuery multi = queryBldr.getPrint();
+            final SelectBuilder ruleInst = SelectBuilder.get().linkto(CIPayroll.Template2Rule.ToLink).instance();
+            multi.addSelect(ruleInst);
+            multi.setEnforceSorted(true);
+            multi.execute();
 
-            final Instance instance = multi.getCurrentInstance();
-            final String oid = instance.getOid();
-            final String postFix;
-            if (instance.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                postFix = "_Deduction";
-            } else if (instance.getType().equals(CIPayroll.CasePositionPayment.getType())) {
-                postFix = "_Payment";
-            } else {
-                postFix = "_Neutral";
+            final List<Instance> ruleInsts = new ArrayList<>();
+            while (multi.next()) {
+                ruleInsts.add(multi.<Instance>getSelect(ruleInst));
             }
-            final Object[] value = new Object[] { oid, name, desc, postFix, mode, dflt};
-            Set<Object[]> set;
-            if (values.containsKey(name)) {
-                set = values.get(name);
-            } else {
-                set = new HashSet<Object[]>();
+            final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts.toArray(new Instance[ruleInsts
+                            .size()]));
+            final Collection<Map<String, Object>> values = new ArrayList<>();
+            for (final AbstractRule<?> rule : rules) {
+                final Map<String, Object> map = new HashMap<>();
+                values.add(map);
+                map.put(CITablePayroll.Payroll_PositionRuleTable.rulePosition.name,
+                                new String[] {rule.getInstance().getOid(), rule.getKey()});
+                map.put(CITablePayroll.Payroll_PositionRuleTable.ruleDescription.name, rule.getDescription());
             }
-            set.add(value);
-            values.put(name, set);
+            final StringBuilder js = getTableRemoveScript(_parameter, "ruleTable")
+                               .append(getTableAddNewRowsScript(_parameter, "ruleTable", values, null));
+            ret.put(ReturnValues.SNIPLETT, js.toString());
         }
-        ret.put(ReturnValues.SNIPLETT, getJs(_parameter, values).toString());
         return ret;
     }
 
-
-    /**
-     * @param _values values
-     * @return javscript
-     * @throws EFapsException on error
-     */
-    protected StringBuilder getJs(final Parameter _parameter,
-                                  final Map<String, Set<Object[]>> _values)
-        throws EFapsException
-    {
-        final StringBuilder js = new StringBuilder();
-        // remove all positions from the tables
-        js.append("require([\"dojo/query\",\"dojo/dom-construct\"], function(query,domConstruct){\n")
-            .append("   var rows=query(\".eFapsTableRowOdd, .eFapsTableRowEven\");\n")
-            .append("   rows.forEach(function(row){\n")
-            .append("       domConstruct.destroy(row);\n")
-            .append("   });\n")
-            .append("});");
-        final StringBuilder dedBldr = new StringBuilder();
-        final StringBuilder payBldr = new StringBuilder();
-        final StringBuilder neuBldr = new StringBuilder();
-        final StringBuilder dedBldr2 = new StringBuilder();
-        final StringBuilder payBldr2 = new StringBuilder();
-        final StringBuilder neuBldr2 = new StringBuilder();
-        dedBldr.append("function setDeduction(){\n");
-        payBldr.append("function setPayment(){\n");
-        neuBldr.append("function setNeutral(){\n");
-        int deb = 0;
-        int cred = 0;
-        int neu = 0;
-        final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
-        for (final Set<Object[]> set : _values.values()) {
-            for (final Object[] value : set) {
-                final int count;
-                final StringBuilder bldr;
-                final StringBuilder bldr2;
-                if ("_Deduction".equals(value[3])) {
-                    bldr = dedBldr;
-                    bldr2 = dedBldr2;
-                    count = deb;
-                    deb++;
-                } else if ("_Payment".equals(value[3])) {
-                    bldr = payBldr;
-                    bldr2 = payBldr2;
-                    count = cred;
-                    cred++;
-                } else {
-                    bldr = neuBldr;
-                    bldr2 = neuBldr2;
-                    count = neu;
-                    neu++;
-                }
-                bldr.append(getSetFieldValue(count, "casePosition" + value[3], value[0].toString(),
-                                    value[1].toString())).append("\n")
-                    .append(getSetFieldValue(count, "description" + value[3], value[2].toString())).append("\n");
-                if (!value[4].equals(MODE.OPTIONAL_DEFAULT.ordinal())) {
-                    bldr2.append(getSetFieldReadOnlyScript(_parameter,count, "casePosition" + value[3])).append("\n")
-                        .append("require([\"dojo/query\",\"dojo/dom-construct\"], function(query,domConstruct){\n")
-                        .append("var x = document.getElementsByName('amount").append(value[3]).append("')[")
-                        .append(count).append("];").append("\n")
-                        .append("var rows=query(\".eFapsTableRemoveRowCell > *\", x.parentNode.parentNode);\n")
-                        .append("rows.forEach(function(row){\n")
-                        .append("domConstruct.destroy(row);\n")
-                        .append("});\n")
-                        .append("});\n");
-                }
-                if (value[4].equals(MODE.REQUIRED_NOEDITABLE.ordinal())) {
-                    bldr2.append(getSetFieldReadOnlyScript(_parameter,count, "amount" + value[3])).append("\n");
-                }
-                if (value[5] != null) {
-                    bldr.append(getSetFieldValue(count, "amount" + value[3], formater.format(value[5]))).append("\n");
-                }
-            }
-        }
-        payBldr.append(payBldr2);
-        payBldr.append("}\n");
-        dedBldr.append(dedBldr2);
-        dedBldr.append("}\n");
-        neuBldr.append(neuBldr2);
-        neuBldr.append("document.getElementsByName('sums')[0].innerHTML='")
-            .append(StringUtils.repeat("<br/>", _values.size())).append("';")
-            .append("positionTableColumns(eFapsTable100);\n")
-            .append("positionTableColumns(eFapsTable200);\n")
-            .append("positionTableColumns(eFapsTable300);\n").append("}\n");
-
-        js.append(payBldr).append(dedBldr).append(neuBldr)
-            .append(" addNewRows_paymentTable(").append(cred)
-            .append(", setPayment, null);\n")
-            .append(" addNewRows_deductionTable(").append(deb)
-            .append(", setDeduction, null);\n")
-            .append(" addNewRows_neutralTable(").append(neu)
-            .append(", setNeutral, null);\n");
-        return js;
-    }
 
     /**
      * @param _parameter as passed from eFaps API.

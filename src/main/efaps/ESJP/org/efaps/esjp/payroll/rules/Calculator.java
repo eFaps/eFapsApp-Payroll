@@ -44,6 +44,8 @@ public class Calculator
     extends Calculator_Base
 {
 
+    public static final String PARAKEY4CONTEXT = Calculator_Base.PARAKEY4CONTEXT;
+
     /**
      * @param _parameter
      * @param _rules

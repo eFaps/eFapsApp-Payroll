@@ -30,7 +30,9 @@ import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.util.EFapsException;
+import org.joda.time.DateTime;
 
 /**
  * TODO comment!
@@ -44,6 +46,9 @@ import org.efaps.util.EFapsException;
 public abstract class AbstractParameter_Base<T>
 {
 
+    protected static final String PARAKEY4EMPLOYINST = "EmployeeInstance";
+
+    protected static final String PARAKEY4DATE = "Date";
     /**
      * Instance of the rule.
      */
@@ -176,6 +181,28 @@ public abstract class AbstractParameter_Base<T>
                 ret.put(para.getKey(), para.getValue());
             }
         }
+        if (_employeeInst != null && _employeeInst.isValid()) {
+            ret.put(AbstractParameter.PARAKEY4EMPLOYINST, _employeeInst);
+        }
+        AbstractParameter.addDate(_parameter, ret);
         return ret;
+    }
+
+    /**
+     * @param _parameter
+     */
+    protected static void addDate(final Parameter _parameter,
+                                  final Map<String, Object> _map)
+        throws EFapsException
+    {
+        DateTime date = null;
+        final String dateStr = _parameter.getParameterValue("date_eFapsDate");
+        if (dateStr != null) {
+            date = DateUtil.getDateFromParameter(dateStr);
+        }
+
+        if (date != null) {
+            _map.put(AbstractParameter.PARAKEY4DATE, date);
+        }
     }
 }
