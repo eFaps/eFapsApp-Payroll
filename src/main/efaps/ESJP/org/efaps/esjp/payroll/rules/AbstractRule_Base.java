@@ -44,7 +44,6 @@ import org.efaps.util.EFapsException;
 @EFapsRevision("$Rev$")
 public abstract class AbstractRule_Base<T>
 {
-
     /**
      * Instance of the rule.
      */
@@ -55,6 +54,8 @@ public abstract class AbstractRule_Base<T>
     private String expression;
 
     private String description;
+
+    private String message;
 
     private boolean initialized = false;
 
@@ -243,6 +244,26 @@ public abstract class AbstractRule_Base<T>
     {
         this.result = _result;
         return getThis();
+    }
+
+    /**
+     * Getter method for the instance variable {@link #message}.
+     *
+     * @return value of instance variable {@link #message}
+     */
+    public String getMessage()
+    {
+        return this.message;
+    }
+
+    /**
+     * Setter method for instance variable {@link #message}.
+     *
+     * @param _message value for instance variable {@link #message}
+     */
+    public void setMessage(final String _message)
+    {
+        this.message = _message;
     }
 
     protected static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)

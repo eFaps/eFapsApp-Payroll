@@ -34,7 +34,6 @@ import org.apache.commons.jexl2.introspection.JexlMethod;
 import org.apache.commons.jexl2.introspection.JexlPropertyGet;
 import org.apache.commons.jexl2.introspection.JexlPropertySet;
 import org.apache.commons.jexl2.introspection.UberspectImpl;
-import org.apache.commons.logging.LogFactory;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
@@ -58,13 +57,16 @@ public abstract class Calculator_Base
 {
     protected static final String PARAKEY4CONTEXT = "Context";
 
+    private static MessageLog MSGLOG = new MessageLog();
+
+
     /**
      * Logger for this classes.
      */
     private static final Logger LOG = LoggerFactory.getLogger(Calculator.class);
 
     private static final JexlEngine JEXL = new JexlEngine(new SandBoxUberspect(),
-                    new JexlArithmetic(true, MathContext.DECIMAL128, 2), null, null);
+                    new JexlArithmetic(true, MathContext.DECIMAL128, 2), null, Calculator.getMessageLog());
     static {
         JEXL.setDebug(true);
         JEXL.setSilent(false);
@@ -93,6 +95,11 @@ public abstract class Calculator_Base
         return JEXL;
     }
 
+    protected static MessageLog getMessageLog()
+    {
+        return MSGLOG;
+    }
+
     protected static String getHtml4Rules(final Parameter _parameter,
                                           final List<? extends AbstractRule<?>> _rules)
         throws EFapsException
@@ -100,7 +107,7 @@ public abstract class Calculator_Base
         final Table table = new Table();
         for (final AbstractRule<?> rule : _rules) {
             table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
-                            .addColumn(String.valueOf(rule.getResult()));
+                            .addColumn(String.valueOf(rule.getResult())).addColumn(rule.getMessage());
         }
         return table.toHtml().toString();
     }
@@ -117,7 +124,7 @@ public abstract class Calculator_Base
          */
         public SandBoxUberspect()
         {
-            super(LogFactory.getLog(JexlEngine.class));
+            super(Calculator.getMessageLog());
             try {
                 final String whiteLstStr = Payroll.getSysConfig().getAttributeValue(
                                 PayrollSettings.RULESANDBOXWHITELIST);

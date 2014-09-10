@@ -21,13 +21,8 @@
 
 package org.efaps.esjp.payroll.rules;
 
-import java.util.List;
-
-import org.apache.commons.jexl2.JexlEngine;
-import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
-import org.efaps.util.EFapsException;
 
 
 /**
@@ -38,39 +33,13 @@ import org.efaps.util.EFapsException;
  * @author The eFaps Team
  * @version $Id$
  */
-@EFapsUUID("19b31ad6-83d0-4c42-86b0-70866573b39d")
+@EFapsUUID("a019d893-0def-4eaa-86f3-eea118aea96a")
 @EFapsRevision("$Rev$")
-public class Calculator
-    extends Calculator_Base
+public class MessageLog
+    extends MessageLog_Base
 {
-
-    public static final String PARAKEY4CONTEXT = Calculator_Base.PARAKEY4CONTEXT;
-
     /**
-     * @param _parameter
-     * @param _rules
+     *
      */
-    public static void evaluate(final Parameter _parameter,
-                                final List<? extends AbstractRule<?>> _rules)
-        throws EFapsException
-    {
-        Calculator_Base.evaluate(_parameter, _rules);
-    }
-
-    public static JexlEngine getJexlEngine()
-    {
-        return Calculator_Base.getJexlEngine();
-    }
-
-    public static String getHtml4Rules(final Parameter _parameter,
-                                       final List<? extends AbstractRule<?>> _rules)
-        throws EFapsException
-    {
-        return Calculator_Base.getHtml4Rules(_parameter, _rules);
-    }
-
-    public static MessageLog getMessageLog()
-    {
-        return Calculator_Base.getMessageLog();
-    }
+    private static final long serialVersionUID = 1L;
 }

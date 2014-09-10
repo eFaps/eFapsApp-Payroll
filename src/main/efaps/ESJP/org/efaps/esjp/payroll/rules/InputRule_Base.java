@@ -61,6 +61,7 @@ public abstract class InputRule_Base
     {
         final Expression expr = Calculator.getJexlEngine().createExpression(getExpression());
         final Object val = expr.evaluate(_context);
+        setMessage(Calculator.getMessageLog().getMessage());
         _context.set(getKey4Expression(), val);
         setResult(val);
     }
