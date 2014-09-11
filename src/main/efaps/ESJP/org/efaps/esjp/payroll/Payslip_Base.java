@@ -95,9 +95,9 @@ import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
+import org.efaps.esjp.payroll.rules.Calculator_Base.Result;
 import org.efaps.esjp.payroll.rules.ExpressionRule;
 import org.efaps.esjp.payroll.rules.InputRule;
-import org.efaps.esjp.payroll.util.Payroll.RuleType;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.sales.util.Sales;
@@ -873,39 +873,41 @@ public abstract class Payslip_Base
                                              final List<? extends AbstractRule<?>> rules)
         throws EFapsException
     {
+        final Result result = Calculator.getResult(_parameter, rules);
         final Table table = new Table();
         table.addRow().addColumn(CIPayroll.PositionPayment.getType().getLabel())
             .getCurrentColumn().setStyle("font-weight: bold;");
-        for (final AbstractRule<?> rule : rules) {
-            if (RuleType.PAYMENT.equals(rule.getRuleType())) {
-                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+        for (final AbstractRule<?> rule : result.getPaymentRules()) {
+            table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
                                 .addColumn(String.valueOf(rule.getResult()));
-            }
         }
+        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getPaymentFrmt());
+
         table.addRow().addColumn(CIPayroll.PositionDeduction.getType().getLabel())
             .getCurrentColumn().setStyle("font-weight: bold;");
-        for (final AbstractRule<?> rule : rules) {
-            if (RuleType.DEDUCTION.equals(rule.getRuleType())) {
+        for (final AbstractRule<?> rule : result.getDeductionRules()) {
                 table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
                                 .addColumn(String.valueOf(rule.getResult()));
-            }
         }
+        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getDeductionFrmt());
+
         table.addRow().addColumn(CIPayroll.PositionNeutral.getType().getLabel())
             .getCurrentColumn().setStyle("font-weight: bold;");
-        for (final AbstractRule<?> rule : rules) {
-            if (RuleType.NEUTRAL.equals(rule.getRuleType())) {
+        for (final AbstractRule<?> rule : result.getNeutralRules()) {
                 table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
                                 .addColumn(String.valueOf(rule.getResult()));
-            }
         }
+        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getNeutralFrmt());
+
         table.addRow().addColumn(CIPayroll.PositionSum.getType().getLabel())
             .getCurrentColumn().setStyle("font-weight: bold;");
-        for (final AbstractRule<?> rule : rules) {
-            if (RuleType.SUM.equals(rule.getRuleType())) {
+        for (final AbstractRule<?> rule : result.getSumRules()) {
                 table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
                                 .addColumn(String.valueOf(rule.getResult()));
-            }
         }
+        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getSumFrmt());
+        table.addRow().addColumn("");
+        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getTotalFrmt());
         return table.toHtml();
     }
 

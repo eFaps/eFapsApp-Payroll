@@ -184,4 +184,12 @@ public abstract class MessageLog_Base
         }
         return ret;
     }
+
+    /**
+     *
+     */
+    public void clean()
+    {
+        this.warnstack.clear();
+    }
 }

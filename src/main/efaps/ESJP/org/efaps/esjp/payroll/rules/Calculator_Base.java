@@ -20,7 +20,11 @@
 
 package org.efaps.esjp.payroll.rules;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +41,7 @@ import org.apache.commons.jexl2.introspection.UberspectImpl;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.util.Payroll;
 import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.esjp.ui.html.Table;
@@ -80,6 +85,7 @@ public abstract class Calculator_Base
                                    final List<? extends AbstractRule<?>> _rules)
         throws EFapsException
     {
+        Calculator.getMessageLog().clean();
         for (final AbstractRule<?> rule : _rules) {
             rule.prepare(_parameter);
         }
@@ -111,6 +117,236 @@ public abstract class Calculator_Base
         }
         return table.toHtml().toString();
     }
+
+    protected static Result getResult(final Parameter _parameter,
+                                      final List<? extends AbstractRule<?>> _rules)
+        throws EFapsException
+    {
+
+        return new Result().addRules(_rules);
+    }
+
+    public static class Result
+    {
+
+        private final List<AbstractRule<?>> rules = new ArrayList<>();
+
+        private final List<AbstractRule<?>> paymentRules = new ArrayList<>();
+
+        private final List<AbstractRule<?>> deductionRules = new ArrayList<>();
+
+        private final List<AbstractRule<?>> sumRules = new ArrayList<>();
+
+        private final List<AbstractRule<?>> neutralRules = new ArrayList<>();
+
+        private boolean initialized = false;
+
+        private DecimalFormat formatter;
+
+        protected void init()
+        {
+            if (!this.initialized) {
+                for (final AbstractRule<?> rule : this.rules) {
+                    switch (rule.getRuleType()) {
+                        case PAYMENT:
+                            this.paymentRules.add(rule);
+                            break;
+                        case DEDUCTION:
+                            this.deductionRules.add(rule);
+                            break;
+                        case SUM:
+                            this.sumRules.add(rule);
+                            break;
+                        case NEUTRAL:
+                            this.neutralRules.add(rule);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                this.initialized = true;
+            }
+        }
+
+        protected void reset()
+        {
+            if (this.initialized) {
+                this.initialized = false;
+                this.paymentRules.clear();
+                this.deductionRules.clear();
+                this.sumRules.clear();
+                this.neutralRules.clear();
+            }
+        }
+
+        protected DecimalFormat getFormatter() throws EFapsException
+        {
+
+            return this.formatter == null ? NumberFormatter.get().getTwoDigitsFormatter() : this.formatter;
+        }
+
+        /**
+         * @param _rules
+         * @return
+         */
+        public Result addRules(final List<? extends AbstractRule<?>> _rules)
+        {
+            this.rules.addAll(_rules);
+
+            return this;
+        }
+
+        /**
+         * @return
+         */
+        public List<? extends AbstractRule<?>> getPaymentRules()
+        {
+            init();
+            return this.paymentRules;
+        }
+
+        /**
+         * @return
+         */
+        public List<? extends AbstractRule<?>> getDeductionRules()
+        {
+            init();
+            return this.deductionRules;
+        }
+
+        /**
+         * @return
+         */
+        public List<? extends AbstractRule<?>> getNeutralRules()
+        {
+            init();
+            return this.neutralRules;
+        }
+
+        /**
+         * @return
+         */
+        public List<? extends AbstractRule<?>> getSumRules()
+        {
+            init();
+            return this.sumRules;
+        }
+
+
+        public BigDecimal getAmount(final List<? extends AbstractRule<?>> _rules)
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            for (final AbstractRule<?> rule : _rules) {
+                ret = ret.add(getBigDecimal(rule.getResult()));
+            }
+            return ret;
+        }
+        /**
+         * @return
+         */
+        public BigDecimal getPayment()
+        {
+            return getAmount(getPaymentRules());
+        }
+        /**
+         * @return
+         */
+        public String getPaymentFrmt() throws EFapsException
+        {
+            return getFormatter().format(getPayment());
+        }
+        /**
+         * @return
+         */
+        public BigDecimal getDeduction()
+        {
+            return getAmount(getDeductionRules());
+        }
+        /**
+         * @return
+         */
+        public String getDeductionFrmt() throws EFapsException
+        {
+            return getFormatter().format(getDeduction());
+        }
+        /**
+         * @return
+         */
+        public BigDecimal getNeutral()
+        {
+            return getAmount(getNeutralRules());
+        }
+
+        /**
+         * @return
+         */
+        public String getNeutralFrmt() throws EFapsException
+        {
+            return getFormatter().format(getNeutral());
+        }
+        /**
+         * @return
+         */
+        public BigDecimal getSum()
+        {
+            return getAmount(getSumRules());
+        }
+
+        /**
+         * @return
+         */
+        public String getSumFrmt() throws EFapsException
+        {
+            return getFormatter().format(getSum());
+        }
+
+        /**
+         * @return
+         */
+        public BigDecimal getTotal()
+        {
+            return getPayment().subtract(getDeduction());
+        }
+
+        /**
+         * @return
+         */
+        public String getTotalFrmt() throws EFapsException
+        {
+            return getFormatter().format(getTotal());
+        }
+
+        private BigDecimal getBigDecimal(final Object _object)
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (_object != null) {
+                if (_object instanceof BigDecimal) {
+                    ret = (BigDecimal) _object;
+                } else if (_object instanceof Double) {
+                    ret = new BigDecimal((Double) _object);
+                } else if (_object instanceof BigInteger) {
+                    ret = new BigDecimal((BigInteger) _object);
+                } else if (_object instanceof Long) {
+                    ret = new BigDecimal((Long) _object);
+                } else if (_object instanceof Integer) {
+                    ret = new BigDecimal((Integer) _object);
+                }
+            }
+            return ret;
+        }
+
+
+        /**
+         * Setter method for instance variable {@link #formatter}.
+         *
+         * @param _formatter value for instance variable {@link #formatter}
+         */
+        public void setFormatter(final DecimalFormat _formatter)
+        {
+            this.formatter = _formatter;
+        }
+    }
+
 
     private static final class SandBoxUberspect
         extends UberspectImpl

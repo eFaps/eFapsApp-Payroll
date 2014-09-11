@@ -73,4 +73,11 @@ public class Calculator
     {
         return Calculator_Base.getMessageLog();
     }
+
+    public static Result getResult(final Parameter _parameter,
+                                   final List<? extends AbstractRule<?>> _rules)
+        throws EFapsException
+    {
+        return Calculator_Base.getResult(_parameter, _rules);
+    }
 }
