@@ -66,6 +66,7 @@
             <type>Integer</type>
             <sqltable>Payroll_Template2RuleSQLTable</sqltable>
             <sqlcolumn>SEQUENCE</sqlcolumn>
+            <defaultvalue>0</defaultvalue>
         </attribute>
         <attribute>
             <name>Creator</name>

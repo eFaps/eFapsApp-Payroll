@@ -6,6 +6,7 @@
         <parameter name="ciClass" value="org.efaps.esjp.ci.CIPayroll"/>
         <parameter name="regex4TypeLabelExclude" value=".*\/Company.Label$|.*\/Group.Label$|.*\/Flag.Label$"/>
         <parameter name="regex4MenuLabelExclude" value=".*_Menu.Label$"/>
+        <parameter name="regex4FieldLabelExclude" value="^HumanResource_"/>
         <packages>
             <package name="org.efaps.tests.ci.*"></package>
         </packages>

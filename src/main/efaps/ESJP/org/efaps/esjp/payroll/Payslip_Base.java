@@ -217,7 +217,7 @@ public abstract class Payslip_Base
         final Instance rateCurrInst = getRateCurrencyInstance(_parameter, createdDoc);
 
         final Object[] rateObj = getRateObject(_parameter);
-        final BigDecimal rate = ((BigDecimal) rateObj[0]).divide((BigDecimal) rateObj[1], 12,
+        ((BigDecimal) rateObj[0]).divide((BigDecimal) rateObj[1], 12,
                         BigDecimal.ROUND_HALF_UP);
         try {
             final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
@@ -239,7 +239,7 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
             insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
             insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.Rate, rate);
+            insert.add(CIPayroll.Payslip.Rate, rateObj);
             insert.add(CIPayroll.Payslip.CrossTotal, BigDecimal.ZERO);
             insert.add(CIPayroll.Payslip.NetTotal, BigDecimal.ZERO);
             insert.add(CIPayroll.Payslip.DiscountTotal, 0);
@@ -782,7 +782,8 @@ public abstract class Payslip_Base
         throws EFapsException
     {
         final Return ret = new Return();
-        final Instance templInst = Instance.get(_parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name));
+        final Instance templInst = Instance.get(_parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name));
         if (templInst.isValid()) {
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2Rule);
             queryBldr.addWhereAttrEqValue(CIPayroll.Template2Rule.FromLink, templInst);
@@ -798,18 +799,18 @@ public abstract class Payslip_Base
             while (multi.next()) {
                 ruleInsts.add(multi.<Instance>getSelect(ruleInst));
             }
-            final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts.toArray(new Instance[ruleInsts
-                            .size()]));
+            final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts
+                            .toArray(new Instance[ruleInsts.size()]));
             final Collection<Map<String, Object>> values = new ArrayList<>();
             for (final AbstractRule<?> rule : rules) {
                 final Map<String, Object> map = new HashMap<>();
                 values.add(map);
                 map.put(CITablePayroll.Payroll_PositionRuleTable.rulePosition.name,
-                                new String[] {rule.getInstance().getOid(), rule.getKey()});
+                                new String[] { rule.getInstance().getOid(), rule.getKey() });
                 map.put(CITablePayroll.Payroll_PositionRuleTable.ruleDescription.name, rule.getDescription());
             }
             final StringBuilder js = getTableRemoveScript(_parameter, "ruleTable")
-                               .append(getTableAddNewRowsScript(_parameter, "ruleTable", values, null));
+                            .append(getTableAddNewRowsScript(_parameter, "ruleTable", values, null));
             ret.put(ReturnValues.SNIPLETT, js.toString());
         }
         return ret;

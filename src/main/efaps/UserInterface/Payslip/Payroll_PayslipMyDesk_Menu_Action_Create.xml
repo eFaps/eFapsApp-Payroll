@@ -38,7 +38,9 @@
         </access>
         <target>
             <form>Payroll_PayslipForm</form>
-            <execute program="org.efaps.esjp.payroll.Payslip" method="create" />
+            <execute program="org.efaps.esjp.payroll.Payslip" method="create" >
+                <property name="UseNumberGenerator4Name">true</property>
+            </execute>
         </target>
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Payslip</property>
