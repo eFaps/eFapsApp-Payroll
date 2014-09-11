@@ -36,6 +36,7 @@
             <table-name>T_PRPOSITION</table-name>
             <column name="TYPEID"           type="INTEGER"      not-null="true" />
             <column name="DOCID"            type="INTEGER"      not-null="true"/>
+            <column name="RULEID"           type="INTEGER"      not-null="true" />
             <column name="POS"              type="INTEGER"      not-null="true"/>
             <column name="KEY"              type="STRING_SHORT" not-null="true" length="32" />
             <column name="DESCR"            type="STRING_SHORT" not-null="true" length="256" />
@@ -46,6 +47,7 @@
             <column name="RATE"             type="DECIMAL"      not-null="true" length="14" scale="6"/>
             <column name="RATEDENOM"        type="DECIMAL"      not-null="true" length="14" scale="6" />
             <foreign name="T_PRPOSITION_DOCID"           key="DOCID"           reference="T_ERPDOC(ID)"/>
+            <foreign name="T_PRPOSITION_RULEID"          key="RULEID"         reference="T_PRRULE(ID)"/>
             <foreign name="T_PRPOSITION_CURRENCYID"      key="CURRENCYID"      reference="T_ERPCUR(ID)"/>
             <foreign name="T_PRPOSITION_RATECURRENCYID"  key="RATECURRENCYID"  reference="T_ERPCUR(ID)"/>
         </database>

@@ -36,15 +36,10 @@
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
         </access>
-        <!-- target definitions -->
         <target>
             <form>Payroll_PayslipForm</form>
-            <execute program="org.efaps.esjp.payroll.Payslip" method="create" >
-                <property name="JasperReport">Payroll_Payslip</property>
-                <property name="Mime">pdf</property>
-            </execute>
+            <execute program="org.efaps.esjp.payroll.Payslip" method="create" />
         </target>
-        <!-- properties -->
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Payslip</property>
         <property name="TargetShowFile">true</property>

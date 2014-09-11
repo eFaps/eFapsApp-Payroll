@@ -278,6 +278,17 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    public Return edit(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Instance instance = _parameter.getInstance();
+
+        final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
+        updatePositions(_parameter, instance, rules);
+        return new Return();
+    }
+
+
     protected void updatePositions(final Parameter _parameter,
                                    final Instance _docInst,
                                    final List<? extends AbstractRule<?>> _rules)
@@ -314,6 +325,7 @@ public abstract class Payslip_Base
                     update = new Update(posInst);
                 } else {
                     update = new Insert(ciType);
+                    update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
                     new Delete(posInst).execute();
                 }
             } else {
@@ -323,6 +335,7 @@ public abstract class Payslip_Base
 
             final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
 
+            update.add(CIPayroll.PositionAbstract.RuleAbstractLink, rule.getInstance());
             update.add(CIPayroll.PositionAbstract.PositionNumber, idx);
             update.add(CIPayroll.PositionAbstract.Description, rule.getDescription());
             update.add(CIPayroll.PositionAbstract.Key, rule.getKey());
@@ -334,6 +347,10 @@ public abstract class Payslip_Base
             update.execute();
 
             idx++;
+        }
+
+        while (posIter.hasNext()) {
+            new Delete(posIter.next()).execute();
         }
     }
 

@@ -85,7 +85,7 @@
             <property name="Label">Payroll_PayslipForm.employee.Label</property>
             <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
             <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeEdit">NONE</property>
+            <property name="ModeEdit">READONLY</property>
             <property name="ModeView">READONLY</property>
             <property name="Required">true</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
@@ -152,8 +152,6 @@
         </field>
         <field name="status">
             <property name="Attribute">Status</property>
-            <property name="ModeCreate">NONE</property>
-            <property name="ModeEdit">EDITABLE</property>
         </field>
         <field name="caseGroup" character="Group">
             <property name="GroupCount">2</property>
@@ -200,17 +198,17 @@
         <field name="ruleTable" character="Target">
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
+            <property name="ModeEdit">EDITABLE</property>
             <table>Payroll_PositionRuleTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Type">Payroll_PositionPayment</property>
-                <property name="LinkFrom">PayslipLink</property>
+                <property name="Type">Payroll_PositionAbstract</property>
+                <property name="LinkFrom">DocumentAbstractLink</property>
             </evaluate>
         </field>
         <field name="sums">
             <property name="ModeCreate">READONLY</property>
             <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
+            <property name="ModeEdit">READONLY</property>
             <property name="Label">Payroll_PayslipForm.Sums.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>

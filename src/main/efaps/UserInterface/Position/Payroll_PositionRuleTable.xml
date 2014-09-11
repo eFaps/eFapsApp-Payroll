@@ -29,7 +29,10 @@
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PositionRuleTable</name>
         <field name="rulePosition">
+            <property name="SelectAlternateOID">linkto[RuleAbstractLink].oid</property>
+            <property name="Select">linkto[RuleAbstractLink].attribute[Key]</property>
             <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
             <property name="Label">Payroll_PositionRuleTable.rulePosition.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Width">1</property>
@@ -53,6 +56,7 @@
         </field>
         <field name="ruleAmount">
             <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
             <property name="Attribute">Amount</property>
             <property name="Label">Payroll_PositionRuleTable.ruleAmount.Label</property>
             <property name="Required">true</property>

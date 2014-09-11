@@ -28,7 +28,9 @@ import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
+import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
+import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.util.EFapsException;
@@ -150,8 +152,22 @@ public abstract class AbstractParameter_Base<T>
     protected static Map<String, Object> getParameters(final Parameter _parameter)
         throws EFapsException
     {
-        final Instance employeeInst = Instance.get(_parameter.getParameterValue("employee"));
-        return getParameters(_parameter, employeeInst);
+        Instance inst = _parameter.getInstance();
+        if (inst != null) {
+            if (inst.getType().isKindOf(CIPayroll.PositionAbstract)) {
+                final PrintQuery print = new PrintQuery(inst);
+                final SelectBuilder sel = SelectBuilder.get()
+                                .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink)
+                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink).instance();
+                print.addSelect(sel);
+                print.execute();
+                inst = print.getSelect(sel);
+            }
+        } else {
+            inst = Instance.get(_parameter.getParameterValue("employee"));
+        }
+
+        return getParameters(_parameter, inst);
     }
 
     protected static Map<String, Object> getParameters(final Parameter _parameter,

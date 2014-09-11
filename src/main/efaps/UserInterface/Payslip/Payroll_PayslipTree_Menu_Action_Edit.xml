@@ -23,8 +23,7 @@
 
 -->
 
-<ui-command xmlns="http://www.efaps.org/xsd"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>cbee7384-9ef8-4131-b780-33ac5546361d</uuid>
     <file-application>eFapsApp-Payroll</file-application>
@@ -36,13 +35,13 @@
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
         </access>
-        <!-- target definitions -->
         <target>
             <form>Payroll_PayslipForm</form>
-            <execute program="org.efaps.esjp.common.uiform.Edit" />
+            <execute program="org.efaps.esjp.payroll.Payslip" method="edit" />
         </target>
-        <!-- properties -->
         <property name="Target">modal</property>
         <property name="TargetMode">edit</property>
+        <property name="WindowHeight">660</property>
+        <property name="WindowWidth">1200</property>
     </definition>
 </ui-command>

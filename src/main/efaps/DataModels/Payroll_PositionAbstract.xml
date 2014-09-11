@@ -61,6 +61,13 @@
             <sqlcolumn>DOCID</sqlcolumn>
         </attribute>
         <attribute>
+            <name>RuleAbstractLink</name>
+            <type>Link</type>
+            <typelink>Payroll_RuleAbstract</typelink>
+            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqlcolumn>RULEID</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>PositionNumber</name>
             <type>Integer</type>
             <sqltable>Payroll_PositionSQLTable</sqltable>
