@@ -200,6 +200,8 @@ public abstract class Payslip_Base
     {
         final Return ret = new Return();
 
+        final CreatedDoc createdDoc = new CreatedDoc();
+
         final String name = getDocName4Create(_parameter);
 
         final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
@@ -211,41 +213,23 @@ public abstract class Payslip_Base
         final String extraLaborTimes = _parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
         final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
-        final String amount2Pay = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.rateCrossTotal .name);
-        final String amountCosts = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.amountCost.name);
-        final String currencyLinks = _parameter.getParameterValue(
-                        CIFormPayroll.Payroll_PayslipForm.rateCurrencyId.name);
-        final String movementType = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.movementType.name);
+        Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+        final Instance rateCurrInst = getRateCurrencyInstance(_parameter, createdDoc);
+
+        final Object[] rateObj = getRateObject(_parameter);
+        final BigDecimal rate = ((BigDecimal) rateObj[0]).divide((BigDecimal) rateObj[1], 12,
+                        BigDecimal.ROUND_HALF_UP);
         try {
             final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
 
-            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+            final Instance baseCurInst = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
 
-            final Instance rateCurrInst = Instance.get(CIERP.Currency.getType(), currencyLinks);
-
-            final PriceUtil util = new PriceUtil();
-            final BigDecimal[] rates = util.getExchangeRate(util.getDateFromParameter(_parameter), rateCurrInst);
-            final CurrencyInst cur = new CurrencyInst(rateCurrInst);
-            final Object[] rate = new Object[] { cur.isInvert() ? BigDecimal.ONE : rates[1],
-                            cur.isInvert() ? rates[1] : BigDecimal.ONE };
-            final BigDecimal ratePay = amount2Pay != null && !amount2Pay.isEmpty()
-                                                        ? (BigDecimal) formater.parse(amount2Pay)
-                                                        : BigDecimal.ZERO;
-            final BigDecimal rateCost = amountCosts != null && !amountCosts.isEmpty()
-                                                        ? (BigDecimal) formater.parse(amountCosts)
-                                                        : BigDecimal.ZERO;
             final BigDecimal time = laborTimes != null && !laborTimes.isEmpty()
                                                         ? (BigDecimal) formater.parse(laborTimes)
                                                         : BigDecimal.ZERO;
             final BigDecimal extraTime = extraLaborTimes != null && !extraLaborTimes.isEmpty()
                                                         ? (BigDecimal) formater.parse(extraLaborTimes)
                             : BigDecimal.ZERO;
-            final BigDecimal pay = ratePay.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : ratePay
-                            .setScale(8, BigDecimal.ROUND_HALF_UP).divide(rates[0], BigDecimal.ROUND_HALF_UP)
-                            .setScale(2, BigDecimal.ROUND_HALF_UP);
-            final BigDecimal cost = rateCost.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rateCost
-                            .setScale(8, BigDecimal.ROUND_HALF_UP).divide(rates[0], BigDecimal.ROUND_HALF_UP)
-                            .setScale(2, BigDecimal.ROUND_HALF_UP);
 
             final Insert insert = new Insert(CIPayroll.Payslip);
             insert.add(CIPayroll.Payslip.Name, name);
@@ -253,54 +237,100 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.DueDate, dueDate);
             insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
             insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
-            insert.add(CIPayroll.Payslip.RateCrossTotal, ratePay);
-            insert.add(CIPayroll.Payslip.RateNetTotal, ratePay);
+            insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
             insert.add(CIPayroll.Payslip.Rate, rate);
-            insert.add(CIPayroll.Payslip.CrossTotal, pay);
-            insert.add(CIPayroll.Payslip.NetTotal, pay);
+            insert.add(CIPayroll.Payslip.CrossTotal, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.NetTotal, BigDecimal.ZERO);
             insert.add(CIPayroll.Payslip.DiscountTotal, 0);
             insert.add(CIPayroll.Payslip.RateDiscountTotal, 0);
-            insert.add(CIPayroll.Payslip.AmountCost, cost);
-            insert.add(CIPayroll.Payslip.CurrencyId, baseCurIns.getId());
-            insert.add(CIPayroll.Payslip.RateCurrencyId, currencyLinks);
+            insert.add(CIPayroll.Payslip.AmountCost, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.CurrencyId, baseCurInst);
+            insert.add(CIPayroll.Payslip.RateCurrencyId, rateCurrInst);
             insert.add(CIPayroll.Payslip.LaborTime, new Object[] { time, laborTimeUoMs });
             insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraTime, extraLaborTimeUoMs });
-            insert.add(CIPayroll.Payslip.MovementType, movementType);
             insert.execute();
 
             final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
-            updatePositions(_parameter, insert.getInstance(), rules);
+            final Result result = Calculator.getResult(_parameter, rules);
+            updateTotals(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
+            updatePositions(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
 
         } catch (final ParseException e) {
             throw new EFapsException(Payslip_Base.class, "create.ParseException", e);
         }
-
         return ret;
     }
+
+    protected void updateTotals(final Parameter _parameter,
+                                final Instance _docInst,
+                                final Result _result,
+                                final Instance _rateCurInst,
+                                final Object[] _rateObj)
+        throws EFapsException
+    {
+        final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+        final BigDecimal rate = ((BigDecimal) _rateObj[0]).divide((BigDecimal) _rateObj[1], 12,
+                        BigDecimal.ROUND_HALF_UP);
+
+        final BigDecimal rateCrossTotal = _result.getTotal()
+                        .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+
+        final BigDecimal crossTotal = rateCrossTotal.divide(rate, BigDecimal.ROUND_HALF_UP)
+                        .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+
+        final BigDecimal cost = _result.getCost().divide(rate, BigDecimal.ROUND_HALF_UP)
+                        .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+
+        final Update insert = new Update(_docInst);
+        insert.add(CIPayroll.Payslip.RateCrossTotal, rateCrossTotal);
+        insert.add(CIPayroll.Payslip.Rate, _rateObj);
+        insert.add(CIPayroll.Payslip.CrossTotal, crossTotal);
+        insert.add(CIPayroll.Payslip.AmountCost, cost);
+        insert.add(CIPayroll.Payslip.CurrencyId, baseCurIns);
+        insert.add(CIPayroll.Payslip.RateCurrencyId, _rateCurInst);
+        insert.execute();
+    }
+
 
     public Return edit(final Parameter _parameter)
         throws EFapsException
     {
         final Instance instance = _parameter.getInstance();
+        final PrintQuery print = new PrintQuery(instance);
+        final SelectBuilder selRateCurInst = SelectBuilder.get().linkto(CIPayroll.Payslip.RateCurrencyId).instance();
+        print.addSelect(selRateCurInst);
+        print.addAttribute(CIPayroll.Payslip.Rate);
+        print.execute();
+
+        final Instance rateCurrInst = print.getSelect(selRateCurInst);
+        final Object[] rateObj = print.getAttribute(CIPayroll.Payslip.Rate);
 
         final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
-        updatePositions(_parameter, instance, rules);
+        final Result result = Calculator.getResult(_parameter, rules);
+        updateTotals(_parameter, instance, result, rateCurrInst, rateObj);
+        updatePositions(_parameter, instance, result, rateCurrInst, rateObj);
         return new Return();
     }
 
-
     protected void updatePositions(final Parameter _parameter,
                                    final Instance _docInst,
-                                   final List<? extends AbstractRule<?>> _rules)
+                                   final Result _result,
+                                   final Instance _rateCurInst,
+                                   final Object[] _rateObj)
         throws EFapsException
     {
+        final BigDecimal rate = ((BigDecimal) _rateObj[0]).divide((BigDecimal) _rateObj[1], 12,
+                        BigDecimal.ROUND_HALF_UP);
+        final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
         queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
         final InstanceQuery query = queryBldr.getQuery();
         final List<Instance> posInsts = query.executeWithoutAccessCheck();
         final Iterator<Instance> posIter = posInsts.iterator();
         int idx = 1;
-        for (final AbstractRule<?> rule : _rules) {
+        for (final AbstractRule<?> rule : _result.getRules()) {
             CIType ciType;
             switch (rule.getRuleType()) {
                 case PAYMENT:
@@ -333,19 +363,22 @@ public abstract class Payslip_Base
                 update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
             }
 
-            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+            final BigDecimal rateAmount = _result.getBigDecimal(rule.getResult())
+                            .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+
+            final BigDecimal amount = rateAmount.divide(rate, BigDecimal.ROUND_HALF_UP)
+                            .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
 
             update.add(CIPayroll.PositionAbstract.RuleAbstractLink, rule.getInstance());
             update.add(CIPayroll.PositionAbstract.PositionNumber, idx);
             update.add(CIPayroll.PositionAbstract.Description, rule.getDescription());
             update.add(CIPayroll.PositionAbstract.Key, rule.getKey());
-            update.add(CIPayroll.PositionAbstract.RateAmount, rule.getResult());
-            update.add(CIPayroll.PositionAbstract.Rate, new Object[]{ BigDecimal.ONE, BigDecimal.ONE });
-            update.add(CIPayroll.PositionAbstract.Amount, BigDecimal.ONE);
+            update.add(CIPayroll.PositionAbstract.RateAmount, rateAmount);
+            update.add(CIPayroll.PositionAbstract.Rate, _rateObj);
+            update.add(CIPayroll.PositionAbstract.Amount, amount);
             update.add(CIPayroll.PositionAbstract.CurrencyLink, baseCurIns);
-            update.add(CIPayroll.PositionAbstract.RateCurrencyLink,baseCurIns);
+            update.add(CIPayroll.PositionAbstract.RateCurrencyLink, _rateCurInst);
             update.execute();
-
             idx++;
         }
 

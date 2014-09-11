@@ -179,7 +179,7 @@ public abstract class Calculator_Base
             }
         }
 
-        protected DecimalFormat getFormatter() throws EFapsException
+        public DecimalFormat getFormatter() throws EFapsException
         {
 
             return this.formatter == null ? NumberFormatter.get().getTwoDigitsFormatter() : this.formatter;
@@ -316,7 +316,24 @@ public abstract class Calculator_Base
             return getFormatter().format(getTotal());
         }
 
-        private BigDecimal getBigDecimal(final Object _object)
+        /**
+         * @return
+         */
+        public BigDecimal getCost()
+        {
+            return getPayment().add(getNeutral());
+        }
+
+        /**
+         * @return
+         */
+        public String getCostFrmt() throws EFapsException
+        {
+            return getFormatter().format(getCost());
+        }
+
+
+        public BigDecimal getBigDecimal(final Object _object)
         {
             BigDecimal ret = BigDecimal.ZERO;
             if (_object != null) {
@@ -344,6 +361,17 @@ public abstract class Calculator_Base
         public void setFormatter(final DecimalFormat _formatter)
         {
             this.formatter = _formatter;
+        }
+
+
+        /**
+         * Getter method for the instance variable {@link #rules}.
+         *
+         * @return value of instance variable {@link #rules}
+         */
+        public List<AbstractRule<?>> getRules()
+        {
+            return this.rules;
         }
     }
 
