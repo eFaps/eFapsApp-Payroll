@@ -30,11 +30,6 @@ import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
-import org.efaps.db.InstanceQuery;
-import org.efaps.db.MultiPrintQuery;
-import org.efaps.db.QueryBuilder;
-import org.efaps.esjp.ci.CIPayroll;
-import org.efaps.esjp.payroll.Payslip_Base.Position;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
@@ -110,8 +105,8 @@ public abstract class IncomeTax5_Base
             final BigDecimal base = getCurrent(_context, KEYS4PAYMENT);
             final BigDecimal extra = getCurrent(_context, KEYS4EXTRA);
 
-            final BigDecimal payed = BigDecimal.ZERO;
-            final BigDecimal extraPayed = BigDecimal.ZERO;
+            final BigDecimal payed = getPrevious(_context, KEYS4PAYMENT, 12);
+            final BigDecimal extraPayed = getPrevious(_context, KEYS4EXTRA, 12);
 
             final int currentMonth = date.getMonthOfYear();
 
@@ -147,13 +142,11 @@ public abstract class IncomeTax5_Base
             if (yearTax.compareTo(BigDecimal.ZERO) > 0) {
                 final BigDecimal taxPayed;
                 if (MONTH2SUBSTRACT.containsKey(currentMonth)) {
-                    taxPayed = getPrevious(null, null, null,
-                                    MONTH2SUBSTRACT.get(currentMonth)).abs();
+                    taxPayed = getPrevious(_context, "0605", MONTH2SUBSTRACT.get(currentMonth));
                 } else {
                     taxPayed = BigDecimal.ZERO;
                 }
-                ret = yearTax.subtract(taxPayed).divide(
-                                new BigDecimal(MONTH2DIVID.get(currentMonth)),
+                ret = yearTax.subtract(taxPayed).divide(new BigDecimal(MONTH2DIVID.get(currentMonth)),
                                 BigDecimal.ROUND_HALF_UP);
             }
         }
@@ -201,43 +194,20 @@ public abstract class IncomeTax5_Base
     }
 
 
-    private BigDecimal getPrevious(final Position _position,
-                                   final String _employeeOID,
-                                   final DateTime _date,
+    private BigDecimal getPrevious(final JexlContext _context,
+                                   final String _key,
                                    final Integer _month)
         throws EFapsException
     {
         BigDecimal ret = BigDecimal.ZERO;
-        if (_position != null) {
-            final Instance employeeIns = Instance.get(_employeeOID);
-            final DateTime startDate = _date.dayOfYear().withMinimumValue().minusMinutes(1);
-            final DateTime endDate = _date.monthOfYear().setCopy(_month).dayOfMonth().withMaximumValue().plusMinutes(1);
 
-            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
-            queryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeIns.getId());
-            queryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, startDate);
-            queryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, endDate);
-            final InstanceQuery query = queryBldr.getQuery();
-            query.execute();
-            if (!query.getValues().isEmpty()) {
-                final Object[] ids = new Object[query.getValues().size()];
-                int i = 0;
-                while (query.next()) {
-                    ids[i] = query.getCurrentValue().getId();
-                    i++;
-                }
-
-                final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
-                queryBldr2.addWhereAttrEqValue(CIPayroll.PositionPayment.DocumentAbstractLink, ids);
-
-                final MultiPrintQuery multi = queryBldr2.getPrint();
-                multi.addAttribute(CIPayroll.PositionPayment.Amount);
-                multi.execute();
-                while (multi.next()) {
-                    final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
-                    ret = ret.add(amount);
-                }
-            }
+        if (_context.has(_key)) {
+            final String[] keys = (String[]) _context.get(_key);
+            final DataFunctions data = new DataFunctions(_context);
+            ret = data.getAnualMonth(_month, keys);
+        } else {
+            final DataFunctions data = new DataFunctions(_context);
+            ret = data.getAnualMonth(_month, _key);
         }
         return ret;
     }

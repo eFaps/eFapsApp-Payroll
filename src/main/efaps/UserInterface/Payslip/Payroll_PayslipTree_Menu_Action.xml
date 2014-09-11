@@ -22,21 +22,19 @@
  Last Changed By: $Author$
 
 -->
-
-<ui-menu xmlns="http://www.efaps.org/xsd"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>b9114815-0d1b-4e21-b1b3-20398c69d1f9</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PayslipTree_Menu_Action</name>
-        <!-- childs -->
         <childs>
             <child>Payroll_PayslipTree_Menu_Action_Edit</child>
+            <child>Payroll_PayslipTree_Menu_Action_SetOpen</child>
             <child>Payroll_PayslipTree_Menu_Action_Checkout</child>
+            <child>ERP_DocumentAbstractTree_Action_EditStatus</child>
         </childs>
     </definition>
-
 </ui-menu>

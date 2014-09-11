@@ -190,8 +190,10 @@
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">EDITABLE</property>
+            <property name="TargetEnforceSorted">true</property>
             <table>Payroll_PositionRuleTable</table>
-            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
+            <evaluate program="org.efaps.esjp.payroll.Payslip"
+                method="positionMultiPrint">
                 <property name="Type">Payroll_PositionAbstract</property>
                 <property name="LinkFrom">DocumentAbstractLink</property>
             </evaluate>

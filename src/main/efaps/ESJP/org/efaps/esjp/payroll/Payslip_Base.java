@@ -23,8 +23,6 @@ package org.efaps.esjp.payroll;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -32,12 +30,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -57,18 +53,15 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
-import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.datamodel.ui.FieldValue;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
-import org.efaps.admin.program.esjp.EFapsClassLoader;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
@@ -90,14 +83,15 @@ import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
+import org.efaps.esjp.common.uitable.MultiPrint;
 import org.efaps.esjp.common.util.InterfaceUtils;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
-import org.efaps.esjp.payroll.rules.Calculator_Base.Result;
 import org.efaps.esjp.payroll.rules.ExpressionRule;
 import org.efaps.esjp.payroll.rules.InputRule;
+import org.efaps.esjp.payroll.rules.Result;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.sales.util.Sales;
@@ -125,7 +119,7 @@ public abstract class Payslip_Base
     /**
      * Logger for this classes.
      */
-    protected static final Logger LOG = LoggerFactory.getLogger(Payslip_Base.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Payslip_Base.class);
 
 
     /**
@@ -296,7 +290,24 @@ public abstract class Payslip_Base
     public Return edit(final Parameter _parameter)
         throws EFapsException
     {
+
         final Instance instance = _parameter.getInstance();
+
+        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
+        final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
+        final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
+        final String laborTimeUoM = _parameter.getParameterValue("laborTimeUoM");
+        final String extraLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
+        final String extraLaborTimeUoM = _parameter.getParameterValue("extraLaborTimeUoM");
+
+        final Update update = new Update(instance);
+        update.add(CIPayroll.Payslip.LaborTime, new Object[] { laborTime, laborTimeUoM });
+        update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraLaborTime, extraLaborTimeUoM });
+        update.add(CIPayroll.Payslip.Date, date);
+        update.add(CIPayroll.Payslip.DueDate, dueDate);
+        update.execute();
+
         final PrintQuery print = new PrintQuery(instance);
         final SelectBuilder selRateCurInst = SelectBuilder.get().linkto(CIPayroll.Payslip.RateCurrencyId).instance();
         print.addSelect(selRateCurInst);
@@ -387,6 +398,25 @@ public abstract class Payslip_Base
         }
     }
 
+    /**
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return new Return
+     * @throws EFapsException on error
+     */
+    public Return positionMultiPrint(final Parameter _parameter) throws EFapsException
+    {
+        final MultiPrint multi =  new MultiPrint() {
+            @Override
+            protected void add2QueryBldr(final Parameter _parameter,
+                                         final QueryBuilder _queryBldr)
+                throws EFapsException
+            {
+                super.add2QueryBldr(_parameter, _queryBldr);
+                _queryBldr.addOrderByAttributeAsc(CIPayroll.PositionAbstract.PositionNumber);
+            }
+        };
+        return multi.execute(_parameter);
+    }
 
     /**
      * Create massive payslips.
@@ -640,43 +670,6 @@ public abstract class Payslip_Base
         return js.toString();
     }
 
-    /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _docInst      instance of the document to be updated
-     * @param _list         list of positions
-     * @param _rates        Rates
-     * @throws EFapsException on error
-     */
-    protected void setAmounts(final Parameter _parameter,
-                              final Instance _docInst,
-                              final List<InsertPos> _list,
-                              final BigDecimal[] _rates)
-        throws EFapsException
-    {
-        BigDecimal ratePay = BigDecimal.ZERO;
-        BigDecimal amountCost = BigDecimal.ZERO;
-        for (final InsertPos pos : _list) {
-            if (pos.caseType.equals(CIPayroll.CasePositionRootSum.getType())) {
-                ratePay = ratePay.add(pos.getAmount());
-            } else if (pos.posType.equals(CIPayroll.PositionNeutral.getType())
-                            || pos.posType.equals(CIPayroll.PositionPayment.getType())) {
-                amountCost = amountCost.add(pos.getAmount());
-            }
-        }
-        final BigDecimal pay = ratePay.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : ratePay
-                        .setScale(8, BigDecimal.ROUND_HALF_UP).divide(_rates[0], BigDecimal.ROUND_HALF_UP)
-                        .setScale(2, BigDecimal.ROUND_HALF_UP);
-        final BigDecimal cost = amountCost.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : amountCost
-                        .setScale(8, BigDecimal.ROUND_HALF_UP).divide(_rates[0], BigDecimal.ROUND_HALF_UP)
-                        .setScale(2, BigDecimal.ROUND_HALF_UP);
-        final Update update = new Update(_docInst);
-        update.add(CIPayroll.Payslip.RateCrossTotal, ratePay);
-        update.add(CIPayroll.Payslip.RateNetTotal, ratePay);
-        update.add(CIPayroll.Payslip.CrossTotal, pay);
-        update.add(CIPayroll.Payslip.NetTotal, pay);
-        update.add(CIPayroll.Payslip.AmountCost, cost);
-        update.execute();
-    }
 
     /**
      * Method for return a first date of month and last date of month.
@@ -817,37 +810,6 @@ public abstract class Payslip_Base
     }
 
 
-    /**
-     * @param _parameter as passed from eFaps API.
-     * @return Map with positions
-     * @throws EFapsException on error.
-     */
-    protected Map<Instance, Position> analysePositions(final Parameter _parameter)
-        throws EFapsException
-    {
-        final Map<Instance, Position> ret = new HashMap<Instance, Position>();
-
-        final String caseOid = _parameter.getParameterValue("case");
-        final Instance caseInst = Instance.get(caseOid);
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.CasePositionRootSum);
-        queryBldr.addWhereAttrEqValue(CIPayroll.CasePositionSumAbstract.CaseAbstractLink, caseInst.getId());
-
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIPayroll.CasePositionAbstract.Name,
-                            CIPayroll.CasePositionAbstract.Description,
-                            CIPayroll.CasePositionAbstract.Sorted,
-                            CIPayroll.CasePositionAbstract.Mode);
-        multi.execute();
-        while (multi.next()) {
-            final String name = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Name);
-            final String description = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Description);
-            final Integer sorted = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Sorted);
-            final Integer mode = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Mode);
-            final SumPosition sum = new SumPosition(ret, multi.getCurrentInstance(), name, description, sorted, mode);
-            ret.put(multi.getCurrentInstance(), sum);
-        }
-        return ret;
-    }
 
     /**
      * Method to update the fields on leaving a amount field.
@@ -895,7 +857,14 @@ public abstract class Payslip_Base
                         new Instance[_ruleInsts.size()]));
         for (final AbstractRule<?> rule : ret) {
             if (rule instanceof InputRule) {
-                rule.setExpression(amounts[_ruleInsts.get(rule.getInstance())]);
+                final String amountStr = amounts[_ruleInsts.get(rule.getInstance())];
+                try {
+                    final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
+                                    .parse(amountStr);
+                    rule.setExpression(Calculator.toJexlBigDecimal(_parameter, amount));
+                } catch (final ParseException e) {
+                    LOG.error("Catched ParserException", e);
+                }
             }
         }
         Calculator.evaluate(_parameter, ret);
@@ -964,46 +933,6 @@ public abstract class Payslip_Base
         return ret;
     }
 
-
-    /**
-     * Get the values from the tables.
-     * @param _parameter    Parameter as passed from the eFaps API
-     * @param _values       values to be analysed
-     * @param _postfix      postfix of the table
-     * @throws EFapsException on error.
-     */
-    protected void analyseTables(final Parameter _parameter,
-                                 final Map<Instance, TablePos> _values,
-                                 final String _postfix)
-        throws EFapsException
-    {
-        try {
-            final String[] posDed = _parameter.getParameterValues("casePosition_" + _postfix);
-            final String[] amountDed = _parameter.getParameterValues("amount_" + _postfix);
-            final DecimalFormat formater = NumberFormatter.get().getTwoDigitsFormatter();
-            if (posDed != null) {
-                for (int i = 0; i < posDed.length; i++) {
-                    if (posDed[i] != null && !posDed[i].isEmpty()) {
-                        final Instance inst = Instance.get(posDed[i]);
-                        if (inst.isValid()) {
-                            BigDecimal amount = BigDecimal.ZERO;
-                            if (amountDed[i] != null && !amountDed[i].isEmpty()) {
-                                amount = (BigDecimal) formater.parse(amountDed[i]);
-                            }
-                            if (_values.containsKey(inst)) {
-                                _values.get(inst).add(amount, i);
-                            } else {
-                                _values.put(inst, new TablePos(amount, i, _postfix));
-                            }
-
-                        }
-                    }
-                }
-            }
-        } catch (final ParseException e) {
-            throw new EFapsException(Payslip.class, "", e);
-        }
-    }
 
     /**
      * Method to create a report for the accounting actions definition, related with the payslip cases.
@@ -1117,444 +1046,5 @@ public abstract class Payslip_Base
 
         }
         return ret;
-    }
-
-    public class InsertPos
-    {
-
-        private final Type posType;
-        private final BigDecimal amount;
-        private final long id;
-        private String description;
-        private Integer sorted;
-        private final Type caseType;
-
-        /**
-         * Getter method for the instance variable {@link #sorted}.
-         *
-         * @return value of instance variable {@link #sorted}
-         */
-        public Integer getSorted()
-        {
-            return this.sorted;
-        }
-
-        /**
-         * @param values
-         * @param _sums
-         * @param _parameter
-         * @param value
-         * @throws EFapsException
-         */
-        public InsertPos(final Position _position,
-                         final Parameter _parameter,
-                         final Map<Instance, Position> _sums,
-                         final Map<Instance, TablePos> _values)
-            throws EFapsException
-        {
-            this.posType = CIPayroll.PositionSum.getType();
-            this.caseType = _position.getInstance().getType();
-            this.amount = _position.getResult(_parameter, _sums, _values);
-            this.id = _position.getInstance().getId();
-            setValues(_position.getInstance());
-        }
-
-        private void setValues(final Instance _instance)
-            throws EFapsException
-        {
-            final PrintQuery print = new PrintQuery(_instance);
-            print.addAttribute(CIPayroll.CasePositionAbstract.Description, CIPayroll.CasePositionAbstract.Sorted);
-            print.execute();
-            this.description = print.<String>getAttribute(CIPayroll.CasePositionAbstract.Description);
-            this.sorted = print.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Sorted);
-         }
-
-        /**
-         * @param key
-         * @param value
-         * @throws EFapsException
-         */
-        public InsertPos(final Instance _instance,
-                         final BigDecimal _amount)
-            throws EFapsException
-        {
-            this.caseType = _instance.getType();
-            if (_instance.getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                this.posType = CIPayroll.PositionDeduction.getType();
-            } else if (_instance.getType().equals(CIPayroll.CasePositionPayment.getType())) {
-                this.posType = CIPayroll.PositionPayment.getType();
-            } else {
-                this.posType = CIPayroll.PositionNeutral.getType();
-            }
-            this.amount = _amount;
-            this.id = _instance.getId();
-            setValues(_instance);
-        }
-
-        /**
-         * @return
-         */
-        public Type getType()
-        {
-            return this.posType;
-        }
-
-        /**
-         * @return
-         */
-        public BigDecimal getAmount()
-        {
-            return this.amount;
-        }
-
-        @Override
-        public String toString()
-        {
-            return ToStringBuilder.reflectionToString(this);
-        }
-    }
-
-    /**
-     * A position in the currently displayed table.
-     */
-    public class TablePos
-    {
-
-        private final List<BigDecimal> values = new ArrayList<BigDecimal>();
-        private final List<Integer> pos = new ArrayList<Integer>();
-
-        private boolean setValue = false;
-        public TablePos(final BigDecimal _amount,
-                        final Integer _pos,
-                        final String _postfix)
-
-        {
-            getValues().add(_amount);
-            this.pos.add(_pos);
-        }
-
-        public void add(final BigDecimal _amount,
-                        final Integer _pos)
-        {
-            getValues().add(_amount);
-            this.pos.add(_pos);
-        }
-
-        /**
-         * Getter method for the instance variable {@link #setValue}.
-         *
-         * @return value of instance variable {@link #setValue}
-         */
-        public boolean isSetValue()
-        {
-            return this.setValue;
-        }
-
-        /**
-         * Setter method for instance variable {@link #setValue}.
-         *
-         * @param setValue value for instance variable {@link #setValue}
-         */
-
-        public void setSetValue(final boolean setValue)
-        {
-            this.setValue = setValue;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #values}.
-         *
-         * @return value of instance variable {@link #values}
-         */
-        public List<BigDecimal> getValues()
-        {
-            return this.values;
-        }
-
-
-        @Override
-        public String toString()
-        {
-            return ToStringBuilder.reflectionToString(this);
-        }
-    }
-
-    /**
-     * Positions used for calculation.
-     */
-    public abstract class Position
-    {
-        /**
-         * Instance of the caseposition.
-         */
-        private final Instance instance;
-
-        /**
-         * @param _instance instance of the caseposition
-         */
-        public Position(final Instance _instance)
-        {
-            this.instance = _instance;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #instance}.
-         *
-         * @return value of instance variable {@link #instance}
-         */
-        public Instance getInstance()
-        {
-            return this.instance;
-        }
-
-        /**
-         * @param _parameter    Parameter as passed by the eFaps API
-         * @param _positions    Positions for calculation
-         * @param _values       values in the form
-         * @return
-         */
-        public abstract BigDecimal getResult(final Parameter _parameter,
-                                             final Map<Instance, Position> _positions,
-                                             final Map<Instance, TablePos> _values);
-
-    }
-
-    public class CalcPosition
-        extends Position
-    {
-
-        private Instance relInst;
-        private Integer denominator;
-        private Integer numerator;
-        private Instance toInst;
-        private final String esjp;
-        private final String method;
-
-        /**
-         * @param _instance currentInstance
-         * @throws EFapsException
-         */
-        public CalcPosition(final Instance _instance)
-            throws EFapsException
-        {
-            super(_instance);
-
-            final PrintQuery print = new PrintQuery(_instance);
-            print.addAttribute(CIPayroll.CasePositionCalc.CalculatorESJP,
-                            CIPayroll.CasePositionCalc.CalculatorMethod);
-            print.execute();
-            this.esjp = print.<String>getAttribute(CIPayroll.CasePositionCalc.CalculatorESJP);
-            this.method = print.<String>getAttribute(CIPayroll.CasePositionCalc.CalculatorMethod);
-
-            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.CasePosition2PositionAbstract);
-            queryBldr.addWhereAttrEqValue(CIPayroll.CasePosition2PositionAbstract.FromAbstractLink, _instance.getId());
-            final MultiPrintQuery multi = queryBldr.getPrint();
-
-            final SelectBuilder oidSel = new SelectBuilder()
-                            .linkto(CIPayroll.CasePosition2PositionAbstract.ToAbstractLink)
-                            .oid();
-            multi.addAttribute(CIPayroll.CasePosition2PositionAbstract.Denominator,
-                            CIPayroll.CasePosition2PositionAbstract.Numerator);
-            multi.addSelect(oidSel);
-            multi.execute();
-            while (multi.next()) {
-                this.relInst = multi.getCurrentInstance();
-                if (this.relInst.isValid()
-                                && this.relInst.getType().equals(CIPayroll.CasePositionCalc2Sum4Multiply.getType())) {
-                    this.denominator = multi.<Integer>getAttribute(CIPayroll.CasePosition2PositionAbstract.Denominator);
-                    this.numerator = multi.<Integer>getAttribute(CIPayroll.CasePosition2PositionAbstract.Numerator);
-                    this.toInst = Instance.get(multi.<String>getSelect(oidSel));
-                }
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public BigDecimal getResult(final Parameter _parameter,
-                                    final Map<Instance, Position> _sums,
-                                    final Map<Instance, TablePos> _values)
-        {
-            BigDecimal ret = BigDecimal.ZERO;
-            if (_values.containsKey(getInstance())) {
-                for (final BigDecimal value : _values.get(getInstance()).getValues()) {
-                    ret = ret.add(value);
-                }
-            }
-
-            if (this.esjp != null && !this.esjp.isEmpty()) {
-                try {
-                    final Class<?> cls = Class.forName(this.esjp, true, EFapsClassLoader.getInstance());
-                    final Method meth = cls.getMethod(this.method, new Class[] { Parameter.class, Map.class, Map.class,
-                                                                                    Position.class });
-                    ret = (BigDecimal) meth.invoke(cls.newInstance(), _parameter, _sums, _values, this);
-                } catch (final SecurityException e) {
-                    Payslip_Base.LOG.error("SecurityException", e);
-                } catch (final ClassNotFoundException e) {
-                    Payslip_Base.LOG.error("ClassNotFoundException", e);
-                } catch (final NoSuchMethodException e) {
-                    Payslip_Base.LOG.error("NoSuchMethodException", e);
-                } catch (final IllegalArgumentException e) {
-                    Payslip_Base.LOG.error("IllegalArgumentException", e);
-                } catch (final IllegalAccessException e) {
-                    Payslip_Base.LOG.error("IllegalAccessException", e);
-                } catch (final InvocationTargetException e) {
-                    Payslip_Base.LOG.error("InvocationTargetException", e);
-                } catch (final InstantiationException e) {
-                    Payslip_Base.LOG.error("InvocationTargetException", e);
-                }
-            } else if (this.toInst != null && this.toInst.isValid()) {
-                if (_sums.containsKey(this.toInst)) {
-                    final Position sum = _sums.get(this.toInst);
-                    final BigDecimal tmp = sum.getResult(_parameter, _sums, _values);
-                    ret = tmp.multiply(new BigDecimal(this.numerator).divide(new BigDecimal(this.denominator),
-                                    8, BigDecimal.ROUND_HALF_UP));
-                    if (_values.containsKey(getInstance())) {
-                        _values.get(getInstance()).setSetValue(true);
-                        final int count = _values.get(getInstance()).getValues().size();
-                        _values.get(getInstance()).getValues().clear();
-                        for (int i = 0; i < count; i++) {
-                            _values.get(getInstance()).getValues().add(ret);
-                        }
-                    }
-                }
-            }
-            return ret.setScale(2, BigDecimal.ROUND_HALF_UP);
-        }
-
-        @Override
-        public String toString()
-        {
-            return ToStringBuilder.reflectionToString(this);
-        }
-    }
-
-    public class SumPosition
-        extends Position
-    {
-
-        private final String name;
-
-        private final String description;
-
-        private final Set<Position> children = new HashSet<Position>();
-
-        private final Integer sorted;
-
-        private final Integer mode;
-
-        public SumPosition(final Map<Instance, Position> _sums,
-                           final Instance _instance,
-                           final String _name,
-                           final String _description,
-                           final Integer _sorted,
-                           final Integer _mode)
-            throws EFapsException
-        {
-            super(_instance);
-            this.name = _name;
-            this.description = _description;
-            this.sorted = _sorted;
-            this.mode = _mode;
-            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.CasePositionAbstract);
-            queryBldr.addWhereAttrEqValue(CIPayroll.CasePositionAbstract.ParentAbstractLink, getInstance().getId());
-
-            final MultiPrintQuery multi = queryBldr.getPrint();
-            multi.addAttribute(CIPayroll.CasePositionAbstract.Name,
-                            CIPayroll.CasePositionAbstract.Description,
-                            CIPayroll.CasePositionAbstract.Sorted,
-                            CIPayroll.CasePositionAbstract.Mode);
-            multi.execute();
-            while (multi.next()) {
-                final String childName = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Name);
-                final String childDescription = multi.<String>getAttribute(CIPayroll.CasePositionAbstract.Description);
-                final Integer sortedTmp = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Sorted);
-                final Integer mode = multi.<Integer>getAttribute(CIPayroll.CasePositionAbstract.Mode);
-                if (multi.getCurrentInstance().getType().isKindOf(CIPayroll.CasePositionSumAbstract.getType())) {
-                    final SumPosition sum = new SumPosition(_sums,
-                                    multi.getCurrentInstance(),
-                                    childName,
-                                    childDescription,
-                                    sortedTmp,
-                                    mode);
-                    _sums.put(multi.getCurrentInstance(), sum);
-                    this.children.add(sum);
-                } else {
-                    final CalcPosition pos = new CalcPosition(multi.getCurrentInstance());
-                    _sums.put(multi.getCurrentInstance(), pos);
-                    this.children.add(pos);
-                }
-            }
-        }
-
-        /**
-         * Getter method for the instance variable {@link #mode}.
-         *
-         * @return value of instance variable {@link #mode}
-         */
-        public Integer getMode()
-        {
-            return this.mode;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #name}.
-         *
-         * @return value of instance variable {@link #name}
-         */
-        public String getName()
-        {
-            return this.name;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #description}.
-         *
-         * @return value of instance variable {@link #description}
-         */
-        public String getDescription()
-        {
-            return this.description;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #sorted}.
-         *
-         * @return value of instance variable {@link #sorted}
-         */
-        public Integer getSorted()
-        {
-            return this.sorted;
-        }
-
-        /**
-         * @param _sums
-         * @param _values
-         * @return
-         */
-        @Override
-        public BigDecimal getResult(final Parameter _parameter,
-                                    final Map<Instance, Position> _sums,
-                                    final Map<Instance, TablePos> _values)
-        {
-            BigDecimal ret = BigDecimal.ZERO;
-            for (final Position child : this.children) {
-                BigDecimal result = child.getResult(_parameter, _sums, _values);
-                if (child.getInstance().getType().equals(CIPayroll.CasePositionDeduction.getType())) {
-                    result = result.negate();
-                }
-                if (!child.getInstance().getType().equals(CIPayroll.CasePositionNeutral.getType())) {
-                    ret = ret.add(result);
-                }
-            }
-            return ret.setScale(2, BigDecimal.ROUND_HALF_UP);
-        }
-
-        @Override
-        public String toString()
-        {
-            return ToStringBuilder.reflectionToString(this);
-        }
     }
 }

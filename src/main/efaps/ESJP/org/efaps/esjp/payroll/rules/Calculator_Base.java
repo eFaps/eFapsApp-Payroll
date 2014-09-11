@@ -24,9 +24,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.jexl2.JexlArithmetic;
@@ -41,7 +42,6 @@ import org.apache.commons.jexl2.introspection.UberspectImpl;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
-import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.util.Payroll;
 import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.esjp.ui.html.Table;
@@ -64,7 +64,12 @@ public abstract class Calculator_Base
 
     private static MessageLog MSGLOG = new MessageLog();
 
-
+    private static final DecimalFormat JEXLFORMATER = (DecimalFormat) DecimalFormat.getInstance();
+    static {
+        JEXLFORMATER.setGroupingUsed(false);
+        JEXLFORMATER.setMinimumFractionDigits(2);
+        JEXLFORMATER.setMaximumFractionDigits(2);
+    }
     /**
      * Logger for this classes.
      */
@@ -75,6 +80,10 @@ public abstract class Calculator_Base
     static {
         JEXL.setDebug(true);
         JEXL.setSilent(false);
+
+        final Map<String, Object> functions = new HashMap<>();
+        functions.put("math", MathFunctions.class);
+        JEXL.setFunctions(functions);
     }
 
     /**
@@ -126,253 +135,30 @@ public abstract class Calculator_Base
         return new Result().addRules(_rules);
     }
 
-    public static class Result
+    protected static String toJexlBigDecimal(final Parameter _parameter,
+                                     final BigDecimal _bigDecimal)
+        throws EFapsException
     {
+        return JEXLFORMATER.format(_bigDecimal)  + "B";
+    }
 
-        private final List<AbstractRule<?>> rules = new ArrayList<>();
-
-        private final List<AbstractRule<?>> paymentRules = new ArrayList<>();
-
-        private final List<AbstractRule<?>> deductionRules = new ArrayList<>();
-
-        private final List<AbstractRule<?>> sumRules = new ArrayList<>();
-
-        private final List<AbstractRule<?>> neutralRules = new ArrayList<>();
-
-        private boolean initialized = false;
-
-        private DecimalFormat formatter;
-
-        protected void init()
-        {
-            if (!this.initialized) {
-                for (final AbstractRule<?> rule : this.rules) {
-                    switch (rule.getRuleType()) {
-                        case PAYMENT:
-                            this.paymentRules.add(rule);
-                            break;
-                        case DEDUCTION:
-                            this.deductionRules.add(rule);
-                            break;
-                        case SUM:
-                            this.sumRules.add(rule);
-                            break;
-                        case NEUTRAL:
-                            this.neutralRules.add(rule);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                this.initialized = true;
+    protected static BigDecimal getBigDecimal(final Object _object)
+    {
+        BigDecimal ret = BigDecimal.ZERO;
+        if (_object != null) {
+            if (_object instanceof BigDecimal) {
+                ret = (BigDecimal) _object;
+            } else if (_object instanceof Double) {
+                ret = new BigDecimal((Double) _object);
+            } else if (_object instanceof BigInteger) {
+                ret = new BigDecimal((BigInteger) _object);
+            } else if (_object instanceof Long) {
+                ret = new BigDecimal((Long) _object);
+            } else if (_object instanceof Integer) {
+                ret = new BigDecimal((Integer) _object);
             }
         }
-
-        protected void reset()
-        {
-            if (this.initialized) {
-                this.initialized = false;
-                this.paymentRules.clear();
-                this.deductionRules.clear();
-                this.sumRules.clear();
-                this.neutralRules.clear();
-            }
-        }
-
-        public DecimalFormat getFormatter() throws EFapsException
-        {
-
-            return this.formatter == null ? NumberFormatter.get().getTwoDigitsFormatter() : this.formatter;
-        }
-
-        /**
-         * @param _rules
-         * @return
-         */
-        public Result addRules(final List<? extends AbstractRule<?>> _rules)
-        {
-            this.rules.addAll(_rules);
-
-            return this;
-        }
-
-        /**
-         * @return
-         */
-        public List<? extends AbstractRule<?>> getPaymentRules()
-        {
-            init();
-            return this.paymentRules;
-        }
-
-        /**
-         * @return
-         */
-        public List<? extends AbstractRule<?>> getDeductionRules()
-        {
-            init();
-            return this.deductionRules;
-        }
-
-        /**
-         * @return
-         */
-        public List<? extends AbstractRule<?>> getNeutralRules()
-        {
-            init();
-            return this.neutralRules;
-        }
-
-        /**
-         * @return
-         */
-        public List<? extends AbstractRule<?>> getSumRules()
-        {
-            init();
-            return this.sumRules;
-        }
-
-
-        public BigDecimal getAmount(final List<? extends AbstractRule<?>> _rules)
-        {
-            BigDecimal ret = BigDecimal.ZERO;
-            for (final AbstractRule<?> rule : _rules) {
-                ret = ret.add(getBigDecimal(rule.getResult()));
-            }
-            return ret;
-        }
-        /**
-         * @return
-         */
-        public BigDecimal getPayment()
-        {
-            return getAmount(getPaymentRules());
-        }
-        /**
-         * @return
-         */
-        public String getPaymentFrmt() throws EFapsException
-        {
-            return getFormatter().format(getPayment());
-        }
-        /**
-         * @return
-         */
-        public BigDecimal getDeduction()
-        {
-            return getAmount(getDeductionRules());
-        }
-        /**
-         * @return
-         */
-        public String getDeductionFrmt() throws EFapsException
-        {
-            return getFormatter().format(getDeduction());
-        }
-        /**
-         * @return
-         */
-        public BigDecimal getNeutral()
-        {
-            return getAmount(getNeutralRules());
-        }
-
-        /**
-         * @return
-         */
-        public String getNeutralFrmt() throws EFapsException
-        {
-            return getFormatter().format(getNeutral());
-        }
-        /**
-         * @return
-         */
-        public BigDecimal getSum()
-        {
-            return getAmount(getSumRules());
-        }
-
-        /**
-         * @return
-         */
-        public String getSumFrmt() throws EFapsException
-        {
-            return getFormatter().format(getSum());
-        }
-
-        /**
-         * @return
-         */
-        public BigDecimal getTotal()
-        {
-            return getPayment().subtract(getDeduction());
-        }
-
-        /**
-         * @return
-         */
-        public String getTotalFrmt() throws EFapsException
-        {
-            return getFormatter().format(getTotal());
-        }
-
-        /**
-         * @return
-         */
-        public BigDecimal getCost()
-        {
-            return getPayment().add(getNeutral());
-        }
-
-        /**
-         * @return
-         */
-        public String getCostFrmt() throws EFapsException
-        {
-            return getFormatter().format(getCost());
-        }
-
-
-        public BigDecimal getBigDecimal(final Object _object)
-        {
-            BigDecimal ret = BigDecimal.ZERO;
-            if (_object != null) {
-                if (_object instanceof BigDecimal) {
-                    ret = (BigDecimal) _object;
-                } else if (_object instanceof Double) {
-                    ret = new BigDecimal((Double) _object);
-                } else if (_object instanceof BigInteger) {
-                    ret = new BigDecimal((BigInteger) _object);
-                } else if (_object instanceof Long) {
-                    ret = new BigDecimal((Long) _object);
-                } else if (_object instanceof Integer) {
-                    ret = new BigDecimal((Integer) _object);
-                }
-            }
-            return ret;
-        }
-
-
-        /**
-         * Setter method for instance variable {@link #formatter}.
-         *
-         * @param _formatter value for instance variable {@link #formatter}
-         */
-        public void setFormatter(final DecimalFormat _formatter)
-        {
-            this.formatter = _formatter;
-        }
-
-
-        /**
-         * Getter method for the instance variable {@link #rules}.
-         *
-         * @return value of instance variable {@link #rules}
-         */
-        public List<AbstractRule<?>> getRules()
-        {
-            return this.rules;
-        }
+        return ret;
     }
 
 
@@ -397,6 +183,7 @@ public abstract class Calculator_Base
                         this.classNames.add(white.trim());
                     }
                 }
+                this.classNames.add(MathFunctions.class.getName());
             } catch (final EFapsException e) {
                 LOG.error("Error", e);
             }
@@ -472,5 +259,4 @@ public abstract class Calculator_Base
             return null;
         }
     }
-
 }

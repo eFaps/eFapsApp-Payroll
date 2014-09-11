@@ -18,9 +18,9 @@
  * Last Changed By: $Author$
  */
 
-
 package org.efaps.esjp.payroll.rules;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.jexl2.JexlEngine;
@@ -28,7 +28,6 @@ import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.util.EFapsException;
-
 
 /**
  * This class must be replaced for customization, therefore it is left empty.
@@ -80,4 +79,17 @@ public class Calculator
     {
         return Calculator_Base.getResult(_parameter, _rules);
     }
+
+    public static String toJexlBigDecimal(final Parameter _parameter,
+                                          final BigDecimal _bigDecimal)
+        throws EFapsException
+    {
+        return Calculator_Base.toJexlBigDecimal(_parameter, _bigDecimal);
+    }
+
+    public static BigDecimal getBigDecimal(final Object _object)
+    {
+        return Calculator_Base.getBigDecimal(_object);
+    }
+
 }

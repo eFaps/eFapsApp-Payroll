@@ -153,11 +153,22 @@ public abstract class AbstractParameter_Base<T>
         throws EFapsException
     {
         Instance inst = _parameter.getInstance();
+        if (inst == null && _parameter.getCallInstance() != null) {
+            inst = _parameter.getCallInstance();
+        }
+
         if (inst != null) {
             if (inst.getType().isKindOf(CIPayroll.PositionAbstract)) {
                 final PrintQuery print = new PrintQuery(inst);
                 final SelectBuilder sel = SelectBuilder.get()
                                 .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink)
+                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink).instance();
+                print.addSelect(sel);
+                print.execute();
+                inst = print.getSelect(sel);
+            } else if (inst.getType().isKindOf(CIPayroll.Payslip)) {
+                final PrintQuery print = new PrintQuery(inst);
+                final SelectBuilder sel = SelectBuilder.get()
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink).instance();
                 print.addSelect(sel);
                 print.execute();

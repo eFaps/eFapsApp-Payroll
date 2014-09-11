@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2012 The eFaps Team
+ * Copyright 2003 - 2014 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
  */
 
 
-package org.efaps.esjp.payroll;
+package org.efaps.esjp.payroll.rules;
 
+import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
@@ -33,10 +34,18 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * @author The eFaps Team
  * @version $Id$
  */
-@EFapsUUID("f91c102c-1fbb-4803-869e-d6657853640c")
+@EFapsUUID("8b9c9a4a-39ef-41c7-a80c-03cb2176ddfc")
 @EFapsRevision("$Rev$")
-public class PayslipCalculator
-    extends PayslipCalculator_Base
+public class MathFunctions
+    extends MathFunctions_Base
 {
+
+    /**
+     * @param _context
+     */
+    public MathFunctions(final JexlContext _context)
+    {
+        super(_context);
+    }
 
 }

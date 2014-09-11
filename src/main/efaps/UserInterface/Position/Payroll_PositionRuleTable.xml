@@ -36,6 +36,7 @@
             <property name="Label">Payroll_PositionRuleTable.rulePosition.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Width">1</property>
+            <property name="SortAble">false</property>
             <trigger event="UI_FIELD_AUTOCOMPLETE"
                 method="autoComplete4Rule"
                 name="Payroll_PositionNeutralTable.rulePosition.UI_FIELD_AUTOCOMPLETE"
@@ -53,6 +54,7 @@
             <property name="Label">Payroll_PositionRuleTable.ruleDescription.Label</property>
             <property name="ModeCreate">READONLY</property>
             <property name="Width">4</property>
+            <property name="SortAble">false</property>
         </field>
         <field name="ruleAmount">
             <property name="ModeCreate">EDITABLE</property>
@@ -62,6 +64,7 @@
             <property name="Required">true</property>
             <property name="Columns">8</property>
             <property name="Width">1</property>
+            <property name="SortAble">false</property>
             <trigger event="UI_FIELD_UPDATE"
                 method="update4Amount"
                 name="Payroll_PositionNeutralTable.ruleAmount.UI_FIELD_UPDATE"
