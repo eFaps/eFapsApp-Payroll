@@ -83,6 +83,7 @@ public abstract class Calculator_Base
 
         final Map<String, Object> functions = new HashMap<>();
         functions.put("math", MathFunctions.class);
+        functions.put("data", DataFunctions.class);
         JEXL.setFunctions(functions);
     }
 
@@ -184,6 +185,7 @@ public abstract class Calculator_Base
                     }
                 }
                 this.classNames.add(MathFunctions.class.getName());
+                this.classNames.add(DataFunctions.class.getName());
             } catch (final EFapsException e) {
                 LOG.error("Error", e);
             }

@@ -47,6 +47,7 @@ public abstract class IncomeTax5_Base
 {
     protected final static String KEYS4PAYMENT = "IncomeTax5PaymentKeys";
     protected final static String KEYS4EXTRA = "IncomeTax5ExtraKeys";
+    protected final static String KEYS4TAX = "IncomeTax5TaxKeys";
 
     public final static Map<Integer, Integer> MONTH2DIVID = new HashMap<Integer, Integer>();
     static {
@@ -102,11 +103,11 @@ public abstract class IncomeTax5_Base
 
         if (employeeInst != null && employeeInst.isValid()) {
             final BigDecimal uit = getBigDecimal(uitObj);
-            final BigDecimal base = getCurrent(_context, KEYS4PAYMENT);
-            final BigDecimal extra = getCurrent(_context, KEYS4EXTRA);
+            final BigDecimal base = getCurrent(_context, IncomeTax5.KEYS4PAYMENT);
+            final BigDecimal extra = getCurrent(_context, IncomeTax5.KEYS4EXTRA);
 
-            final BigDecimal payed = getPrevious(_context, KEYS4PAYMENT, 12);
-            final BigDecimal extraPayed = getPrevious(_context, KEYS4EXTRA, 12);
+            final BigDecimal payed = getPrevious(_context, IncomeTax5.KEYS4PAYMENT, 12);
+            final BigDecimal extraPayed = getPrevious(_context, IncomeTax5.KEYS4EXTRA, 12);
 
             final int currentMonth = date.getMonthOfYear();
 
@@ -142,7 +143,7 @@ public abstract class IncomeTax5_Base
             if (yearTax.compareTo(BigDecimal.ZERO) > 0) {
                 final BigDecimal taxPayed;
                 if (MONTH2SUBSTRACT.containsKey(currentMonth)) {
-                    taxPayed = getPrevious(_context, "0605", MONTH2SUBSTRACT.get(currentMonth));
+                    taxPayed = getPrevious(_context, IncomeTax5.KEYS4TAX, MONTH2SUBSTRACT.get(currentMonth));
                 } else {
                     taxPayed = BigDecimal.ZERO;
                 }

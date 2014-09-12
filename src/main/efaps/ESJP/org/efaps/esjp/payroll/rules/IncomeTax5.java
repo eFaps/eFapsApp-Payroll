@@ -39,5 +39,9 @@ public class IncomeTax5
     extends IncomeTax5_Base
 {
     public final static String KEYS4PAYMENT = IncomeTax5_Base.KEYS4PAYMENT;
+
     public final static String KEYS4EXTRA = IncomeTax5_Base.KEYS4EXTRA;
+
+    public final static String KEYS4TAX = IncomeTax5_Base.KEYS4TAX;
+
 }

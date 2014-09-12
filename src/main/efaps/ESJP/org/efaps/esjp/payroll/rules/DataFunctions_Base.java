@@ -23,10 +23,10 @@ package org.efaps.esjp.payroll.rules;
 import java.math.BigDecimal;
 
 import org.apache.commons.jexl2.JexlContext;
+import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
-import org.efaps.db.InstanceQuery;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.esjp.ci.CIPayroll;
@@ -89,30 +89,22 @@ public abstract class DataFunctions_Base
         final DateTime startDate = date.dayOfYear().withMinimumValue().minusMinutes(1);
         final DateTime endDate = date.monthOfYear().setCopy(_month).dayOfMonth().withMaximumValue().plusMinutes(1);
 
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
-        queryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
-        queryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, startDate);
-        queryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, endDate);
-        final InstanceQuery query = queryBldr.getQuery();
-        query.execute();
-        if (!query.getValues().isEmpty()) {
-            final Object[] ids = new Object[query.getValues().size()];
-            int i = 0;
-            while (query.next()) {
-                ids[i] = query.getCurrentValue().getId();
-                i++;
-            }
+        final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
+        attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
+        attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status, Status.find(CIPayroll.PayslipStatus.Canceled));
+        attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, startDate);
+        attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, endDate);
 
-            final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
-            queryBldr2.addWhereAttrEqValue(CIPayroll.PositionPayment.DocumentAbstractLink, ids);
-
-            final MultiPrintQuery multi = queryBldr2.getPrint();
-            multi.addAttribute(CIPayroll.PositionPayment.Amount);
-            multi.execute();
-            while (multi.next()) {
-                final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
-                ret = ret.add(amount);
-            }
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key, (Object[]) _keys);
+        queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
+                        attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID));
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        multi.addAttribute(CIPayroll.PositionPayment.Amount);
+        multi.execute();
+        while (multi.next()) {
+            final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
+            ret = ret.add(amount);
         }
         return ret;
     }

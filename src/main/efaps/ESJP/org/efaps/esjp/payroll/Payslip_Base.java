@@ -830,7 +830,8 @@ public abstract class Payslip_Base
         final String html = Calculator.getHtml4Rules(_parameter, rules) + "<br/>"
                         + getHtml4Positions(_parameter, rules);
         final StringBuilder js = new StringBuilder().append("document.getElementsByName('sums')[0].innerHTML='")
-                        .append(StringEscapeUtils.escapeEcmaScript(html)).append("';");
+                        .append(StringEscapeUtils.escapeEcmaScript(html)).append("';")
+                        .append("positionTableColumns(eFapsTable100);");
         map.put(EFapsKey.FIELDUPDATE_JAVASCRIPT.getKey(), js.toString());
         list.add(map);
 
