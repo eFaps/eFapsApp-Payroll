@@ -85,6 +85,7 @@ import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.common.uitable.MultiPrint;
 import org.efaps.esjp.common.util.InterfaceUtils;
+import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.rules.AbstractRule;
@@ -94,8 +95,6 @@ import org.efaps.esjp.payroll.rules.InputRule;
 import org.efaps.esjp.payroll.rules.Result;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
-import org.efaps.esjp.sales.util.Sales;
-import org.efaps.esjp.sales.util.SalesSettings;
 import org.efaps.esjp.ui.html.Table;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.util.EFapsException;
@@ -207,7 +206,6 @@ public abstract class Payslip_Base
         final String extraLaborTimes = _parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
         final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
-        Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
         final Instance rateCurrInst = getRateCurrencyInstance(_parameter, createdDoc);
 
         final Object[] rateObj = getRateObject(_parameter);
@@ -216,7 +214,7 @@ public abstract class Payslip_Base
         try {
             final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
 
-            final Instance baseCurInst = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+            final Instance baseCurInst = Currency.getBaseCurrency();
 
             final BigDecimal time = laborTimes != null && !laborTimes.isEmpty()
                                                         ? (BigDecimal) formater.parse(laborTimes)
@@ -263,7 +261,7 @@ public abstract class Payslip_Base
                                 final Object[] _rateObj)
         throws EFapsException
     {
-        final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+        final Instance baseCurIns = Currency.getBaseCurrency();
         final BigDecimal rate = ((BigDecimal) _rateObj[0]).divide((BigDecimal) _rateObj[1], 12,
                         BigDecimal.ROUND_HALF_UP);
 
@@ -333,7 +331,7 @@ public abstract class Payslip_Base
     {
         final BigDecimal rate = ((BigDecimal) _rateObj[0]).divide((BigDecimal) _rateObj[1], 12,
                         BigDecimal.ROUND_HALF_UP);
-        final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+        final Instance baseCurIns = Currency.getBaseCurrency();
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
         queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
@@ -445,7 +443,7 @@ public abstract class Payslip_Base
                         .getParameterValues(CITablePayroll.Payroll_PayslipTable.rateCurrencyId.name);
         final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
         try {
-            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+            final Instance baseCurIns = Currency.getBaseCurrency();
             final PriceUtil util = new PriceUtil();
 
             for (int i = 0; i < employees.length; i++) {
@@ -525,7 +523,7 @@ public abstract class Payslip_Base
                         .getParameterValues(CITablePayroll.Payroll_AdvanceTable.rateCurrencyId.name);
         final DecimalFormat formater =  NumberFormatter.get().getTwoDigitsFormatter();
         try {
-            final Instance baseCurIns = Sales.getSysConfig().getLink(SalesSettings.CURRENCYBASE);
+            final Instance baseCurIns = Currency.getBaseCurrency();
             final PriceUtil util = new PriceUtil();
             for (int i = 0; i < employees.length; i++) {
                 if (employees[i] != null && !employees[i].isEmpty()) {
