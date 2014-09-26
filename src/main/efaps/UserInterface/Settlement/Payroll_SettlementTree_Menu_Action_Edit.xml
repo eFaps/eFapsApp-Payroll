@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
  Copyright 2003 - 2010 The eFaps Team
 
@@ -22,29 +20,31 @@
  Last Changed By: $Author$
 
 -->
-
-<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>2de7f422-acce-4a5d-9c65-84ce8c82a11d</uuid>
+    <uuid>9e429c73-e86d-4939-956a-2d02fd95c753</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipMyDesk</name>
+        <name>Payroll_SettlementTree_Menu_Action_Edit</name>
         <access>
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
-            <role>Payroll_Reader</role>
         </access>
         <target>
-            <menu>Payroll_PayslipMyDesk_Menu</menu>
-            <table>Payroll_PayslipTable</table>
-            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Type">Payroll_Payslip</property>
-            </evaluate>
+            <form>Payroll_PayslipForm</form>
+            <execute method="edit" program="org.efaps.esjp.payroll.Settlement" />
+            <trigger event="UI_ACCESSCHECK"
+                method="check4Status"
+                name="Payroll_SettlementTree_Menu_Action_Edit.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <property name="Status">Draft</property>
+            </trigger>
         </target>
-        <property name="Target">content</property>
-        <property name="TargetShowCheckBoxes">true</property>
-        <property name="TargetMode">view</property>
+        <property name="Target">modal</property>
+        <property name="TargetMode">edit</property>
+        <property name="WindowHeight">660</property>
+        <property name="WindowWidth">1200</property>
     </definition>
-</ui-menu>
+</ui-command>

@@ -23,13 +23,11 @@
 
 -->
 
-<datamodel-sqltable  xmlns="http://www.efaps.org/xsd"
-                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+<datamodel-sqltable  xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>5504bebc-4885-44d6-8e43-8ab45c3f42e7</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
-
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_DocumentSQLTable</name>
@@ -37,7 +35,6 @@
         <database>
             <table-name>T_PRDOC</table-name>
             <parent-table>T_ERPDOC</parent-table>
-            <!-- columns -->
             <column name="EMPLOYEEID"       type="INTEGER"   not-null="true"/>
             <column name="AMOUNTCOST"       type="DECIMAL"                      length="10" scale="2"/>
             <column name="TIME"             type="DECIMAL"                      length="16" scale="6"/>
@@ -47,7 +44,6 @@
             <column name="EXTRATIMEUOMID"   type="INTEGER"/>
             <column name="EXTRATIMEBASE"    type="REAL"/>
             <column name="MOVEMENTTYPE"     type="INTEGER"/>
-            <!-- foreign keys -->
             <foreign name="T_PRDOC_EMPLOYEEID"   key="EMPLOYEEID"      reference="T_HREMPLOYEE(ID)"/>
         </database>
     </definition>
