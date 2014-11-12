@@ -22,6 +22,7 @@
 package org.efaps.esjp.payroll;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -248,6 +249,12 @@ public abstract class Payslip_Base
             updateTotals(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
             updatePositions(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
 
+            final File file = createReport(_parameter, createdDoc);
+            if (file != null) {
+                ret.put(ReturnValues.VALUES, file);
+                ret.put(ReturnValues.TRUE, true);
+            }
+
         } catch (final ParseException e) {
             throw new EFapsException(Payslip_Base.class, "create.ParseException", e);
         }
@@ -288,6 +295,7 @@ public abstract class Payslip_Base
     public Return edit(final Parameter _parameter)
         throws EFapsException
     {
+        final Return ret = new Return();
 
         final Instance instance = _parameter.getInstance();
 
@@ -319,7 +327,16 @@ public abstract class Payslip_Base
         final Result result = Calculator.getResult(_parameter, rules);
         updateTotals(_parameter, instance, result, rateCurrInst, rateObj);
         updatePositions(_parameter, instance, result, rateCurrInst, rateObj);
-        return new Return();
+
+        final EditedDoc editedDoc = new EditedDoc(instance);
+
+        final File file = createReport(_parameter, editedDoc);
+        if (file != null) {
+            ret.put(ReturnValues.VALUES, file);
+            ret.put(ReturnValues.TRUE, true);
+        }
+
+        return ret;
     }
 
     protected void updatePositions(final Parameter _parameter,
