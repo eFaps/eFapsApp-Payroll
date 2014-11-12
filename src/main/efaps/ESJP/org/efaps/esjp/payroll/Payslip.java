@@ -38,5 +38,5 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 public class Payslip
     extends Payslip_Base
 {
-
+    public static String SESSIONKEY = Payslip_Base.SESSIONKEY;
 }

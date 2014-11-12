@@ -27,6 +27,7 @@ import org.apache.commons.jexl2.JexlEngine;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.db.Instance;
 import org.efaps.util.EFapsException;
 
 /**
@@ -54,6 +55,14 @@ public class Calculator
         throws EFapsException
     {
         Calculator_Base.evaluate(_parameter, _rules);
+    }
+
+    public static void evaluate(final Parameter _parameter,
+                                final List<? extends AbstractRule<?>> _rules,
+                                final Instance _docInst)
+        throws EFapsException
+    {
+        Calculator_Base.evaluate(_parameter, _rules, _docInst);
     }
 
     public static JexlEngine getJexlEngine()

@@ -42,6 +42,7 @@ import org.apache.commons.jexl2.introspection.UberspectImpl;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.db.Instance;
 import org.efaps.esjp.payroll.util.Payroll;
 import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.esjp.ui.html.Table;
@@ -95,16 +96,30 @@ public abstract class Calculator_Base
                                    final List<? extends AbstractRule<?>> _rules)
         throws EFapsException
     {
+        evaluate(_parameter, _rules, null);
+    }
+
+    /**
+     * @param _parameter
+     * @param _rules
+     */
+    protected static void evaluate(final Parameter _parameter,
+                                   final List<? extends AbstractRule<?>> _rules,
+                                   final Instance _docInst)
+        throws EFapsException
+    {
         Calculator.getMessageLog().clean();
         for (final AbstractRule<?> rule : _rules) {
             rule.prepare(_parameter);
         }
-        final JexlContext context = new MapContext(AbstractParameter.getParameters(_parameter));
+        final JexlContext context = new MapContext(AbstractParameter.getParameters(_parameter, _docInst));
         context.set(Calculator.PARAKEY4CONTEXT, context);
         for (final AbstractRule<?> rule : _rules) {
             rule.evaluate(_parameter, context);
         }
     }
+
+
 
     protected static JexlEngine getJexlEngine()
     {

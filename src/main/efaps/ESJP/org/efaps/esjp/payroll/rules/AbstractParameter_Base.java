@@ -152,50 +152,60 @@ public abstract class AbstractParameter_Base<T>
     protected static Map<String, Object> getParameters(final Parameter _parameter)
         throws EFapsException
     {
-        Instance inst = _parameter.getInstance();
-        if (inst == null && _parameter.getCallInstance() != null) {
-            inst = _parameter.getCallInstance();
-        }
+        return getParameters(_parameter, null);
+    }
 
-        if (inst != null) {
-            if (inst.getType().isKindOf(CIPayroll.PositionAbstract)) {
-                final PrintQuery print = new PrintQuery(inst);
+    protected static Map<String, Object> getParameters(final Parameter _parameter,
+                                                       final Instance _docInst)
+        throws EFapsException
+    {
+        Instance docInst = _docInst;
+        Instance employeeInst = null;
+        if (docInst == null) {
+            docInst = _parameter.getInstance();
+            if (docInst == null && _parameter.getCallInstance() != null) {
+                docInst = _parameter.getCallInstance();
+            }
+        }
+        if (docInst != null) {
+            if (docInst.getType().isKindOf(CIPayroll.PositionAbstract)) {
+                final PrintQuery print = new PrintQuery(docInst);
                 final SelectBuilder sel = SelectBuilder.get()
                                 .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink)
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink).instance();
                 print.addSelect(sel);
                 print.execute();
-                inst = print.getSelect(sel);
-            } else if (inst.getType().isKindOf(CIPayroll.Payslip)) {
-                final PrintQuery print = new PrintQuery(inst);
+                employeeInst = print.getSelect(sel);
+            } else if (docInst.getType().isKindOf(CIPayroll.Payslip)) {
+                final PrintQuery print = new PrintQuery(docInst);
                 final SelectBuilder sel = SelectBuilder.get()
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink).instance();
                 print.addSelect(sel);
                 print.execute();
-                inst = print.getSelect(sel);
+                employeeInst = print.getSelect(sel);
             }
         } else {
-            inst = Instance.get(_parameter.getParameterValue("employee"));
+            employeeInst = Instance.get(_parameter.getParameterValue("employee"));
         }
-
-        return getParameters(_parameter, inst);
+        return getParameters(_parameter, docInst, employeeInst);
     }
 
     protected static Map<String, Object> getParameters(final Parameter _parameter,
+                                                       final Instance _docInst,
                                                        final Instance _employeeInst)
         throws EFapsException
     {
         final Map<String, Object> ret = new HashMap<>();
 
-        AbstractParameter.addDate(_parameter, ret);
+        AbstractParameter.addDate(_parameter, ret, _docInst);
         DateTime date;
         if (ret.containsKey(AbstractParameter.PARAKEY4DATE)) {
-            date = (DateTime) ret.get(AbstractParameter.PARAKEY4DATE) ;
+            date = (DateTime) ret.get(AbstractParameter.PARAKEY4DATE);
         } else {
             date = new DateTime();
         }
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.ParameterAbstract);
-        queryBldr.addWhereAttrGreaterValue(CIPayroll.ParameterAbstract.ValidUntil , date.minusMinutes(1));
+        queryBldr.addWhereAttrGreaterValue(CIPayroll.ParameterAbstract.ValidUntil, date.minusMinutes(1));
         queryBldr.addWhereAttrLessValue(CIPayroll.ParameterAbstract.ValidFrom, date.plusMinutes(1));
 
         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -231,11 +241,29 @@ public abstract class AbstractParameter_Base<T>
                                   final Map<String, Object> _map)
         throws EFapsException
     {
+        addDate(_parameter, _map, null);
+    }
+
+    /**
+     * @param _parameter
+     */
+    protected static void addDate(final Parameter _parameter,
+                                  final Map<String, Object> _map,
+                                  final Instance _docInst)
+        throws EFapsException
+    {
         if (!_map.containsKey(AbstractParameter.PARAKEY4DATE)) {
             DateTime date = null;
-            final String dateStr = _parameter.getParameterValue("date_eFapsDate");
-            if (dateStr != null) {
-                date = DateUtil.getDateFromParameter(dateStr);
+            if (_docInst != null && _docInst.isValid()) {
+                final PrintQuery print = new PrintQuery(_docInst);
+                print.addAttribute(CIPayroll.DocumentAbstract.Date);
+                print.executeWithoutAccessCheck();
+                date = print.getAttribute(CIPayroll.DocumentAbstract.Date);
+            } else {
+                final String dateStr = _parameter.getParameterValue("date_eFapsDate");
+                if (dateStr != null) {
+                    date = DateUtil.getDateFromParameter(dateStr);
+                }
             }
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4DATE, date);
