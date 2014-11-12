@@ -185,9 +185,19 @@ public abstract class AbstractParameter_Base<T>
                                                        final Instance _employeeInst)
         throws EFapsException
     {
-
         final Map<String, Object> ret = new HashMap<>();
+
+        AbstractParameter.addDate(_parameter, ret);
+        DateTime date;
+        if (ret.containsKey(AbstractParameter.PARAKEY4DATE)) {
+            date = (DateTime) ret.get(AbstractParameter.PARAKEY4DATE) ;
+        } else {
+            date = new DateTime();
+        }
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.ParameterAbstract);
+        queryBldr.addWhereAttrGreaterValue(CIPayroll.ParameterAbstract.ValidUntil , date.minusMinutes(1));
+        queryBldr.addWhereAttrLessValue(CIPayroll.ParameterAbstract.ValidFrom, date.plusMinutes(1));
+
         final MultiPrintQuery multi = queryBldr.getPrint();
         multi.addAttribute(CIPayroll.ParameterAbstract.Key, CIPayroll.ParameterAbstract.Value);
         multi.execute();
@@ -211,7 +221,6 @@ public abstract class AbstractParameter_Base<T>
         if (_employeeInst != null && _employeeInst.isValid()) {
             ret.put(AbstractParameter.PARAKEY4EMPLOYINST, _employeeInst);
         }
-        AbstractParameter.addDate(_parameter, ret);
         return ret;
     }
 
@@ -222,14 +231,15 @@ public abstract class AbstractParameter_Base<T>
                                   final Map<String, Object> _map)
         throws EFapsException
     {
-        DateTime date = null;
-        final String dateStr = _parameter.getParameterValue("date_eFapsDate");
-        if (dateStr != null) {
-            date = DateUtil.getDateFromParameter(dateStr);
-        }
-
-        if (date != null) {
-            _map.put(AbstractParameter.PARAKEY4DATE, date);
+        if (!_map.containsKey(AbstractParameter.PARAKEY4DATE)) {
+            DateTime date = null;
+            final String dateStr = _parameter.getParameterValue("date_eFapsDate");
+            if (dateStr != null) {
+                date = DateUtil.getDateFromParameter(dateStr);
+            }
+            if (date != null) {
+                _map.put(AbstractParameter.PARAKEY4DATE, date);
+            }
         }
     }
 }

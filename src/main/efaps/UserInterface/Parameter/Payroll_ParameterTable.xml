@@ -46,5 +46,13 @@
             <property name="Attribute">Value</property>
             <property name="Label">Payroll_ParameterAbstract/Value.Label</property>
         </field>
+        <field name="validFrom">
+            <property name="Attribute">ValidFrom</property>
+            <property name="Label">Payroll_ParameterAbstract/ValidFrom.Label</property>
+        </field>
+        <field name="validUntil">
+            <property name="Attribute">ValidUntil</property>
+            <property name="Label">Payroll_ParameterAbstract/ValidUntil.Label</property>
+        </field>
     </definition>
 </ui-table>

@@ -36,5 +36,10 @@
             <value>toBeSet</value>
             <description>OIDs of the movement type attribute definition that should be added with the end date in the afp report.</description>
         </attribute>
+        <attribute>
+            <key>org.efaps.payroll.WhiteList4RuleSandbox</key>
+            <value>org.efaps.esjp.payroll.rules.IncomeTax5</value>
+            <description></description>
+        </attribute>
     </definition>
 </common-systemconfiguration>

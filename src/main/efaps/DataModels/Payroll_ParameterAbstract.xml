@@ -65,6 +65,18 @@
             <sqltable>Payroll_ParameterSQLTable</sqltable>
             <sqlcolumn>DESCR</sqlcolumn>
         </attribute>
+          <attribute>
+            <name>ValidFrom</name>
+            <type>Date</type>
+            <sqltable>Payroll_ParameterSQLTable</sqltable>
+            <sqlcolumn>VALIDFROM</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>ValidUntil</name>
+            <type>Date</type>
+            <sqltable>Payroll_ParameterSQLTable</sqltable>
+            <sqlcolumn>VALIDUNTIL</sqlcolumn>
+        </attribute>
          <attribute>
             <name>Creator</name>
             <type>CreatorLink</type>
