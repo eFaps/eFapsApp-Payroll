@@ -1106,8 +1106,10 @@ public abstract class Payslip_Base
 
         values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
                         "ExtraLaborTime", DBProperties.getProperty("Payroll_Payslip/ExtraLaborTime.Label")));
-        values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
-                        "LaborTime", DBProperties.getProperty("Payroll_Payslip/LaborTime.Label")));
+        final DropDownPosition labeOp = new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
+                        "LaborTime", DBProperties.getProperty("Payroll_Payslip/LaborTime.Label"));
+        labeOp.setSelected(true);
+        values.add(0, labeOp);
 
         ret.put(ReturnValues.VALUES, values);
         return ret;
@@ -1164,14 +1166,60 @@ public abstract class Payslip_Base
                     }
                     break;
                 default:
+                    final PrintQuery print = new PrintQuery(selected);
+                    print.addAttribute(CIPayroll.RuleAbstract.Key);
+                    print.execute();
+                    final String key = print.getAttribute(CIPayroll.RuleAbstract.Key);
+
+                    final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+                    queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key, key);
+                    queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, insts.toArray());
+
+                    final MultiPrintQuery multi2 = queryBldr.getPrint();
+                    final SelectBuilder selDocName = SelectBuilder.get()
+                                    .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink)
+                                    .attribute(CIPayroll.DocumentAbstract.Name);
+                    final SelectBuilder selEmp2 = SelectBuilder.get()
+                                    .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink)
+                                    .linkto(CIPayroll.Payslip.EmployeeAbstractLink);
+                    final SelectBuilder selEmpFirstName2 = new SelectBuilder(selEmp2)
+                                    .attribute(CIHumanResource.Employee.FirstName);
+                    final SelectBuilder selEmpLastName2 = new SelectBuilder(selEmp2)
+                                    .attribute(CIHumanResource.Employee.LastName);
+                    final SelectBuilder selEmpSecLastName2 = new SelectBuilder(selEmp2)
+                                    .attribute(CIHumanResource.Employee.SecondLastName);
+                    final SelectBuilder selCurrSymb =  SelectBuilder.get()
+                                       .linkto(CIPayroll.PositionAbstract.RateCurrencyLink)
+                                       .attribute(CIERP.Currency.Symbol);
+                    multi2.addSelect(selDocName, selEmpFirstName2, selEmpLastName2, selEmpSecLastName2, selCurrSymb);
+                    multi2.addAttribute(CIPayroll.PositionAbstract.RateAmount);
+                    multi2.execute();
+                    while (multi2.next()) {
+                        final String employee = multi2.getSelect(selEmpLastName2) + " "
+                                        + multi2.getSelect(selEmpSecLastName2) + ", "
+                                        + multi2.getSelect(selEmpFirstName2);
+                        final String id1 = RandomStringUtils.randomAlphanumeric(8);
+                        final String id2 = RandomStringUtils.randomAlphanumeric(8);
+                        map.put(id1, id2);
+                        table.addRow().addColumn("<input type=\"checkbox\" name=\"oid\" value=\""
+                                            + multi2.getCurrentInstance().getOid() + "\" id=\"" + id1 + "\" >")
+                            .addColumn(multi2.<String>getSelect(selDocName))
+                            .addColumn(employee)
+                            .addColumn("<input disabled=\"disabled\" name=\"newValue\" value=\""
+                                            + multi2.getAttribute(CIPayroll.PositionAbstract.RateAmount)
+                                            + "\" id=\"" + id2 + "\"></input>")
+                            .addColumn(multi2.<String>getSelect(selCurrSymb));
+                    }
+
                     break;
             }
             final StringBuilder js = new StringBuilder();
 
             for (final Entry<String, String> entry  :map.entrySet()) {
                 js.append("on(dom.byId(\"").append(entry.getKey()).append("\"), \"click\", function(evt){")
-                    .append("dom.byId(\"").append(entry.getValue()).append("\").disabled = evt.currentTarget.checked ? '' : 'disabled';")
-                    .append("});");
+                    .append("dom.byId(\"").append(entry.getValue())
+                    .append("\").disabled = evt.currentTarget.checked ? '' : 'disabled';")
+                    .append("});\n");
             }
             final StringBuilder html = InterfaceUtils.wrappInScriptTag(_parameter,
                             InterfaceUtils.wrapInDojoRequire(_parameter, js, DojoLibs.ON, DojoLibs.DOM), true, 1500);
@@ -1191,9 +1239,27 @@ public abstract class Payslip_Base
         final String[] values = _parameter.getParameterValues("newValue");
         if (oids != null && values != null && oids.length == values.length) {
             for (int i = 0; i < values.length; i++) {
-                final Instance instance = Instance.get(oids[i]);
-
-                final PrintQuery print = new PrintQuery(instance);
+                final Instance tmpInst = Instance.get(oids[i]);
+                final Instance docInst;
+                final Map<Instance, BigDecimal> _mapping = new HashMap<>();
+                if (tmpInst.getType().isKindOf(CIPayroll.PositionAbstract)) {
+                    final PrintQuery print = new PrintQuery(tmpInst);
+                    final SelectBuilder selDocInst = SelectBuilder.get()
+                                    .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink).instance();
+                    print.addSelect(selDocInst);
+                    print.execute();
+                    docInst = print.getSelect(selDocInst);
+                    try {
+                        final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
+                                        .parse(values[i]);
+                        _mapping.put(tmpInst, amount);
+                    } catch (final ParseException e) {
+                        LOG.error("Catched ParserException", e);
+                    }
+                } else {
+                    docInst = tmpInst;
+                }
+                final PrintQuery print = new PrintQuery(docInst);
                 final SelectBuilder selRateCurInst = SelectBuilder.get().linkto(CIPayroll.Payslip.RateCurrencyId)
                                 .instance();
                 print.addSelect(selRateCurInst);
@@ -1207,7 +1273,7 @@ public abstract class Payslip_Base
                 final Object[] laborTime = print.getAttribute(CIPayroll.Payslip.LaborTime);
                 final Object[] extraLaborTime = print.getAttribute(CIPayroll.Payslip.ExtraLaborTime);
 
-                final Update update = new Update(instance);
+                final Update update = new Update(docInst);
                 if (selected.equals("LaborTime")) {
                     update.add(CIPayroll.Payslip.LaborTime, new Object[] { values[i], laborTime[1] });
                 }
@@ -1216,12 +1282,12 @@ public abstract class Payslip_Base
                 }
                 update.execute();
 
-                final List<? extends AbstractRule<?>> rules = analyseRulesFomDoc(_parameter, instance);
+                final List<? extends AbstractRule<?>> rules = analyseRulesFomDoc(_parameter, docInst, _mapping);
                 final Result result = Calculator.getResult(_parameter, rules);
-                updateTotals(_parameter, instance, result, rateCurrInst, rateObj);
-                updatePositions(_parameter, instance, result, rateCurrInst, rateObj);
+                updateTotals(_parameter, docInst, result, rateCurrInst, rateObj);
+                updatePositions(_parameter, docInst, result, rateCurrInst, rateObj);
 
-                final EditedDoc editedDoc = new EditedDoc(instance);
+                final EditedDoc editedDoc = new EditedDoc(docInst);
                 createReport(_parameter, editedDoc);
             }
         }
@@ -1230,6 +1296,14 @@ public abstract class Payslip_Base
 
     protected List<? extends AbstractRule<?>> analyseRulesFomDoc(final Parameter _parameter,
                                                                  final Instance _docInst)
+        throws EFapsException
+    {
+        return analyseRulesFomDoc(_parameter, _docInst, new HashMap<Instance, BigDecimal>());
+    }
+
+    protected List<? extends AbstractRule<?>> analyseRulesFomDoc(final Parameter _parameter,
+                                                                 final Instance _docInst,
+                                                                 final Map<Instance, BigDecimal> _mapping)
         throws EFapsException
     {
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
@@ -1242,8 +1316,13 @@ public abstract class Payslip_Base
         multi.execute();
         final Map<Instance, BigDecimal> map = new HashMap<>();
         while (multi.next()) {
-            map.put(multi.<Instance>getSelect(selRulsInst),
-                            multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.RateAmount));
+            final BigDecimal amount;
+            if (_mapping.containsKey(multi.getCurrentInstance())) {
+                amount =_mapping.get(multi.getCurrentInstance());
+            } else {
+                amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.RateAmount);
+            }
+            map.put(multi.<Instance>getSelect(selRulsInst), amount);
         }
         final List<? extends AbstractRule<?>> ret = AbstractRule.getRules(map.keySet().toArray(
                         new Instance[map.size()]));

@@ -254,7 +254,7 @@ public abstract class AbstractParameter_Base<T>
     {
         if (!_map.containsKey(AbstractParameter.PARAKEY4DATE)) {
             DateTime date = null;
-            if (_docInst != null && _docInst.isValid()) {
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
                 final PrintQuery print = new PrintQuery(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date);
                 print.executeWithoutAccessCheck();

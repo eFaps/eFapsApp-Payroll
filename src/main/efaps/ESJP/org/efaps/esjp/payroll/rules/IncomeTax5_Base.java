@@ -106,8 +106,8 @@ public abstract class IncomeTax5_Base
             final BigDecimal base = getCurrent(_context, IncomeTax5.KEYS4PAYMENT);
             final BigDecimal extra = getCurrent(_context, IncomeTax5.KEYS4EXTRA);
 
-            final BigDecimal payed = getPrevious(_context, IncomeTax5.KEYS4PAYMENT, 12);
-            final BigDecimal extraPayed = getPrevious(_context, IncomeTax5.KEYS4EXTRA, 12);
+            final BigDecimal payed = getPrevious(_context, IncomeTax5.KEYS4PAYMENT, date.getMonthOfYear() - 1);
+            final BigDecimal extraPayed = getPrevious(_context, IncomeTax5.KEYS4EXTRA, date.getMonthOfYear() - 1);
 
             final int currentMonth = date.getMonthOfYear();
 
@@ -212,6 +212,4 @@ public abstract class IncomeTax5_Base
         }
         return ret;
     }
-
-
 }

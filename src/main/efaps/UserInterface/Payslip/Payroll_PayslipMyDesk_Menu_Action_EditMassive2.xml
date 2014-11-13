@@ -35,6 +35,9 @@
         <target>
             <form>Payroll_PayslipEditMassiveUpdateForm</form>
             <execute program="org.efaps.esjp.payroll.Payslip" method="edit4Massive" >
+                <property name="JasperReport">Payroll_Payslip</property>
+                <property name="Mime">pdf</property>
+                <property name="NoDataSource">true</property>
             </execute>
         </target>
         <property name="Target">modal</property>

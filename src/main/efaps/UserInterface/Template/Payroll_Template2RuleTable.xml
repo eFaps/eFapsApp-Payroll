@@ -28,7 +28,12 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_Template2RuleTable</name>
-         <field name="sequence">
+        <field name="type">
+            <property name="Select">type.label</property>
+            <property name="Label">Payroll_Template2RuleAbstract/Type.Label</property>
+            <property name="HRef">TREE</property>
+        </field>
+        <field name="sequence">
             <property name="Attribute">Sequence</property>
             <property name="Label">Payroll_Template2RuleTable.sequence.Label</property>
         </field>
