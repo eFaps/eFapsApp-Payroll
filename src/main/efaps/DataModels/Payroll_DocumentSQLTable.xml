@@ -43,6 +43,12 @@
             <column name="EXTRATIME"        type="DECIMAL"                      length="16" scale="6"/>
             <column name="EXTRATIMEUOMID"   type="INTEGER"/>
             <column name="EXTRATIMEBASE"    type="REAL"/>
+            <column name="NIGHTTIME"        type="DECIMAL"                      length="16" scale="6"/>
+            <column name="NIGHTTIMEUOMID"   type="INTEGER"/>
+            <column name="NIGHTTIMEBASE"    type="REAL"/>
+            <column name="HOLIDAYTIME"      type="DECIMAL"                      length="16" scale="6"/>
+            <column name="HOLIDAYTIMEUOMID" type="INTEGER"/>
+            <column name="HOLIDAYTIMEBASE"  type="REAL"/>
             <column name="MOVEMENTTYPE"     type="INTEGER"/>
             <foreign name="T_PRDOC_EMPLOYEEID"   key="EMPLOYEEID"      reference="T_HREMPLOYEE(ID)"/>
         </database>

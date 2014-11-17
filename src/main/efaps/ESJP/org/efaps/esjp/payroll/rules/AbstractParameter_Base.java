@@ -20,18 +20,23 @@
 
 package org.efaps.esjp.payroll.rules;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.db.CachedPrintQuery;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
@@ -43,6 +48,12 @@ import org.joda.time.DateTime;
  * @version $Id: AbstractParameter_Base.java 13971 2014-09-08 21:03:58Z
  *          jan@moxter.net $
  */
+/**
+ * TODO comment!
+ *
+ * @author The eFaps Team
+ * @version $Id$
+ */
 @EFapsUUID("45fcf09d-d676-4ac1-8f15-5f790f2eaf03")
 @EFapsRevision("$Rev$")
 public abstract class AbstractParameter_Base<T>
@@ -51,6 +62,16 @@ public abstract class AbstractParameter_Base<T>
     protected static final String PARAKEY4EMPLOYINST = "EmployeeInstance";
 
     protected static final String PARAKEY4DATE = "Date";
+
+    protected static final String PARAKEY4LT = "LaborTime";
+
+    protected static final String PARAKEY4ELT = "ExtraLaborTime";
+
+    protected static final String PARAKEY4NLT = "NightLaborTime";
+
+    protected static final String PARAKEY4HLT = "HolidayLaborTime";
+
+
     /**
      * Instance of the rule.
      */
@@ -197,7 +218,7 @@ public abstract class AbstractParameter_Base<T>
     {
         final Map<String, Object> ret = new HashMap<>();
 
-        AbstractParameter.addDate(_parameter, ret, _docInst);
+        AbstractParameter.add2Parameters(_parameter, ret, _docInst);
         DateTime date;
         if (ret.containsKey(AbstractParameter.PARAKEY4DATE)) {
             date = (DateTime) ret.get(AbstractParameter.PARAKEY4DATE);
@@ -234,29 +255,37 @@ public abstract class AbstractParameter_Base<T>
         return ret;
     }
 
+
     /**
-     * @param _parameter
+     * @param _parameter parameter as passed by the eFaps API
+     * @param _map map to add to
+     * @throws EFapsException on error
      */
-    protected static void addDate(final Parameter _parameter,
-                                  final Map<String, Object> _map)
+    protected static void add2Parameters(final Parameter _parameter,
+                                         final Map<String, Object> _map)
         throws EFapsException
     {
-        addDate(_parameter, _map, null);
+        AbstractParameter.add2Parameters(_parameter, _map, null);
     }
 
     /**
-     * @param _parameter
+     * @param _parameter parameter as passed by the eFaps API
+     * @param _map map to add to
+     * @param _docInst instance of the document to be evaluated for parameters
+     * @throws EFapsException on error
      */
-    protected static void addDate(final Parameter _parameter,
-                                  final Map<String, Object> _map,
-                                  final Instance _docInst)
+    protected static void add2Parameters(final Parameter _parameter,
+                                         final Map<String, Object> _map,
+                                         final Instance _docInst)
         throws EFapsException
     {
         if (!_map.containsKey(AbstractParameter.PARAKEY4DATE)) {
             DateTime date = null;
             if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
-                final PrintQuery print = new PrintQuery(_docInst);
-                print.addAttribute(CIPayroll.DocumentAbstract.Date);
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
+                                CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
                 date = print.getAttribute(CIPayroll.DocumentAbstract.Date);
             } else {
@@ -267,6 +296,115 @@ public abstract class AbstractParameter_Base<T>
             }
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4DATE, date);
+            }
+        }
+        if (!_map.containsKey(AbstractParameter.PARAKEY4LT)) {
+            BigDecimal laborTime = null;
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
+                                CIPayroll.DocumentAbstract.NightLaborTime);
+                print.executeWithoutAccessCheck();
+                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.LaborTime)[0];
+            } else {
+                try {
+                    final String laborTimeStr = _parameter
+                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
+                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
+                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
+                    } else {
+                        laborTime = BigDecimal.ZERO;
+                    }
+                } catch (final ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            }
+            if (laborTime != null) {
+                _map.put(AbstractParameter.PARAKEY4LT, Calculator.toJexlBigDecimal(_parameter, laborTime));
+            }
+        }
+        if (!_map.containsKey(AbstractParameter.PARAKEY4ELT)) {
+            BigDecimal laborTime = null;
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
+                                CIPayroll.DocumentAbstract.NightLaborTime);
+                print.executeWithoutAccessCheck();
+                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.ExtraLaborTime)[0];
+            } else {
+                try {
+                    final String laborTimeStr = _parameter
+                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
+                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
+                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
+                    } else {
+                        laborTime = BigDecimal.ZERO;
+                    }
+                } catch (final ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if (laborTime != null) {
+                _map.put(AbstractParameter.PARAKEY4ELT, Calculator.toJexlBigDecimal(_parameter, laborTime));
+            }
+        }
+        if (!_map.containsKey(AbstractParameter.PARAKEY4HLT)) {
+            BigDecimal laborTime = null;
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
+                                CIPayroll.DocumentAbstract.NightLaborTime);
+                print.executeWithoutAccessCheck();
+                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime)[0];
+            } else {
+                try {
+                    final String laborTimeStr = _parameter
+                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.holidayLaborTime.name);
+                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
+                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
+                    } else {
+                        laborTime = BigDecimal.ZERO;
+                    }
+                } catch (final ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if (laborTime != null) {
+                _map.put(AbstractParameter.PARAKEY4HLT, Calculator.toJexlBigDecimal(_parameter, laborTime));
+            }
+        }
+        if (!_map.containsKey(AbstractParameter.PARAKEY4NLT)) {
+            BigDecimal laborTime = null;
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
+                                CIPayroll.DocumentAbstract.NightLaborTime);
+                print.executeWithoutAccessCheck();
+                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.NightLaborTime)[0];
+            } else {
+                try {
+                    final String laborTimeStr = _parameter
+                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.nightLaborTime.name);
+                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
+                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
+                    } else {
+                        laborTime = BigDecimal.ZERO;
+                    }
+                } catch (final ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if (laborTime != null) {
+                _map.put(AbstractParameter.PARAKEY4NLT, Calculator.toJexlBigDecimal(_parameter, laborTime));
             }
         }
     }

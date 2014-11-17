@@ -63,6 +63,20 @@
             <sqltable>Payroll_DocumentSQLTable</sqltable>
             <sqlcolumn>EXTRATIME,EXTRATIMEUOMID,EXTRATIMEBASE</sqlcolumn>
         </attribute>
+         <attribute>
+            <name>NightLaborTime</name>
+            <type>DecimalWithUoM</type>
+            <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>NIGHTTIME,NIGHTTIMEUOMID,NIGHTTIMEBASE</sqlcolumn>
+        </attribute>
+         <attribute>
+            <name>HolidayLaborTime</name>
+            <type>DecimalWithUoM</type>
+            <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>HOLIDAYTIME,HOLIDAYTIMEUOMID,HOLIDAYTIMEBASE</sqlcolumn>
+        </attribute>
         <attribute>
             <name>MovementType</name>
             <type>LinkWithRanges</type>

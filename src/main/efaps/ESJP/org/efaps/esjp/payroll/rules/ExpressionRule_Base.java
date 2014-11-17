@@ -22,6 +22,7 @@ package org.efaps.esjp.payroll.rules;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlException;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
@@ -31,7 +32,8 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: ExpressionRule_Base.java 13984 2014-09-10 14:56:29Z
+ *          jan@moxter.net $
  */
 @EFapsUUID("e1c6f718-a232-47ed-beda-fa2cc87e985d")
 @EFapsRevision("$Rev$")
@@ -51,11 +53,15 @@ public abstract class ExpressionRule_Base
                          final JexlContext _context)
         throws EFapsException
     {
-        final Expression expr = Calculator.getJexlEngine().createExpression(getExpression());
-        final Object val = expr.evaluate(_context);
-        setMessage(Calculator.getMessageLog().getMessage());
-        _context.set(getKey4Expression(), val);
-        setResult(val);
+        try {
+            final Expression expr = Calculator.getJexlEngine().createExpression(getExpression());
+            final Object val = expr.evaluate(_context);
+            setMessage(Calculator.getMessageLog().getMessage());
+            _context.set(getKey4Expression(), val);
+            setResult(val);
+        } catch (final JexlException e) {
+            throw new EFapsException("Catched JexlException", e);
+        }
     }
 
     @Override

@@ -34,6 +34,7 @@
         <name>Payroll_PayslipForm</name>
         <field name="type">
             <property name="Attribute">Type</property>
+            <property name="ModeEdit">NONE</property>
         </field>
         <field name="nameGroup" character="Group">
             <property name="GroupCount">3</property>
@@ -64,11 +65,6 @@
                      method="dateValueUI"
                      name="Payroll_PayslipForm.duedate.UI_FIELD_VALUE"
                      event="UI_FIELD_VALUE" />
-        </field>
-        <field name="movementType">
-            <property name="Attribute">MovementType</property>
-            <property name="ModeEdit">EDITABLE</property>
-            <property name="ModeCreate">EDITABLE</property>
         </field>
         <field name="employee">
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
@@ -117,6 +113,22 @@
             <property name="ModeCreate">EDITABLE</property>
             <property name="Required">true</property>
         </field>
+         <field name="laborTimeGroup2" character="Group">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+        </field>
+         <field name="nightLaborTime">
+            <property name="Attribute">NightLaborTime</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
+        <field name="holidayLaborTime">
+            <property name="Attribute">HolidayLaborTime</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
         <field name="rateCrossTotal">
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
@@ -143,6 +155,7 @@
         </field>
         <field name="status">
             <property name="Attribute">Status</property>
+            <property name="ModeEdit">NONE</property>
         </field>
         <field name="caseGroup" character="Group">
             <property name="GroupCount">2</property>

@@ -206,62 +206,57 @@ public abstract class Payslip_Base
         final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
         final Long employeeid = Instance.get(
                         _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.employee.name)).getId();
-        final String laborTimes = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
-        final String laborTimeUoMs = _parameter.getParameterValue("laborTimeUoM");
-        final String extraLaborTimes = _parameter
+        final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
+        final String laborTimeUoM = _parameter.getParameterValue("laborTimeUoM");
+        final String extraLaborTime = _parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
-        final String extraLaborTimeUoMs = _parameter.getParameterValue("extraLaborTimeUoM");
+        final String extraLaborTimeUoM = _parameter.getParameterValue("extraLaborTimeUoM");
+        final String nightLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.nightLaborTime.name);
+        final String nightLaborTimeUoM = _parameter.getParameterValue("nightLaborTimeUoM");
+        final String holidayLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.holidayLaborTime.name);
+        final String holidayLaborTimeUoM = _parameter.getParameterValue("holidayLaborTimeUoM");
+
         final Instance rateCurrInst = getRateCurrencyInstance(_parameter, createdDoc);
 
         final Object[] rateObj = getRateObject(_parameter);
-        ((BigDecimal) rateObj[0]).divide((BigDecimal) rateObj[1], 12,
-                        BigDecimal.ROUND_HALF_UP);
-        try {
-            final DecimalFormat formater = NumberFormatter.get().getTwoDigitsFormatter();
 
-            final Instance baseCurInst = Currency.getBaseCurrency();
+        final Instance baseCurInst = Currency.getBaseCurrency();
 
-            final BigDecimal time = laborTimes != null && !laborTimes.isEmpty()
-                            ? (BigDecimal) formater.parse(laborTimes)
-                            : BigDecimal.ZERO;
-            final BigDecimal extraTime = extraLaborTimes != null && !extraLaborTimes.isEmpty()
-                            ? (BigDecimal) formater.parse(extraLaborTimes)
-                            : BigDecimal.ZERO;
+        final Insert insert = new Insert(CIPayroll.Payslip);
+        insert.add(CIPayroll.Payslip.Name, name);
+        insert.add(CIPayroll.Payslip.Date, date);
+        insert.add(CIPayroll.Payslip.DueDate, dueDate);
+        insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
+        insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
+        insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.Rate, rateObj);
+        insert.add(CIPayroll.Payslip.CrossTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.NetTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.DiscountTotal, 0);
+        insert.add(CIPayroll.Payslip.RateDiscountTotal, 0);
+        insert.add(CIPayroll.Payslip.AmountCost, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.CurrencyId, baseCurInst);
+        insert.add(CIPayroll.Payslip.RateCurrencyId, rateCurrInst);
+        insert.add(CIPayroll.Payslip.LaborTime, new Object[] { laborTime, laborTimeUoM });
+        insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraLaborTime, extraLaborTimeUoM });
+        insert.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { holidayLaborTime, holidayLaborTimeUoM });
+        insert.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
+        insert.execute();
 
-            final Insert insert = new Insert(CIPayroll.Payslip);
-            insert.add(CIPayroll.Payslip.Name, name);
-            insert.add(CIPayroll.Payslip.Date, date);
-            insert.add(CIPayroll.Payslip.DueDate, dueDate);
-            insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
-            insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
-            insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.Rate, rateObj);
-            insert.add(CIPayroll.Payslip.CrossTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.NetTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.DiscountTotal, 0);
-            insert.add(CIPayroll.Payslip.RateDiscountTotal, 0);
-            insert.add(CIPayroll.Payslip.AmountCost, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.CurrencyId, baseCurInst);
-            insert.add(CIPayroll.Payslip.RateCurrencyId, rateCurrInst);
-            insert.add(CIPayroll.Payslip.LaborTime, new Object[] { time, laborTimeUoMs });
-            insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraTime, extraLaborTimeUoMs });
-            insert.execute();
+        final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
+        final Result result = Calculator.getResult(_parameter, rules);
+        updateTotals(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
+        updatePositions(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
 
-            final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
-            final Result result = Calculator.getResult(_parameter, rules);
-            updateTotals(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
-            updatePositions(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
-
-            final File file = createReport(_parameter, createdDoc);
-            if (file != null) {
-                ret.put(ReturnValues.VALUES, file);
-                ret.put(ReturnValues.TRUE, true);
-            }
-
-        } catch (final ParseException e) {
-            throw new EFapsException(Payslip_Base.class, "create.ParseException", e);
+        final File file = createReport(_parameter, createdDoc);
+        if (file != null) {
+            ret.put(ReturnValues.VALUES, file);
+            ret.put(ReturnValues.TRUE, true);
         }
+
         return ret;
     }
 
@@ -309,10 +304,18 @@ public abstract class Payslip_Base
         final String extraLaborTime = _parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
         final String extraLaborTimeUoM = _parameter.getParameterValue("extraLaborTimeUoM");
+        final String nightLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.nightLaborTime.name);
+        final String nightLaborTimeUoM = _parameter.getParameterValue("nightLaborTimeUoM");
+        final String holidayLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipForm.holidayLaborTime.name);
+        final String holidayLaborTimeUoM = _parameter.getParameterValue("holidayLaborTimeUoM");
 
         final Update update = new Update(instance);
         update.add(CIPayroll.Payslip.LaborTime, new Object[] { laborTime, laborTimeUoM });
         update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraLaborTime, extraLaborTimeUoM });
+        update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
+        update.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { holidayLaborTime, holidayLaborTimeUoM });
         update.add(CIPayroll.Payslip.Date, date);
         update.add(CIPayroll.Payslip.DueDate, dueDate);
         update.execute();
@@ -923,15 +926,8 @@ public abstract class Payslip_Base
         }
         table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getNeutralFrmt());
 
-        table.addRow().addColumn(CIPayroll.PositionSum.getType().getLabel())
-                        .getCurrentColumn().setStyle("font-weight: bold;");
-        for (final AbstractRule<?> rule : result.getSumRules()) {
-            table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
-                            .addColumn(String.valueOf(rule.getResult()));
-        }
-        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getSumFrmt());
-        table.addRow().addColumn("");
-        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getTotalFrmt());
+        table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow()
+            .addColumn(result.getTotalFrmt()).getCurrentColumn().setStyle("font-weight: bold;");
         return table.toHtml();
     }
 
@@ -1103,7 +1099,8 @@ public abstract class Payslip_Base
                             _parameter, multi.getCurrentInstance().getOid(), option);
             values.add(position);
         }
-
+        values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
+                        "HolidayLaborTime", DBProperties.getProperty("Payroll_Payslip/HolidayLaborTime.Label")));
         values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
                         "ExtraLaborTime", DBProperties.getProperty("Payroll_Payslip/ExtraLaborTime.Label")));
         final DropDownPosition labeOp = new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
@@ -1134,8 +1131,11 @@ public abstract class Payslip_Base
                             .getParameterValue(CIFormPayroll.Payroll_PayslipEditMassiveSelectForm.select.name);
             final Map<String, String> map = new HashMap<>();
             switch (selected) {
+                case "HolidayLaborTime":
                 case "ExtraLaborTime":
+                case "NightLaborTime":
                 case "LaborTime":
+
                     final MultiPrintQuery multi = new MultiPrintQuery(insts);
                     final SelectBuilder selEmp = SelectBuilder.get()
                                     .linkto(CIPayroll.Payslip.EmployeeAbstractLink);
@@ -1241,7 +1241,7 @@ public abstract class Payslip_Base
             for (int i = 0; i < values.length; i++) {
                 final Instance tmpInst = Instance.get(oids[i]);
                 final Instance docInst;
-                final Map<Instance, BigDecimal> _mapping = new HashMap<>();
+                final Map<Instance, BigDecimal> mapping = new HashMap<>();
                 if (tmpInst.getType().isKindOf(CIPayroll.PositionAbstract)) {
                     final PrintQuery print = new PrintQuery(tmpInst);
                     final SelectBuilder selDocInst = SelectBuilder.get()
@@ -1252,7 +1252,7 @@ public abstract class Payslip_Base
                     try {
                         final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
                                         .parse(values[i]);
-                        _mapping.put(tmpInst, amount);
+                        mapping.put(tmpInst, amount);
                     } catch (final ParseException e) {
                         LOG.error("Catched ParserException", e);
                     }
@@ -1272,6 +1272,8 @@ public abstract class Payslip_Base
                 final Object[] rateObj = print.getAttribute(CIPayroll.Payslip.Rate);
                 final Object[] laborTime = print.getAttribute(CIPayroll.Payslip.LaborTime);
                 final Object[] extraLaborTime = print.getAttribute(CIPayroll.Payslip.ExtraLaborTime);
+                final Object[] holidayLaborTime = print.getAttribute(CIPayroll.Payslip.HolidayLaborTime);
+                final Object[] nightLaborTime = print.getAttribute(CIPayroll.Payslip.NightLaborTime);
 
                 final Update update = new Update(docInst);
                 if (selected.equals("LaborTime")) {
@@ -1280,9 +1282,15 @@ public abstract class Payslip_Base
                 if (selected.equals("ExtraLaborTime")) {
                     update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { values[i], extraLaborTime[1] });
                 }
+                if (selected.equals("HolidayLaborTime")) {
+                    update.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { values[i], holidayLaborTime[1] });
+                }
+                if (selected.equals("NightLaborTime")) {
+                    update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { values[i], nightLaborTime[1] });
+                }
                 update.execute();
 
-                final List<? extends AbstractRule<?>> rules = analyseRulesFomDoc(_parameter, docInst, _mapping);
+                final List<? extends AbstractRule<?>> rules = analyseRulesFomDoc(_parameter, docInst, mapping);
                 final Result result = Calculator.getResult(_parameter, rules);
                 updateTotals(_parameter, docInst, result, rateCurrInst, rateObj);
                 updatePositions(_parameter, docInst, result, rateCurrInst, rateObj);
