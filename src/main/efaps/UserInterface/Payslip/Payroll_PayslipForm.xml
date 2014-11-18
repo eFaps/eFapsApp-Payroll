@@ -38,11 +38,16 @@
         </field>
         <field name="nameGroup" character="Group">
             <property name="GroupCount">3</property>
-            <property name="ModeCreate">READONLY</property>
         </field>
         <field name="name">
             <property name="ModeSearch">EDITABLE</property>
             <property name="Attribute">Name</property>
+        </field>
+        <field name="dateGroup" character="Group">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModeView">NONE</property>
         </field>
         <field name="date">
             <property name="Columns">12</property>
