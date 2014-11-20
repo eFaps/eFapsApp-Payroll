@@ -18,17 +18,17 @@
  * Last Changed By: $Author$
  */
 
-
 package org.efaps.esjp.payroll.util;
 
 import java.util.UUID;
 
 import org.efaps.admin.common.SystemConfiguration;
+import org.efaps.admin.datamodel.IBitEnum;
 import org.efaps.admin.datamodel.IEnum;
+import org.efaps.admin.datamodel.attributetype.BitEnumType;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.util.cache.CacheReloadException;
-
 
 /**
  * TODO comment!
@@ -38,9 +38,9 @@ import org.efaps.util.cache.CacheReloadException;
  */
 @EFapsUUID("e773a372-0d29-41bf-b064-c2fd1f84b279")
 @EFapsRevision("$Rev$")
-
 public final class Payroll
 {
+
     /**
      * Singelton.
      */
@@ -58,6 +58,33 @@ public final class Payroll
 
         @Override
         public int getInt()
+        {
+            return ordinal();
+        }
+    }
+
+    public enum RuleConfig
+        implements IBitEnum
+    {
+        /**
+         * Exclude it if it is Zero.
+         */
+        EXCLUDEZERO;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getInt()
+        {
+            return BitEnumType.getInt4Index(ordinal());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getBitIndex()
         {
             return ordinal();
         }

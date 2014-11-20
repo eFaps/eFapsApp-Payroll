@@ -20,6 +20,7 @@
 
 package org.efaps.esjp.payroll.rules;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.PrintQuery;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.payroll.util.Payroll.RuleConfig;
 import org.efaps.esjp.payroll.util.Payroll.RuleType;
 import org.efaps.util.EFapsException;
 
@@ -45,6 +47,7 @@ import org.efaps.util.EFapsException;
 @EFapsRevision("$Rev$")
 public abstract class AbstractRule_Base<T>
 {
+
     /**
      * Instance of the rule.
      */
@@ -64,6 +67,8 @@ public abstract class AbstractRule_Base<T>
 
     private RuleType ruleType;
 
+    private List<RuleConfig> config;
+
     protected void init()
         throws EFapsException
     {
@@ -71,12 +76,14 @@ public abstract class AbstractRule_Base<T>
             setInitialized(true);
             final PrintQuery print = new PrintQuery(getInstance());
             print.addAttribute(CIPayroll.RuleAbstract.Key, CIPayroll.RuleAbstract.Description,
-                            CIPayroll.RuleAbstract.Expression, CIPayroll.RuleAbstract.RuleType);
+                            CIPayroll.RuleAbstract.Expression, CIPayroll.RuleAbstract.RuleType,
+                            CIPayroll.RuleAbstract.Config);
             print.execute();
             initInternal(print);
             setKey(print.<String>getAttribute(CIPayroll.RuleAbstract.Key));
             setDescription(print.<String>getAttribute(CIPayroll.RuleAbstract.Description));
             setRuleType(print.<RuleType>getAttribute(CIPayroll.RuleAbstract.RuleType));
+            setConfig(print.<List<RuleConfig>>getAttribute(CIPayroll.RuleAbstract.Config));
         }
     }
 
@@ -290,17 +297,45 @@ public abstract class AbstractRule_Base<T>
         this.ruleType = _ruletype;
     }
 
-    protected static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
+    /**
+     * @return
+     */
+    public boolean add()
     {
-        final List<AbstractRule<?>> ret = new ArrayList<>();
-        for (final Instance inst : _ruleInsts) {
-            if (inst.getType().isCIType(CIPayroll.RuleInput)) {
-                ret.add(new InputRule().setInstance(inst));
-            } else if (inst.getType().isCIType(CIPayroll.RuleExpression)) {
-                ret.add(new ExpressionRule().setInstance(inst));
+        boolean ret = true;
+        final Object obj = getResult();
+        if (getConfig() != null && getConfig().contains(RuleConfig.EXCLUDEZERO)) {
+            if (obj != null) {
+                if (obj instanceof BigDecimal) {
+                    ret = ((BigDecimal) obj).compareTo(BigDecimal.ZERO) > 0;
+                } else if (obj instanceof Integer) {
+                    ret = (Integer) obj > 0;
+                } else if (obj instanceof Double) {
+                    ret = (Double) obj > 0;
+                }
             }
         }
         return ret;
+    }
+
+    /**
+     * Getter method for the instance variable {@link #config}.
+     *
+     * @return value of instance variable {@link #config}
+     */
+    public List<RuleConfig> getConfig()
+    {
+        return this.config;
+    }
+
+    /**
+     * Setter method for instance variable {@link #config}.
+     *
+     * @param _config value for instance variable {@link #config}
+     */
+    public void setConfig(final List<RuleConfig> _config)
+    {
+        this.config = _config;
     }
 
     @Override
@@ -316,5 +351,18 @@ public abstract class AbstractRule_Base<T>
         return new ToStringBuilder(this)
                         .append("key", keyTmp)
                         .append("result", getResult()).toString();
+    }
+
+    protected static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
+    {
+        final List<AbstractRule<?>> ret = new ArrayList<>();
+        for (final Instance inst : _ruleInsts) {
+            if (inst.getType().isCIType(CIPayroll.RuleInput)) {
+                ret.add(new InputRule().setInstance(inst));
+            } else if (inst.getType().isCIType(CIPayroll.RuleExpression)) {
+                ret.add(new ExpressionRule().setInstance(inst));
+            }
+        }
+        return ret;
     }
 }

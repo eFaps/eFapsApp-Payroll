@@ -363,55 +363,57 @@ public abstract class Payslip_Base
         final Iterator<Instance> posIter = posInsts.iterator();
         int idx = 1;
         for (final AbstractRule<?> rule : _result.getRules()) {
-            CIType ciType;
-            switch (rule.getRuleType()) {
-                case PAYMENT:
-                    ciType = CIPayroll.PositionPayment;
-                    break;
-                case DEDUCTION:
-                    ciType = CIPayroll.PositionDeduction;
-                    break;
-                case NEUTRAL:
-                    ciType = CIPayroll.PositionNeutral;
-                    break;
-                default:
-                    ciType = CIPayroll.PositionSum;
-            }
+            if (rule.add()) {
+                CIType ciType;
+                switch (rule.getRuleType()) {
+                    case PAYMENT:
+                        ciType = CIPayroll.PositionPayment;
+                        break;
+                    case DEDUCTION:
+                        ciType = CIPayroll.PositionDeduction;
+                        break;
+                    case NEUTRAL:
+                        ciType = CIPayroll.PositionNeutral;
+                        break;
+                    default:
+                        ciType = CIPayroll.PositionSum;
+                }
 
-            Update update;
-            Instance posInst = null;
-            if (posIter.hasNext()) {
-                posInst = posIter.next();
+                Update update;
+                Instance posInst = null;
+                if (posIter.hasNext()) {
+                    posInst = posIter.next();
 
-                if (posInst.getType().isCIType(ciType)) {
-                    update = new Update(posInst);
+                    if (posInst.getType().isCIType(ciType)) {
+                        update = new Update(posInst);
+                    } else {
+                        update = new Insert(ciType);
+                        update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
+                        new Delete(posInst).execute();
+                    }
                 } else {
                     update = new Insert(ciType);
                     update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
-                    new Delete(posInst).execute();
                 }
-            } else {
-                update = new Insert(ciType);
-                update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
+
+                final BigDecimal rateAmount = _result.getBigDecimal(rule.getResult())
+                                .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+
+                final BigDecimal amount = rateAmount.divide(rate, BigDecimal.ROUND_HALF_UP)
+                                .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+
+                update.add(CIPayroll.PositionAbstract.RuleAbstractLink, rule.getInstance());
+                update.add(CIPayroll.PositionAbstract.PositionNumber, idx);
+                update.add(CIPayroll.PositionAbstract.Description, rule.getDescription());
+                update.add(CIPayroll.PositionAbstract.Key, rule.getKey());
+                update.add(CIPayroll.PositionAbstract.RateAmount, rateAmount);
+                update.add(CIPayroll.PositionAbstract.Rate, _rateObj);
+                update.add(CIPayroll.PositionAbstract.Amount, amount);
+                update.add(CIPayroll.PositionAbstract.CurrencyLink, baseCurIns);
+                update.add(CIPayroll.PositionAbstract.RateCurrencyLink, _rateCurInst);
+                update.execute();
+                idx++;
             }
-
-            final BigDecimal rateAmount = _result.getBigDecimal(rule.getResult())
-                            .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-
-            final BigDecimal amount = rateAmount.divide(rate, BigDecimal.ROUND_HALF_UP)
-                            .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-
-            update.add(CIPayroll.PositionAbstract.RuleAbstractLink, rule.getInstance());
-            update.add(CIPayroll.PositionAbstract.PositionNumber, idx);
-            update.add(CIPayroll.PositionAbstract.Description, rule.getDescription());
-            update.add(CIPayroll.PositionAbstract.Key, rule.getKey());
-            update.add(CIPayroll.PositionAbstract.RateAmount, rateAmount);
-            update.add(CIPayroll.PositionAbstract.Rate, _rateObj);
-            update.add(CIPayroll.PositionAbstract.Amount, amount);
-            update.add(CIPayroll.PositionAbstract.CurrencyLink, baseCurIns);
-            update.add(CIPayroll.PositionAbstract.RateCurrencyLink, _rateCurInst);
-            update.execute();
-            idx++;
         }
 
         while (posIter.hasNext()) {
@@ -905,24 +907,30 @@ public abstract class Payslip_Base
         table.addRow().addColumn(CIPayroll.PositionPayment.getType().getLabel())
                         .getCurrentColumn().setStyle("font-weight: bold;");
         for (final AbstractRule<?> rule : result.getPaymentRules()) {
-            table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
-                            .addColumn(String.valueOf(rule.getResult()));
+            if (rule.add()) {
+                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+                    .addColumn(String.valueOf(rule.getResult()));
+            }
         }
         table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getPaymentFrmt());
 
         table.addRow().addColumn(CIPayroll.PositionDeduction.getType().getLabel())
                         .getCurrentColumn().setStyle("font-weight: bold;");
         for (final AbstractRule<?> rule : result.getDeductionRules()) {
-            table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+            if (rule.add()) {
+                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
                             .addColumn(String.valueOf(rule.getResult()));
+            }
         }
         table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getDeductionFrmt());
 
         table.addRow().addColumn(CIPayroll.PositionNeutral.getType().getLabel())
                         .getCurrentColumn().setStyle("font-weight: bold;");
         for (final AbstractRule<?> rule : result.getNeutralRules()) {
-            table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
+            if (rule.add()) {
+                table.addRow().addColumn(rule.getKey()).addColumn(rule.getDescription())
                             .addColumn(String.valueOf(rule.getResult()));
+            }
         }
         table.addRow().addColumn("").getCurrentColumn().setColSpan(2).getRow().addColumn(result.getNeutralFrmt());
 
@@ -1099,8 +1107,11 @@ public abstract class Payslip_Base
                             _parameter, multi.getCurrentInstance().getOid(), option);
             values.add(position);
         }
+
         values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
                         "HolidayLaborTime", DBProperties.getProperty("Payroll_Payslip/HolidayLaborTime.Label")));
+        values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
+                        "NightLaborTime", DBProperties.getProperty("Payroll_Payslip/NightLaborTime.Label")));
         values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
                         "ExtraLaborTime", DBProperties.getProperty("Payroll_Payslip/ExtraLaborTime.Label")));
         final DropDownPosition labeOp = new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
@@ -1326,7 +1337,7 @@ public abstract class Payslip_Base
         while (multi.next()) {
             final BigDecimal amount;
             if (_mapping.containsKey(multi.getCurrentInstance())) {
-                amount =_mapping.get(multi.getCurrentInstance());
+                amount = _mapping.get(multi.getCurrentInstance());
             } else {
                 amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.RateAmount);
             }

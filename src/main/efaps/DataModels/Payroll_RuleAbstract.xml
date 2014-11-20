@@ -78,6 +78,13 @@
             <sqltable>Payroll_RuleSQLTable</sqltable>
             <sqlcolumn>RULETYPE</sqlcolumn>
         </attribute>
+         <attribute>
+            <name>Config</name>
+            <type>BitEnum</type>
+            <className>org.efaps.esjp.payroll.util.Payroll$RuleConfig</className>
+            <sqltable>Payroll_RuleSQLTable</sqltable>
+            <sqlcolumn>CONFIG</sqlcolumn>
+        </attribute>
         <attribute>
             <name>Creator</name>
             <type>CreatorLink</type>

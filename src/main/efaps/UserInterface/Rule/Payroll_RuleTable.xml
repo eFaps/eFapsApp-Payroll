@@ -50,6 +50,10 @@
             <property name="Label">Payroll_RuleAbstract/RuleType.Label</property>
             <property name="ModeSearch">READONLY</property>
         </field>
+        <field name="config">
+            <property name="Attribute">Config</property>
+            <property name="Label">Payroll_RuleAbstract/Config.Label</property>
+        </field>
          <field name="note">
             <property name="Attribute">Note</property>
             <property name="Label">Payroll_RuleAbstract/Note.Label</property>
