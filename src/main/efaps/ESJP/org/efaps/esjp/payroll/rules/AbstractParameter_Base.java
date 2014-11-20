@@ -40,49 +40,78 @@ import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * TODO comment!
- *
- * @author The eFaps Team
- * @version $Id: AbstractParameter_Base.java 13971 2014-09-08 21:03:58Z
- *          jan@moxter.net $
- */
 /**
  * TODO comment!
  *
  * @author The eFaps Team
  * @version $Id$
+ * @param <T> type of parameter
  */
 @EFapsUUID("45fcf09d-d676-4ac1-8f15-5f790f2eaf03")
 @EFapsRevision("$Rev$")
 public abstract class AbstractParameter_Base<T>
 {
-
+    /**
+     * Key for a parameter containing the instance of the employee.
+     */
     protected static final String PARAKEY4EMPLOYINST = "EmployeeInstance";
 
+    /**
+     * Key for a parameter containing the date.
+     */
     protected static final String PARAKEY4DATE = "Date";
 
+    /**
+     * Key for a parameter containing the Labor Time.
+     */
     protected static final String PARAKEY4LT = "LaborTime";
 
+    /**
+     * Key for a parameter containing the Extra Labor Time.
+     */
     protected static final String PARAKEY4ELT = "ExtraLaborTime";
 
+    /**
+     * Key for a parameter containing the Night Labor Time.
+     */
     protected static final String PARAKEY4NLT = "NightLaborTime";
 
+    /**
+     * Key for a parameter containing the Holiday Labor Time.
+     */
     protected static final String PARAKEY4HLT = "HolidayLaborTime";
 
+    /**
+     * Logger for this classes.
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractParameter.class);
 
     /**
      * Instance of the rule.
      */
     private Instance instance;
 
+    /**
+     * Key.
+     */
     private String key;
 
+    /**
+     * Value.
+     */
     private Object value;
 
+    /**
+     * Description.
+     */
     private String description;
 
+    /**
+     * @return this used for chaining
+     */
     protected abstract T getThis();
 
     /**
@@ -99,6 +128,7 @@ public abstract class AbstractParameter_Base<T>
      * Setter method for instance variable {@link #key}.
      *
      * @param _key value for instance variable {@link #key}
+     * @return this for chaining
      */
     public T setKey(final String _key)
     {
@@ -110,6 +140,7 @@ public abstract class AbstractParameter_Base<T>
      * Getter method for the instance variable {@link #value}.
      *
      * @return value of instance variable {@link #value}
+     * @throws EFapsException on error
      */
     public Object getValue()
         throws EFapsException
@@ -121,6 +152,7 @@ public abstract class AbstractParameter_Base<T>
      * Setter method for instance variable {@link #value}.
      *
      * @param _value value for instance variable {@link #value}
+     * @return this for chaining
      */
     public T setValue(final Object _value)
     {
@@ -142,6 +174,7 @@ public abstract class AbstractParameter_Base<T>
      * Setter method for instance variable {@link #description}.
      *
      * @param _description value for instance variable {@link #description}
+     * @return this for chaining
      */
     public T setDescription(final String _description)
     {
@@ -163,6 +196,7 @@ public abstract class AbstractParameter_Base<T>
      * Setter method for instance variable {@link #instance}.
      *
      * @param _instance value for instance variable {@link #instance}
+     * @return this for chaining
      */
     public T setInstance(final Instance _instance)
     {
@@ -170,12 +204,23 @@ public abstract class AbstractParameter_Base<T>
         return getThis();
     }
 
+    /**
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return Map of parameters
+     * @throws EFapsException on error
+     */
     protected static Map<String, Object> getParameters(final Parameter _parameter)
         throws EFapsException
     {
         return getParameters(_parameter, null);
     }
 
+    /**
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _docInst instance of the document
+     * @return Map of parameters
+     * @throws EFapsException on error
+     */
     protected static Map<String, Object> getParameters(final Parameter _parameter,
                                                        final Instance _docInst)
         throws EFapsException
@@ -211,6 +256,13 @@ public abstract class AbstractParameter_Base<T>
         return getParameters(_parameter, docInst, employeeInst);
     }
 
+    /**
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _docInst instance of the document
+     * @param _employeeInst instance of the employee
+     * @return Map of parameters
+     * @throws EFapsException on error
+     */
     protected static Map<String, Object> getParameters(final Parameter _parameter,
                                                        final Instance _docInst,
                                                        final Instance _employeeInst)
@@ -254,7 +306,6 @@ public abstract class AbstractParameter_Base<T>
         }
         return ret;
     }
-
 
     /**
      * @param _parameter parameter as passed by the eFaps API
@@ -317,13 +368,11 @@ public abstract class AbstractParameter_Base<T>
                         laborTime = BigDecimal.ZERO;
                     }
                 } catch (final ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOG.warn("Parsing problems", e);
                 }
-
             }
             if (laborTime != null) {
-                _map.put(AbstractParameter.PARAKEY4LT, Calculator.toJexlBigDecimal(_parameter, laborTime));
+                _map.put(AbstractParameter.PARAKEY4LT, laborTime);
             }
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4ELT)) {
@@ -345,12 +394,11 @@ public abstract class AbstractParameter_Base<T>
                         laborTime = BigDecimal.ZERO;
                     }
                 } catch (final ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOG.warn("Parsing problems", e);
                 }
             }
             if (laborTime != null) {
-                _map.put(AbstractParameter.PARAKEY4ELT, Calculator.toJexlBigDecimal(_parameter, laborTime));
+                _map.put(AbstractParameter.PARAKEY4ELT, laborTime);
             }
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4HLT)) {
@@ -372,12 +420,11 @@ public abstract class AbstractParameter_Base<T>
                         laborTime = BigDecimal.ZERO;
                     }
                 } catch (final ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOG.warn("Parsing problems", e);
                 }
             }
             if (laborTime != null) {
-                _map.put(AbstractParameter.PARAKEY4HLT, Calculator.toJexlBigDecimal(_parameter, laborTime));
+                _map.put(AbstractParameter.PARAKEY4HLT, laborTime);
             }
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4NLT)) {
@@ -399,12 +446,11 @@ public abstract class AbstractParameter_Base<T>
                         laborTime = BigDecimal.ZERO;
                     }
                 } catch (final ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOG.warn("Parsing problems", e);
                 }
             }
             if (laborTime != null) {
-                _map.put(AbstractParameter.PARAKEY4NLT, Calculator.toJexlBigDecimal(_parameter, laborTime));
+                _map.put(AbstractParameter.PARAKEY4NLT, laborTime);
             }
         }
     }
