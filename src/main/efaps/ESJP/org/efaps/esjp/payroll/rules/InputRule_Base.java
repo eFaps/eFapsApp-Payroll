@@ -59,7 +59,11 @@ public abstract class InputRule_Base
                          final JexlContext _context)
         throws EFapsException
     {
-        final Expression expr = Calculator.getJexlEngine().createExpression(getExpression());
+        String exprStr = getExpression();
+        if (exprStr == null || exprStr != null && exprStr.isEmpty()) {
+            exprStr = "0";
+        }
+        final Expression expr = Calculator.getJexlEngine().createExpression(exprStr);
         final Object val = expr.evaluate(_context);
         setMessage(Calculator.getMessageLog().getMessage());
         _context.set(getKey4Expression(), val);

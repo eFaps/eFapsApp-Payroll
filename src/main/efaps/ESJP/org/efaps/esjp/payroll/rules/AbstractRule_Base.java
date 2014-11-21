@@ -312,6 +312,8 @@ public abstract class AbstractRule_Base<T>
                     ret = (Integer) obj > 0;
                 } else if (obj instanceof Double) {
                     ret = (Double) obj > 0;
+                } else if (obj instanceof Float) {
+                    ret = (Float) obj > 0;
                 }
             }
         }

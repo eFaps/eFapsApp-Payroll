@@ -54,7 +54,6 @@
             <property name="Attribute">Config</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
-            <property name="Required">true</property>
         </field>
         <field name="expression">
             <property name="Attribute">Expression</property>
