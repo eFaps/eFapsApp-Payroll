@@ -54,7 +54,6 @@
             <property name="Attribute">Config</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
-            <property name="Required">true</property>
         </field>
         <field name="note">
             <property name="Attribute">Note</property>
