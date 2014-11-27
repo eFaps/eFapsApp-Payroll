@@ -185,6 +185,10 @@
                 <property name="ValueSelect">oid</property>
             </trigger>
         </field>
+        <field name="template4View">
+            <property name="Select">linkto[TemplateLink].attribute[Name]</property>
+            <property name="Label">Payroll_PayslipForm.template.Label</property>
+        </field>
         <field name="updateButton" character="Command">
             <property name="ModeCreate">READONLY</property>
             <property name="ModeView">NONE</property>

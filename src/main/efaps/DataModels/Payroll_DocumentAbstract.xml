@@ -78,6 +78,13 @@
             <sqlcolumn>HOLIDAYTIME,HOLIDAYTIMEUOMID,HOLIDAYTIMEBASE</sqlcolumn>
         </attribute>
         <attribute>
+            <name>TemplateLinkAbstract</name>
+            <type>Link</type>
+            <typelink>Payroll_TemplateAbstract</typelink>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>TEMPLATEID</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>MovementType</name>
             <type>LinkWithRanges</type>
             <typelink>Payroll_AttributeDefinitionMovementType</typelink>

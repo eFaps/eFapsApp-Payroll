@@ -244,6 +244,8 @@ public abstract class Payslip_Base
         insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraLaborTime, extraLaborTimeUoM });
         insert.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { holidayLaborTime, holidayLaborTimeUoM });
         insert.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
+        insert.add(CIPayroll.Payslip.TemplateLink,  Instance.get(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name)));
         insert.execute();
 
         final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));

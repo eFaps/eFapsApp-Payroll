@@ -50,7 +50,9 @@
             <column name="HOLIDAYTIMEUOMID" type="INTEGER"/>
             <column name="HOLIDAYTIMEBASE"  type="REAL"/>
             <column name="MOVEMENTTYPE"     type="INTEGER"/>
+            <column name="TEMPLATEID"       type="INTEGER"/>
             <foreign name="T_PRDOC_EMPLOYEEID"   key="EMPLOYEEID"      reference="T_HREMPLOYEE(ID)"/>
+            <foreign name="T_PRDOC_TEMPLATEID"   key="TEMPLATEID"      reference="T_PRTEMPLATE(ID)"/>
         </database>
     </definition>
 </datamodel-sqltable>
