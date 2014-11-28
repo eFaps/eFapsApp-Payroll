@@ -18,12 +18,16 @@
  * Last Changed By: $Author$
  */
 
-
 package org.efaps.esjp.payroll;
 
+import java.util.List;
+
+import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
-
+import org.efaps.db.Instance;
+import org.efaps.esjp.payroll.rules.AbstractRule;
+import org.efaps.util.EFapsException;
 
 /**
  * This class must be replaced for customization, therefore it is left empty.
@@ -39,4 +43,10 @@ public class Template
     extends Template_Base
 {
 
+    public static List<? extends AbstractRule<?>> getRules4Template(final Parameter _parameter,
+                                                                    final Instance _templateInst)
+        throws EFapsException
+    {
+        return Template_Base.getRules4Template(_parameter, _templateInst);
+    }
 }

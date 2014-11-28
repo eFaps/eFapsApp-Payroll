@@ -82,4 +82,27 @@ public abstract class Template_Base
         }
         return new Return();
     }
+
+    protected static List<? extends AbstractRule<?>> getRules4Template(final Parameter _parameter,
+                                                                       final Instance _templateInst)
+        throws EFapsException
+    {
+
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2Rule);
+        queryBldr.addWhereAttrEqValue(CIPayroll.Template2Rule.FromLink, _templateInst);
+        queryBldr.addOrderByAttributeAsc(CIPayroll.Template2Rule.Sequence);
+
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        final SelectBuilder ruleInst = SelectBuilder.get().linkto(CIPayroll.Template2Rule.ToLink).instance();
+        multi.addSelect(ruleInst);
+        multi.setEnforceSorted(true);
+        multi.execute();
+
+        final List<Instance> ruleInsts = new ArrayList<>();
+        while (multi.next()) {
+            ruleInsts.add(multi.<Instance>getSelect(ruleInst));
+        }
+        return AbstractRule.getRules(ruleInsts.toArray(new Instance[ruleInsts
+                        .size()]));
+    }
 }

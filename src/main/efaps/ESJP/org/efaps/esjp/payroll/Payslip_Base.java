@@ -248,7 +248,9 @@ public abstract class Payslip_Base
                         _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name)));
         insert.execute();
 
+        createdDoc.setInstance(insert.getInstance());
         final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
+        Calculator.evaluate(_parameter, rules);
         final Result result = Calculator.getResult(_parameter, rules);
         updateTotals(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
         updatePositions(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
@@ -260,6 +262,77 @@ public abstract class Payslip_Base
         }
 
         return ret;
+    }
+
+    /**
+     * Create a payslip.
+     *
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return new Return
+     * @throws EFapsException on error
+     */
+    public Return createMultiple(final Parameter _parameter)
+        throws EFapsException
+    {
+        final QueryBuilder attrQueryBldr = new QueryBuilder(CIHumanResource.EmployeeAbstract);
+        attrQueryBldr.addWhereAttrEqValue(CIHumanResource.EmployeeAbstract.StatusAbstract,
+                        Status.find(CIHumanResource.EmployeeStatus.Worker));
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2EmployeeAbstract);
+        queryBldr.addWhereAttrInQuery(CIPayroll.Template2EmployeeAbstract.ToAbstractLink,
+                        attrQueryBldr.getAttributeQuery(CIHumanResource.EmployeeAbstract.ID));
+        final MultiPrintQuery multi = queryBldr.getPrint();
+        final SelectBuilder selTemplInst = SelectBuilder.get()
+                        .linkto(CIPayroll.Template2EmployeeAbstract.FromAbstractLink).instance();
+        final SelectBuilder selEmplInst = SelectBuilder.get()
+                        .linkto(CIPayroll.Template2EmployeeAbstract.ToAbstractLink).instance();
+        multi.addSelect(selTemplInst, selEmplInst);
+        multi.execute();
+
+        final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
+        final DateTime date = new DateTime();
+        final DateTime dueDate = new DateTime();
+
+        final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
+                        .getDimension();
+        while (multi.next()) {
+            final Instance templInst = multi.getSelect(selTemplInst);
+            final Instance emplInst = multi.getSelect(selEmplInst);
+
+            final CreatedDoc createdDoc = new CreatedDoc();
+
+            final Insert insert = new Insert(CIPayroll.Payslip);
+            insert.add(CIPayroll.Payslip.Name, getDocName4Create(_parameter));
+            insert.add(CIPayroll.Payslip.Date, date);
+            insert.add(CIPayroll.Payslip.DueDate, dueDate);
+            insert.add(CIPayroll.Payslip.EmployeeAbstractLink, emplInst);
+            insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
+            insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.Rate, rateObj);
+            insert.add(CIPayroll.Payslip.CrossTotal, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.NetTotal, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.DiscountTotal, 0);
+            insert.add(CIPayroll.Payslip.RateDiscountTotal, 0);
+            insert.add(CIPayroll.Payslip.AmountCost, BigDecimal.ZERO);
+            insert.add(CIPayroll.Payslip.CurrencyId, Currency.getBaseCurrency());
+            insert.add(CIPayroll.Payslip.RateCurrencyId, Currency.getBaseCurrency());
+            insert.add(CIPayroll.Payslip.LaborTime, new Object[] { 240, timeDim.getBaseUoM().getId() });
+            insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
+            insert.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
+            insert.add(CIPayroll.Payslip.NightLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
+            insert.add(CIPayroll.Payslip.TemplateLink, templInst);
+            insert.execute();
+
+            createdDoc.setInstance(insert.getInstance());
+
+            final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
+            final Result result = Calculator.getResult(_parameter, rules);
+            updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+            updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+
+            createReport(_parameter, createdDoc);
+        }
+        return new Return();
     }
 
     protected void updateTotals(final Parameter _parameter,
