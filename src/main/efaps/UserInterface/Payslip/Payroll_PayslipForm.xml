@@ -186,8 +186,10 @@
             </trigger>
         </field>
         <field name="template4View">
+            <property name="SelectAlternateOID">linkto[TemplateLink].oid</property>
             <property name="Select">linkto[TemplateLink].attribute[Name]</property>
             <property name="Label">Payroll_PayslipForm.template.Label</property>
+            <property name="HRef">TREE</property>
         </field>
         <field name="updateButton" character="Command">
             <property name="ModeCreate">READONLY</property>

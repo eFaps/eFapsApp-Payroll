@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2014 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,27 +22,23 @@
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>b253330c-affc-4c45-a47d-83357d71581c</uuid>
+    <uuid>e59a1881-a20b-4a71-9575-5c019b533570</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipMyDesk_Menu_Action_CreateMultiple</name>
+        <name>Payroll_PayslipMyDesk_Menu_Action_Checkout</name>
         <access>
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
+            <role>Payroll_Reader</role>
         </access>
         <target>
-            <form>Payroll_PayslipCreateMultipleForm</form>
-            <execute method="createMultiple" program="org.efaps.esjp.payroll.Payslip" >
-                <property name="UseNumberGenerator4Name">true</property>
-                <property name="JasperReport">Payroll_Payslip</property>
-                <property name="Mime">pdf</property>
-                <property name="NoDataSource">true</property>
+            <execute program="org.efaps.esjp.common.file.FileCheckout" method="multiple">
+                <property name="FileName">Boletas de Pago</property>
             </execute>
         </target>
-        <property name="Target">modal</property>
-        <property name="TargetCreateType">Payroll_Payslip</property>
-        <property name="TargetMode">create</property>
+        <property name="TargetShowFile">true</property>
+        <property name="Submit">true</property>
     </definition>
 </ui-command>

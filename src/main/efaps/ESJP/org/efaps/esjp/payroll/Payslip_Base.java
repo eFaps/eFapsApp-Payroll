@@ -250,7 +250,7 @@ public abstract class Payslip_Base
 
         createdDoc.setInstance(insert.getInstance());
         final List<? extends AbstractRule<?>> rules = analyseRulesFomUI(_parameter, getRuleInstFromUI(_parameter));
-        Calculator.evaluate(_parameter, rules);
+
         final Result result = Calculator.getResult(_parameter, rules);
         updateTotals(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
         updatePositions(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
@@ -289,8 +289,9 @@ public abstract class Payslip_Base
         multi.execute();
 
         final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
-        final DateTime date = new DateTime();
-        final DateTime dueDate = new DateTime();
+        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.date.name);
+        final String dueDate = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.dueDate.name);
 
         final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
                         .getDimension();
@@ -326,6 +327,7 @@ public abstract class Payslip_Base
             createdDoc.setInstance(insert.getInstance());
 
             final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
+            Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
             final Result result = Calculator.getResult(_parameter, rules);
             updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
             updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
@@ -1350,8 +1352,8 @@ public abstract class Payslip_Base
                                 .instance();
                 print.addSelect(selRateCurInst);
                 print.addAttribute(CIPayroll.Payslip.Rate, CIPayroll.Payslip.Date,
-                                CIPayroll.Payslip.LaborTime,
-                                CIPayroll.Payslip.ExtraLaborTime);
+                                CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.HolidayLaborTime,
+                                CIPayroll.Payslip.ExtraLaborTime, CIPayroll.Payslip.NightLaborTime);
                 print.execute();
 
                 final Instance rateCurrInst = print.getSelect(selRateCurInst);
@@ -1388,6 +1390,12 @@ public abstract class Payslip_Base
         return new Return();
     }
 
+    /**
+     * @param _parameter    Parameter as passed by the eFaps API
+     * @param _docInst      Instance of the document
+     * @return list of rules
+     * @throws EFapsException on error
+     */
     protected List<? extends AbstractRule<?>> analyseRulesFomDoc(final Parameter _parameter,
                                                                  final Instance _docInst)
         throws EFapsException
@@ -1395,11 +1403,27 @@ public abstract class Payslip_Base
         return analyseRulesFomDoc(_parameter, _docInst, new HashMap<Instance, BigDecimal>());
     }
 
+    /**
+     * @param _parameter    Parameter as passed by the eFaps API
+     * @param _docInst       Instance of the document
+     * @param _mapping      Map values
+     * @return list of rules
+     * @throws EFapsException on error
+     */
     protected List<? extends AbstractRule<?>> analyseRulesFomDoc(final Parameter _parameter,
                                                                  final Instance _docInst,
                                                                  final Map<Instance, BigDecimal> _mapping)
         throws EFapsException
     {
+        final PrintQuery print = new PrintQuery(_docInst);
+        final SelectBuilder selTmplInst = SelectBuilder.get().linkto(CIPayroll.DocumentAbstract.TemplateLinkAbstract)
+                        .instance();
+        print.addSelect(selTmplInst);
+        print.execute();
+
+        final List<? extends AbstractRule<?>> ret = Template.getRules4Template(_parameter,
+                        print.<Instance>getSelect(selTmplInst));
+
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
         queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -1418,10 +1442,9 @@ public abstract class Payslip_Base
             }
             map.put(multi.<Instance>getSelect(selRulsInst), amount);
         }
-        final List<? extends AbstractRule<?>> ret = AbstractRule.getRules(map.keySet().toArray(
-                        new Instance[map.size()]));
+
         for (final AbstractRule<?> rule : ret) {
-            if (rule instanceof InputRule) {
+            if (rule instanceof InputRule && map.containsKey(rule.getInstance())) {
                 final BigDecimal amount = map.get(rule.getInstance());
                 rule.setExpression(Calculator.toJexlBigDecimal(_parameter, amount));
             }
