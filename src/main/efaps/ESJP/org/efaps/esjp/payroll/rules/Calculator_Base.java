@@ -104,8 +104,8 @@ public abstract class Calculator_Base
     }
 
     /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _rules        List of rules
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _rules List of rules
      * @throws EFapsException on error
      */
     protected static void evaluate(final Parameter _parameter,
@@ -116,9 +116,9 @@ public abstract class Calculator_Base
     }
 
     /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _rules        List of rules
-     * @param _docInst      instance of the actual document
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _rules List of rules
+     * @param _docInst instance of the actual document
      * @throws EFapsException on error
      */
     protected static void evaluate(final Parameter _parameter,
@@ -154,8 +154,8 @@ public abstract class Calculator_Base
     }
 
     /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _rules        List of rules the html is wanted for
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _rules List of rules the html is wanted for
      * @return html table
      * @throws EFapsException on error
      */
@@ -166,16 +166,16 @@ public abstract class Calculator_Base
         final Table table = new Table();
         for (final AbstractRule<?> rule : _rules) {
             table.addRow().addColumn(StringEscapeUtils.escapeHtml4(rule.getKey()))
-                    .addColumn(StringEscapeUtils.escapeHtml4(rule.getDescription()))
-                    .addColumn(StringEscapeUtils.escapeHtml4(String.valueOf(rule.getResult())))
-                    .addColumn(StringEscapeUtils.escapeHtml4(rule.getMessage()).replace("\n", "<br/>"));
+                            .addColumn(StringEscapeUtils.escapeHtml4(rule.getDescription()))
+                            .addColumn(StringEscapeUtils.escapeHtml4(String.valueOf(rule.getResult())))
+                            .addColumn(StringEscapeUtils.escapeHtml4(rule.getMessage()).replace("\n", "<br/>"));
         }
         return table.toHtml().toString();
     }
 
     /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _rules        List of rules
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _rules List of rules
      * @return the result
      * @throws EFapsException on error
      */
@@ -187,8 +187,8 @@ public abstract class Calculator_Base
     }
 
     /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _bigDecimal   BigDecimal to be converted
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _bigDecimal BigDecimal to be converted
      * @return string for BigDecimal
      * @throws EFapsException on error
      */
@@ -242,6 +242,7 @@ public abstract class Calculator_Base
         {
             super(Calculator.getMessageLog());
             setClassLoader(EFapsClassLoader.getInstance());
+            setLoader(EFapsClassLoader.getInstance());
             try {
                 final String whiteLstStr = Payroll.getSysConfig().getAttributeValue(
                                 PayrollSettings.RULESANDBOXWHITELIST);
@@ -327,6 +328,21 @@ public abstract class Calculator_Base
                 if (this.classNames.contains(_obj.getClass().getName())) {
                     ret = super.getPropertySet(_obj, _identifier.toString(), _arg, _info);
                 }
+            }
+            return ret;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Class<?> getClassByName(final String _className)
+        {
+            Class<?> ret = null;
+            try {
+                ret = EFapsClassLoader.getInstance().loadClass(_className);
+            } catch (final ClassNotFoundException e) {
+                LOG.debug("ClassNotFoundException", e);
             }
             return ret;
         }
