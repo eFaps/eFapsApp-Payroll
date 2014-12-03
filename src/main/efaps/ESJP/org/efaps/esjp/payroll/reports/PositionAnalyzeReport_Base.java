@@ -24,7 +24,9 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
@@ -38,6 +40,7 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.efaps.admin.common.MsgPhrase;
+import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
@@ -47,11 +50,14 @@ import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.ci.CISales;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
 import org.efaps.esjp.erp.FilteredReport;
 import org.efaps.esjp.sales.report.DocumentSumReport;
 import org.efaps.util.EFapsException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +115,24 @@ public abstract class PositionAnalyzeReport_Base
         return ret;
     }
 
+    @Override
+    protected Object getDefaultValue(final Parameter _parameter,
+                                     final String _field,
+                                     final String _type,
+                                     final String _default)
+        throws EFapsException
+    {
+        Object ret;
+        if ("Status".equalsIgnoreCase(_type)) {
+            final Set<Long> set = new HashSet<>();
+            set.add(Status.find(CIPayroll.PayslipStatus.Draft).getId());
+            ret = new StatusFilterValue().setObject(set);
+        } else {
+            ret = super.getDefaultValue(_parameter, _field, _type, _default);
+        }
+        return ret ;
+    }
+
     /**
      * @param _parameter Parameter as passed by the eFasp API
      * @return the report class
@@ -143,7 +167,7 @@ public abstract class PositionAnalyzeReport_Base
         {
             final Collection<DataBean> datasource = new ArrayList<>();
             final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionAbstract);
-
+            add2QueryBuilder(_parameter, queryBuilder);
             final MultiPrintQuery multi = queryBuilder.getPrint();
             final SelectBuilder selDoc = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
             final SelectBuilder selDocInst = new SelectBuilder(selDoc).instance();
@@ -166,6 +190,39 @@ public abstract class PositionAnalyzeReport_Base
             }
             return new JRBeanCollectionDataSource(datasource);
         }
+
+        /**
+         * @param _parameter    Parameter as passed by the eFaps API
+         * @param _queryBldr    queryBldr to add to
+         * @throws EFapsException on error
+         */
+        protected void add2QueryBuilder(final Parameter _parameter,
+                                        final QueryBuilder _queryBldr)
+            throws EFapsException
+        {
+            final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+            final QueryBuilder attrQueryBldr = new QueryBuilder(CIERP.DocumentAbstract);
+            if (filterMap.containsKey("dateFrom")) {
+                final DateTime date = (DateTime) filterMap.get("dateFrom");
+                attrQueryBldr.addWhereAttrGreaterValue(CIERP.DocumentAbstract.Date,
+                                date.withTimeAtStartOfDay().minusSeconds(1));
+            }
+            if (filterMap.containsKey("dateTo")) {
+                final DateTime date = (DateTime) filterMap.get("dateTo");
+                attrQueryBldr.addWhereAttrLessValue(CIERP.DocumentAbstract.Date,
+                                date.withTimeAtStartOfDay().plusDays(1));
+            }
+            if (filterMap.containsKey("status")) {
+                final StatusFilterValue filter = (StatusFilterValue) filterMap.get("status");
+                if (!filter.getObject().isEmpty()) {
+                    attrQueryBldr.addWhereAttrEqValue(CIERP.DocumentAbstract.StatusAbstract,
+                                    filter.getObject().toArray());
+                }
+            }
+            _queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
+                            attrQueryBldr.getAttributeQuery(CISales.DocumentAbstract.ID));
+        }
+
 
         @Override
         protected void addColumnDefintion(final Parameter _parameter,

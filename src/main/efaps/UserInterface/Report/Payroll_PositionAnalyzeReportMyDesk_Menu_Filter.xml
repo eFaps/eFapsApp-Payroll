@@ -33,7 +33,7 @@
             <role>Sales_Admin</role>
         </access>
         <target>
-            <form>ERP_ReportFilterForm4DateFromTo</form>
+            <form>Payroll_PositionAnalyzeReportFilterForm</form>
             <execute method="setFilter" program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
                 <property name="FilterKey">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.FilterKey</property>
             </execute>
@@ -43,7 +43,7 @@
         <property name="Label">report.Filter</property>
         <property name="TargetTitle">report.Filter</property>
         <property name="FilterKey">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.FilterKey</property>
-        <property name="FilterTargetForm">Sales_RetentionBookReportForm</property>
+        <property name="FilterTargetForm">Payroll_PositionAnalyzeReportForm</property>
         <property name="FilterTargetField">report</property>
     </definition>
 </ui-command>
