@@ -65,11 +65,13 @@ import org.slf4j.LoggerFactory;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: PositionAnalyzeReport_Base.java 14584 2014-12-04 03:55:22Z
+ *          jan@moxter.net $
  */
 public abstract class PositionAnalyzeReport_Base
     extends FilteredReport
 {
+
     /**
      * Logging instance used in this class.
      */
@@ -129,7 +131,7 @@ public abstract class PositionAnalyzeReport_Base
         } else {
             ret = super.getDefaultValue(_parameter, _field, _type, _default);
         }
-        return ret ;
+        return ret;
     }
 
     /**
@@ -165,6 +167,11 @@ public abstract class PositionAnalyzeReport_Base
             throws EFapsException
         {
             final Collection<DataBean> datasource = new ArrayList<>();
+            final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+            Boolean switchVal = false;
+            if (filterMap.containsKey("switch")) {
+                switchVal = (Boolean) filterMap.get("switch");
+            }
             final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionAbstract);
             add2QueryBuilder(_parameter, queryBuilder);
             final MultiPrintQuery multi = queryBuilder.getPrint();
@@ -180,7 +187,9 @@ public abstract class PositionAnalyzeReport_Base
             while (multi.next()) {
                 final Instance docInst = multi.getSelect(selDocInst);
                 final DataBean bean = new DataBean().setDocInst(docInst)
+                                .setSwitched(switchVal)
                                 .setDocName(multi.<String>getSelect(selDocName))
+                                .setPosInst(multi.getCurrentInstance())
                                 .setPosDescr(multi.<String>getAttribute(CIPayroll.PositionAbstract.Description))
                                 .setPosKey(multi.<String>getAttribute(CIPayroll.PositionAbstract.Key))
                                 .setAmount(multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount))
@@ -191,8 +200,8 @@ public abstract class PositionAnalyzeReport_Base
         }
 
         /**
-         * @param _parameter    Parameter as passed by the eFaps API
-         * @param _queryBldr    queryBldr to add to
+         * @param _parameter Parameter as passed by the eFaps API
+         * @param _queryBldr queryBldr to add to
          * @throws EFapsException on error
          */
         protected void add2QueryBuilder(final Parameter _parameter,
@@ -221,7 +230,6 @@ public abstract class PositionAnalyzeReport_Base
             _queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
                             attrQueryBldr.getAttributeQuery(CISales.DocumentAbstract.ID));
         }
-
 
         @Override
         protected void addColumnDefintion(final Parameter _parameter,
@@ -261,8 +269,10 @@ public abstract class PositionAnalyzeReport_Base
     public static class DataBean
     {
 
+        private Boolean switched;
         private String docName;
         private Instance docInst;
+        private Instance posInst;
         private String posKey;
         private String posDescr;
         private BigDecimal amount;
@@ -285,7 +295,13 @@ public abstract class PositionAnalyzeReport_Base
          */
         public String getPosition()
         {
-            return getPosKey() + " " + getPosDescr();
+            String ret;
+            if (getSwitched()) {
+                ret = getPosKey() + " " + getPosDescr();
+            } else {
+                ret = getPosInst().getType().getLabel();
+            }
+            return ret;
         }
 
         /**
@@ -398,7 +414,6 @@ public abstract class PositionAnalyzeReport_Base
             return this;
         }
 
-
         /**
          * Getter method for the instance variable {@link #employee}.
          *
@@ -409,7 +424,6 @@ public abstract class PositionAnalyzeReport_Base
             return this.employee;
         }
 
-
         /**
          * Setter method for instance variable {@link #employee}.
          *
@@ -419,6 +433,48 @@ public abstract class PositionAnalyzeReport_Base
         public DataBean setEmployee(final String _employee)
         {
             this.employee = _employee;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #posInst}.
+         *
+         * @return value of instance variable {@link #posInst}
+         */
+        public Instance getPosInst()
+        {
+            return this.posInst;
+        }
+
+        /**
+         * Setter method for instance variable {@link #posInst}.
+         *
+         * @param _posInst value for instance variable {@link #posInst}
+         */
+        public DataBean setPosInst(final Instance _posInst)
+        {
+            this.posInst = _posInst;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #switched}.
+         *
+         * @return value of instance variable {@link #switched}
+         */
+        public Boolean getSwitched()
+        {
+            return this.switched;
+        }
+
+        /**
+         * Setter method for instance variable {@link #switched}.
+         *
+         * @param _switched value for instance variable {@link #switched}
+         */
+        public DataBean setSwitched(final Boolean _switched)
+        {
+            this.switched = _switched;
             return this;
         }
     }
