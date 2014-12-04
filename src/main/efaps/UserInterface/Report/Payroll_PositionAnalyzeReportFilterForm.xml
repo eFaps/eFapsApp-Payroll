@@ -59,5 +59,13 @@
                 <property name="Status05">Canceled</property>
             </trigger>
         </field>
+        <field name="switch">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.BooleanUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
+            <trigger event="UI_FIELD_VALUE" method="getBooleanFieldValue"
+                name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" />
+        </field>
     </definition>
 </ui-form>

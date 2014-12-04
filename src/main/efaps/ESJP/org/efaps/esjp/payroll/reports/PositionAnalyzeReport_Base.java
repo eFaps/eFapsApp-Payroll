@@ -70,7 +70,6 @@ import org.slf4j.LoggerFactory;
 public abstract class PositionAnalyzeReport_Base
     extends FilteredReport
 {
-
     /**
      * Logging instance used in this class.
      */
