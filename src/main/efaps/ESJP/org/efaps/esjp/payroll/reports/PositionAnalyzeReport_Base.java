@@ -172,7 +172,8 @@ public abstract class PositionAnalyzeReport_Base
             if (filterMap.containsKey("switch")) {
                 switchVal = (Boolean) filterMap.get("switch");
             }
-            final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionAbstract);
+            final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionDeduction);
+            queryBuilder.addType(CIPayroll.PositionNeutral, CIPayroll.PositionPayment);
             add2QueryBuilder(_parameter, queryBuilder);
             final MultiPrintQuery multi = queryBuilder.getPrint();
             final SelectBuilder selDoc = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
@@ -450,6 +451,7 @@ public abstract class PositionAnalyzeReport_Base
          * Setter method for instance variable {@link #posInst}.
          *
          * @param _posInst value for instance variable {@link #posInst}
+         * @return this for chaining
          */
         public DataBean setPosInst(final Instance _posInst)
         {
@@ -471,6 +473,7 @@ public abstract class PositionAnalyzeReport_Base
          * Setter method for instance variable {@link #switched}.
          *
          * @param _switched value for instance variable {@link #switched}
+         * @return this for chaining
          */
         public DataBean setSwitched(final Boolean _switched)
         {
