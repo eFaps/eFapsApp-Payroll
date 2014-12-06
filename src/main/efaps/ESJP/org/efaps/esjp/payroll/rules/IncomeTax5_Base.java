@@ -115,6 +115,12 @@ public abstract class IncomeTax5_Base
                             .get(currentMonth)));
             yearAmountBruto = yearAmountBruto.add(payed).add(extra).add(extraPayed);
 
+
+
+
+
+
+
             final BigDecimal yearAmountNeto = yearAmountBruto.subtract(uit.multiply(new BigDecimal(7)));
             BigDecimal restNetto = yearAmountNeto;
 

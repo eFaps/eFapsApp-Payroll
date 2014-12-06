@@ -38,7 +38,9 @@
         </attribute>
         <attribute>
             <key>org.efaps.payroll.WhiteList4RuleSandbox</key>
-            <value>org.efaps.esjp.payroll.rules.IncomeTax5</value>
+            <value>org.efaps.esjp.payroll.rules.IncomeTax5
+org.joda.time.DateTime
+java.util.HashMap</value>
             <description></description>
         </attribute>
     </definition>
