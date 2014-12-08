@@ -50,7 +50,6 @@ import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
-import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CISales;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
@@ -210,22 +209,29 @@ public abstract class PositionAnalyzeReport_Base
             throws EFapsException
         {
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
-            final QueryBuilder attrQueryBldr = new QueryBuilder(CIERP.DocumentAbstract);
+            final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
             if (filterMap.containsKey("dateFrom")) {
                 final DateTime date = (DateTime) filterMap.get("dateFrom");
-                attrQueryBldr.addWhereAttrGreaterValue(CIERP.DocumentAbstract.Date,
+                attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date,
                                 date.withTimeAtStartOfDay().minusSeconds(1));
             }
             if (filterMap.containsKey("dateTo")) {
                 final DateTime date = (DateTime) filterMap.get("dateTo");
-                attrQueryBldr.addWhereAttrLessValue(CIERP.DocumentAbstract.Date,
+                attrQueryBldr.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date,
                                 date.withTimeAtStartOfDay().plusDays(1));
             }
             if (filterMap.containsKey("status")) {
                 final StatusFilterValue filter = (StatusFilterValue) filterMap.get("status");
                 if (!filter.getObject().isEmpty()) {
-                    attrQueryBldr.addWhereAttrEqValue(CIERP.DocumentAbstract.StatusAbstract,
+                    attrQueryBldr.addWhereAttrEqValue(CIPayroll.DocumentAbstract.StatusAbstract,
                                     filter.getObject().toArray());
+                }
+            }
+            if (filterMap.containsKey("employee")) {
+                final InstanceFilterValue filter = (InstanceFilterValue) filterMap.get("employee");
+                if (filter.getObject() != null && filter.getObject().isValid()) {
+                    attrQueryBldr.addWhereAttrEqValue(CIPayroll.DocumentAbstract.EmployeeAbstractLink,
+                                    filter.getObject());
                 }
             }
             _queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,

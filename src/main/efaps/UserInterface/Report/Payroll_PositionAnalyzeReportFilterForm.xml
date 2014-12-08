@@ -44,6 +44,21 @@
                 name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
                 program="org.efaps.esjp.erp.FilteredReport" />
         </field>
+         <field name="employee">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.employee</property>
+            <trigger program="org.efaps.esjp.erp.FilteredReport"
+                method="getInstanceFieldValue"
+                name="Payroll_PositionAnalyzeReportFilterForm.employee.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE" >
+                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+            </trigger>
+            <trigger program="org.efaps.esjp.humanresource.Employee"
+                method="autoComplete4Employee"
+                name="Payroll_PositionAnalyzeReportFilterForm.employee.UI_FIELD_AUTOCOMPLETE"
+                event="UI_FIELD_AUTOCOMPLETE" />
+        </field>
         <field name="status">
             <property name="ModeEdit">EDITABLE</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
