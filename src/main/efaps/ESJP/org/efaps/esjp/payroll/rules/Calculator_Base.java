@@ -218,6 +218,8 @@ public abstract class Calculator_Base
                 ret = new BigDecimal((Long) _object);
             } else if (_object instanceof Integer) {
                 ret = new BigDecimal((Integer) _object);
+            } else if (_object instanceof Float) {
+                ret = new BigDecimal((Float) _object);
             }
         }
         return ret;

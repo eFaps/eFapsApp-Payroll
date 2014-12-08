@@ -205,8 +205,7 @@
         </field>
         <field name="ruleHeading" character="Heading">
             <property name="ModeCreate">READONLY</property>
-            <property name="ModeView">NONE</property>
-            <property name="ModeEdit">NONE</property>
+            <property name="ModeEdit">READONLY</property>
             <property name="Level">2</property>
             <property name="Label">Payroll_PayslipForm.ruleHeading.Heading</property>
         </field>
@@ -214,10 +213,16 @@
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">EDITABLE</property>
-            <property name="TargetEnforceSorted">true</property>
             <table>Payroll_PositionRuleTable</table>
-            <evaluate program="org.efaps.esjp.payroll.Payslip"
-                method="positionMultiPrint">
+            <evaluate program="org.efaps.esjp.payroll.Payslip" method="positionMultiPrint">
+                <property name="Type">Payroll_PositionAbstract</property>
+            </evaluate>
+        </field>
+         <field name="positionTable" character="Target">
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <table>Payroll_PayslipPositionTable</table>
+            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
                 <property name="Type">Payroll_PositionAbstract</property>
                 <property name="LinkFrom">DocumentAbstractLink</property>
             </evaluate>
@@ -229,21 +234,6 @@
             <property name="Label">Payroll_PayslipForm.Sums.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
-         <field name="positionHeading" character="Heading">
-            <property name="ModeCreate">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <property name="Level">2</property>
-            <property name="Label">Payroll_PayslipForm.positionHeading.Label</property>
-        </field>
-        <field name="positionTable" character="Target">
-            <property name="ModeCreate">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <table>Payroll_PayslipPositionTable</table>
-            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_PositionAbstract</property>
-                <property name="LinkFroms">DocumentAbstractLink</property>
-            </evaluate>
-        </field>
         <field name="javaScript">
             <property name="ModeCreate">HIDDEN</property>
             <property name="ModeEdit">NONE</property>
@@ -253,6 +243,17 @@
             <trigger program="org.efaps.esjp.payroll.Payslip"
                     method="getJavaScriptUIValue"
                     name="Payroll_PayslipForm.javaScript.UI_FIELD_VALUE"
+                    event="UI_FIELD_VALUE"></trigger>
+        </field>
+        <field name="javaScript4edit">
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">HIDDEN</property>
+            <property name="ModeView">NONE</property>
+            <property name="ModePrint">NONE</property>
+            <property name="UIType">SNIPPLET</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                    method="getJavaScript4EditUIValue"
+                    name="Payroll_PayslipForm.javaScript4edit.UI_FIELD_VALUE"
                     event="UI_FIELD_VALUE"></trigger>
         </field>
     </definition>

@@ -52,5 +52,9 @@
             <sqltable>Payroll_DocumentSQLTable</sqltable>
             <sqlcolumn>TEMPLATEID</sqlcolumn>
         </attribute>
+        <trigger program="org.efaps.esjp.payroll.Payslip"
+            method="deletePreTrigger"
+            name="Payroll_Payslip.DELETE_PRE"
+            event="DELETE_PRE"></trigger>
     </definition>
 </datamodel-type>

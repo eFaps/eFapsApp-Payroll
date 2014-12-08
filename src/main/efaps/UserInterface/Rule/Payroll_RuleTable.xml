@@ -57,6 +57,7 @@
          <field name="note">
             <property name="Attribute">Note</property>
             <property name="Label">Payroll_RuleAbstract/Note.Label</property>
+            <property name="ModeSearch">READONLY</property>
         </field>
     </definition>
 </ui-table>
