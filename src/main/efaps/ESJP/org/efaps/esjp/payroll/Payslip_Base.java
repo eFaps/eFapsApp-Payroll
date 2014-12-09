@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
@@ -616,78 +615,7 @@ public abstract class Payslip_Base
         return ret;
     }
 
-    /**
-     * Create advances.
-     *
-     * @param _parameter Parameter as passed from the eFaps API
-     * @return new Return
-     * @throws EFapsException on error
-     */
-    public Return createAdvance(final Parameter _parameter)
-        throws EFapsException
-    {
-        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.date.name);
 
-        final String[] employees = _parameter.getParameterValues(CITablePayroll.Payroll_AdvanceTable.employee.name);
-        final String[] employeeNames = _parameter.getParameterValues(CITablePayroll.Payroll_AdvanceTable.employee.name
-                        + "AutoComplete");
-        final String[] amount2Pays = _parameter
-                        .getParameterValues(CITablePayroll.Payroll_AdvanceTable.rateCrossTotal.name);
-        final String[] currencyLinks = _parameter
-                        .getParameterValues(CITablePayroll.Payroll_AdvanceTable.rateCurrencyId.name);
-        final DecimalFormat formater = NumberFormatter.get().getTwoDigitsFormatter();
-        try {
-            final Instance baseCurIns = Currency.getBaseCurrency();
-            final PriceUtil util = new PriceUtil();
-            for (int i = 0; i < employees.length; i++) {
-                if (employees[i] != null && !employees[i].isEmpty()) {
-                    final Instance rateCurrInst = Instance.get(CIERP.Currency.getType(), currencyLinks[i]);
-
-                    final BigDecimal[] rates = util
-                                    .getExchangeRate(util.getDateFromParameter(_parameter), rateCurrInst);
-                    final CurrencyInst cur = new CurrencyInst(rateCurrInst);
-                    final Object[] rate = new Object[] { cur.isInvert() ? BigDecimal.ONE : rates[1],
-                                    cur.isInvert() ? rates[1] : BigDecimal.ONE };
-
-                    final BigDecimal ratePay = amount2Pays[i] != null && !amount2Pays[i].isEmpty()
-                                    ? (BigDecimal) formater.parse(amount2Pays[i])
-                                    : BigDecimal.ZERO;
-
-                    final BigDecimal pay = ratePay.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : ratePay
-                                    .setScale(8, BigDecimal.ROUND_HALF_UP).divide(rates[0], BigDecimal.ROUND_HALF_UP)
-                                    .setScale(2, BigDecimal.ROUND_HALF_UP);
-                    final Insert insert = new Insert(CIPayroll.Advance);
-                    insert.add(CIPayroll.Advance.Name,
-                                    DBProperties.getProperty("org.efaps.esjp.payroll.Payslip.Advance") + " "
-                                                    + employeeNames[i]);
-                    insert.add(CIPayroll.Advance.Date, date);
-                    insert.add(CIPayroll.Advance.EmployeeAbstractLink, Instance.get(employees[i]).getId());
-                    insert.add(CIPayroll.Advance.Status,
-                                    ((Long) Status.find(CIPayroll.AdvanceStatus.uuid, "Open").getId()).toString());
-                    insert.add(CIPayroll.Advance.RateCrossTotal, ratePay);
-                    insert.add(CIPayroll.Advance.RateNetTotal, ratePay);
-                    insert.add(CIPayroll.Advance.CrossTotal, pay);
-                    insert.add(CIPayroll.Advance.NetTotal, pay);
-                    insert.add(CIPayroll.Advance.RateCurrencyId, rateCurrInst.getId());
-                    insert.add(CIPayroll.Advance.CurrencyId, baseCurIns.getId());
-                    insert.add(CIPayroll.Advance.AmountCost, pay);
-                    insert.add(CIPayroll.Advance.Rate, rate);
-                    insert.add(CIPayroll.Advance.DiscountTotal, 0);
-                    insert.add(CIPayroll.Advance.RateDiscountTotal, 0);
-                    insert.add(CIPayroll.Advance.LaborTime, new Object[] { 0,
-                                    Dimension.get(UUID.fromString("8154e40c-3f2d-4bc0-91e6-b8510eaf642c"))
-                                                    .getBaseUoM().getId() });
-                    insert.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { 0,
-                                    Dimension.get(UUID.fromString("8154e40c-3f2d-4bc0-91e6-b8510eaf642c"))
-                                                    .getBaseUoM().getId() });
-                    insert.execute();
-                }
-            }
-        } catch (final ParseException e) {
-            throw new EFapsException(Payslip_Base.class, "createMassive.ParseException", e);
-        }
-        return new Return();
-    }
 
     /**
      * Method to set the instance of the payslip selected to the Context.

@@ -59,5 +59,10 @@
             <property name="Label">Payroll_RuleAbstract/Note.Label</property>
             <property name="ModeSearch">READONLY</property>
         </field>
+        <field name="status">
+            <property name="Attribute">StatusAbstract</property>
+            <property name="Label">Payroll_RuleAbstract/StatusAbstract.Label</property>
+            <property name="ModeSearch">READONLY</property>
+        </field>
     </definition>
 </ui-table>

@@ -31,6 +31,12 @@
         <field name="type">
             <property name="Attribute">Type</property>
         </field>
+        <field name="status">
+            <property name="Attribute">Status</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
         <field name="key">
             <property name="Attribute">Key</property>
             <property name="ModeEdit">EDITABLE</property>

@@ -19,7 +19,9 @@
  Last Changed:    $Date: 2010-08-16 11:58:36 -0500 (lun, 16 ago 2010) $
  Last Changed By: $Author: miguel.a.aranya $
 
---><ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+-->
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>46368fad-b0b5-4c7c-9380-fbb088697844</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 5319 $</file-revision>
@@ -30,12 +32,12 @@
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
         </access>
-        <!-- target definitions -->
         <target>
             <form>Payroll_AdvanceCreateForm</form>
-            <execute method="createAdvance" program="org.efaps.esjp.payroll.Payslip"/>
+            <execute method="createMultiple" program="org.efaps.esjp.payroll.Advance" >
+                <property name="UseNumberGenerator4Name">true</property>
+            </execute>
         </target>
-        <!-- properties -->
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Advance</property>
         <property name="TargetMode">create</property>

@@ -46,5 +46,9 @@
             <property name="Attribute">Value</property>
             <property name="Label">Payroll_TemplateAbstract/Value.Label</property>
         </field>
+        <field name="statusAbstract">
+            <property name="Attribute">StatusAbstract</property>
+            <property name="Label">Payroll_TemplateAbstract/StatusAbstract.Label</property>
+        </field>
     </definition>
 </ui-table>

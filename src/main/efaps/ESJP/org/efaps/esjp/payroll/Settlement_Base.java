@@ -20,6 +20,9 @@
 
 package org.efaps.esjp.payroll;
 
+import java.io.File;
+import java.util.List;
+
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
@@ -29,7 +32,10 @@ import org.efaps.db.Insert;
 import org.efaps.db.Instance;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
-import org.efaps.esjp.sales.document.AbstractSumOnlyDocument;
+import org.efaps.esjp.payroll.rules.AbstractRule;
+import org.efaps.esjp.payroll.rules.Calculator;
+import org.efaps.esjp.payroll.rules.Result;
+import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.util.EFapsException;
 
 /**
@@ -41,7 +47,7 @@ import org.efaps.util.EFapsException;
 @EFapsUUID("89fc5497-2f5f-480e-bb82-cc29259603dd")
 @EFapsRevision("$Rev$")
 public abstract class Settlement_Base
-    extends AbstractSumOnlyDocument
+    extends AbstractDocumentSum
 {
 
     /**
@@ -55,6 +61,26 @@ public abstract class Settlement_Base
         final CreatedDoc createdDoc = createDoc(_parameter);
         connect2Object(_parameter, createdDoc);
         final Return ret = new Return();
+
+        final Payslip payslip = new Payslip();
+
+        final Instance rateCurrInst = getRateCurrencyInstance(_parameter, createdDoc);
+
+        final Object[] rateObj = getRateObject(_parameter);
+
+        final List<? extends AbstractRule<?>> rules = payslip.analyseRulesFomUI(_parameter,
+                        payslip.getRuleInstFromUI(_parameter));
+
+        final Result result = Calculator.getResult(_parameter, rules);
+        payslip.updateTotals(_parameter, createdDoc.getInstance(), result, rateCurrInst, rateObj);
+        payslip.updatePositions(_parameter, createdDoc.getInstance(), result, rateCurrInst, rateObj);
+
+        final File file = createReport(_parameter, createdDoc);
+        if (file != null) {
+            ret.put(ReturnValues.VALUES, file);
+            ret.put(ReturnValues.TRUE, true);
+        }
+
         ret.put(ReturnValues.INSTANCE, createdDoc.getInstance());
         return ret;
     }
@@ -72,7 +98,11 @@ public abstract class Settlement_Base
 
         final Instance employeeInst = Instance.get(
                         _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.employee.name));
-        _insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
+        _insert.add(CIPayroll.Settlement.EmployeeAbstractLink, employeeInst);
+        _insert.add(CIPayroll.Settlement.StartDate,
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name));
+        _insert.add(CIPayroll.Settlement.EndDate,
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name));
     }
 
     /**

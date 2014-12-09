@@ -40,5 +40,17 @@
                 program="org.efaps.esjp.admin.datamodel.StatusValue">
             </trigger>
         </attribute>
+         <attribute>
+            <name>StartDate</name>
+            <type>Date</type>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>STARTDATE</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>EndDate</name>
+            <type>Date</type>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>ENDDATE</sqlcolumn>
+        </attribute>
     </definition>
 </datamodel-type>

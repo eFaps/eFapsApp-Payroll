@@ -48,33 +48,6 @@
             <property name="Attribute">DueDate</property>
             <property name="Required">true</property>
         </field>
-        <field name="salesperson">
-            <property name="Attribute">Salesperson</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <property name="ModeEdit">EDITABLE</property>
-            <property name="ModePrint">NONE</property>
-            <property name="ModeView">NONE</property>
-            <property name="Required">true</property>
-            <trigger event="UI_FIELD_VALUE"
-                method="getSalesPersonFieldValue"
-                name="Payroll_SettlementForm.salesperson.UI_FIELD_VALUE"
-                program="org.efaps.esjp.payroll.Settlement">
-                <property name="Type">Admin_User_Person</property>
-                <property name="Phrase">$&lt;attribute[LastName]&gt;, $&lt;attribute[FirstName]&gt;</property>
-                <property name="OrderSelect">attribute[LastName]</property>
-                <property name="WhereAttrEqValue">Status|true</property>
-                <property name="SelectCurrent">true</property>
-            </trigger>
-        </field>
-        <field name="salespersonLink">
-            <property name="SelectAlternateOID">linkto[Salesperson].oid</property>
-            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Attribute">Salesperson</property>
-            <property name="ModeCreate">NONE</property>
-            <property name="ModeEdit">NONE</property>
-            <property name="ModePrint">READONLY</property>
-            <property name="ModeView">READONLY</property>
-        </field>
         <field name="status">
             <property name="Attribute">Status</property>
         </field>
@@ -143,6 +116,22 @@
             <property name="ModeCreate">READONLY</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
+        <field character="Group" name="dateGroup">
+            <property name="GroupCount">1</property>
+            <property name="ModeCreate">READONLY</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModeView">NONE</property>
+        </field>
+        <field name="startDate">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="Attribute">StartDate</property>
+        </field>
+         <field name="endDate">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="Attribute">EndDate</property>
+        </field>
         <field character="Group" name="currencyGroup">
             <property name="GroupCount">1</property>
             <property name="ModeCreate">READONLY</property>
@@ -168,7 +157,7 @@
         <field name="rateCrossTotal">
             <property name="Columns">10</property>
             <property name="Rows">1</property>
-            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">READONLY</property>
             <property name="Attribute">RateCrossTotal</property>
             <property name="Required">true</property>
@@ -186,5 +175,78 @@
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Label">Payroll_Settlement/CrossTotal.Label</property>
         </field>
+         <field name="templateGroup" character="Group">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+            <property name="ModeView">NONE</property>
+            <property name="ModeEdit">NONE</property>
+        </field>
+        <field name="template">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeView">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Label">Payroll_PayslipForm.template.Label</property>
+            <property name="UIType">DROPDOWN</property>
+            <trigger program="org.efaps.esjp.common.uiform.Field"
+                method="getOptionListFieldValue"
+                name="Payroll_PayslipForm.template.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE">
+                <property name="Type">Payroll_TemplatePayslip</property>
+                <property name="StatusGroup">Payroll_TemplateStatus</property>
+                <property name="Status">Active</property>
+                <property name="Select">attribute[Name]</property>
+                <property name="ValueSelect">oid</property>
+            </trigger>
+        </field>
+        <field name="template4View">
+            <property name="SelectAlternateOID">linkto[TemplateLink].oid</property>
+            <property name="Select">linkto[TemplateLink].attribute[Name]</property>
+            <property name="Label">Payroll_PayslipForm.template.Label</property>
+            <property name="HRef">TREE</property>
+        </field>
+        <field name="updateButton" character="Command">
+            <property name="ModeCreate">READONLY</property>
+            <property name="ModeView">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Label">Payroll_PayslipForm.updateButton.Label</property>
+            <property name="CmdIcon">ACCEPT</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                method="executeButton"
+                name="Payroll_PayslipForm.case.UI_FIELD_CMD"
+                event="UI_FIELD_CMD">
+            </trigger>
+        </field>
+        <field name="ruleHeading" character="Heading">
+            <property name="ModeCreate">READONLY</property>
+            <property name="ModeEdit">READONLY</property>
+            <property name="Level">2</property>
+            <property name="Label">Payroll_PayslipForm.ruleHeading.Heading</property>
+        </field>
+        <field name="ruleTable" character="Target">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeView">NONE</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <table>Payroll_PositionRuleTable</table>
+            <evaluate program="org.efaps.esjp.payroll.Payslip" method="positionMultiPrint">
+                <property name="Type">Payroll_PositionAbstract</property>
+            </evaluate>
+        </field>
+         <field name="positionTable" character="Target">
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <table>Payroll_PayslipPositionTable</table>
+            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
+                <property name="Type">Payroll_PositionAbstract</property>
+                <property name="LinkFrom">DocumentAbstractLink</property>
+            </evaluate>
+        </field>
+        <field name="sums">
+            <property name="ModeCreate">READONLY</property>
+            <property name="ModeView">NONE</property>
+            <property name="ModeEdit">READONLY</property>
+            <property name="Label">Payroll_PayslipForm.Sums.Label</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+        </field>
+
     </definition>
 </ui-form>
