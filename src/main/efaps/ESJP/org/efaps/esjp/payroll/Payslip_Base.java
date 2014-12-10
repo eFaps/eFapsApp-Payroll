@@ -848,10 +848,8 @@ public abstract class Payslip_Base
         final Instance templInst = Instance.get(_parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name));
         if (templInst.isValid()) {
-            final List<? extends AbstractRule<?>> ruleInsts = Template.getRules4Template(_parameter, templInst);
+            final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
 
-            final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts.toArray(
-                            new Instance[ruleInsts.size()]));
             final Collection<Map<String, Object>> values = new ArrayList<>();
             for (final AbstractRule<?> rule : rules) {
                 final Map<String, Object> map = new HashMap<>();

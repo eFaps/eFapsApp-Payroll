@@ -267,6 +267,7 @@ public abstract class Calculator_Base
                                                final Object[] _args,
                                                final JexlInfo _info)
         {
+            setClassLoader(EFapsClassLoader.getInstance());
             JexlMethod ret = null;
             final String className;
             if (_ctorHandle instanceof Class<?>) {
