@@ -18,12 +18,10 @@
  * Last Changed By: $Author$
  */
 
-
 package org.efaps.esjp.payroll.rules;
 
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
-
 
 /**
  * This class must be replaced for customization, therefore it is left empty.
@@ -38,6 +36,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 public class MessageLog
     extends MessageLog_Base
 {
+
     /**
      *
      */

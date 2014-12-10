@@ -100,7 +100,7 @@ public abstract class Calculator_Base
         final Map<String, Object> functions = new HashMap<>();
         functions.put("math", MathFunctions.class);
         functions.put("data", DataFunctions.class);
-        functions.put("sysout", System.out);
+        functions.put("log", MSGLOG);
         JEXL.setFunctions(functions);
     }
 
@@ -256,7 +256,7 @@ public abstract class Calculator_Base
                 }
                 this.classNames.add(MathFunctions.class.getName());
                 this.classNames.add(DataFunctions.class.getName());
-                this.classNames.add(System.out.getClass().getName());
+                this.classNames.add(MessageLog.class.getName());
             } catch (final EFapsException e) {
                 LOG.error("Error", e);
             }

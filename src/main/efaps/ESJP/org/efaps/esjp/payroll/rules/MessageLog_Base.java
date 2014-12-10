@@ -50,6 +50,9 @@ public abstract class MessageLog_Base
      */
     private static final Logger LOG = LoggerFactory.getLogger(MessageLog.class);
 
+    /**
+     * Stack of warnings.
+     */
     private final Stack<String> warnstack = new Stack<>();
 
     @Override
@@ -106,7 +109,7 @@ public abstract class MessageLog_Base
     @Override
     public void debug(final Object _message)
     {
-       LOG.debug(_message.toString());
+        LOG.debug(_message.toString());
     }
 
     @Override
@@ -172,7 +175,7 @@ public abstract class MessageLog_Base
     }
 
     /**
-     *
+     * @return message to be shown
      */
     public String getMessage()
     {
@@ -180,7 +183,7 @@ public abstract class MessageLog_Base
         if (!this.warnstack.isEmpty()) {
             ret = this.warnstack.pop();
         } else {
-            ret ="";
+            ret = "";
         }
         return ret;
     }

@@ -848,22 +848,10 @@ public abstract class Payslip_Base
         final Instance templInst = Instance.get(_parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name));
         if (templInst.isValid()) {
-            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2Rule);
-            queryBldr.addWhereAttrEqValue(CIPayroll.Template2Rule.FromLink, templInst);
-            queryBldr.addOrderByAttributeAsc(CIPayroll.Template2Rule.Sequence);
+            final List<? extends AbstractRule<?>> ruleInsts = Template.getRules4Template(_parameter, templInst);
 
-            final MultiPrintQuery multi = queryBldr.getPrint();
-            final SelectBuilder ruleInst = SelectBuilder.get().linkto(CIPayroll.Template2Rule.ToLink).instance();
-            multi.addSelect(ruleInst);
-            multi.setEnforceSorted(true);
-            multi.execute();
-
-            final List<Instance> ruleInsts = new ArrayList<>();
-            while (multi.next()) {
-                ruleInsts.add(multi.<Instance>getSelect(ruleInst));
-            }
-            final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts
-                            .toArray(new Instance[ruleInsts.size()]));
+            final List<? extends AbstractRule<?>> rules = AbstractRule.getRules(ruleInsts.toArray(
+                            new Instance[ruleInsts.size()]));
             final Collection<Map<String, Object>> values = new ArrayList<>();
             for (final AbstractRule<?> rule : rules) {
                 final Map<String, Object> map = new HashMap<>();
