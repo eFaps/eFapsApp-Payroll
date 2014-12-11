@@ -41,6 +41,13 @@
             </trigger>
         </attribute>
          <attribute>
+            <name>TemplateLink</name>
+            <type>Link</type>
+            <typelink>Payroll_TemplatePayslip</typelink>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>TEMPLATEID</sqlcolumn>
+        </attribute>
+         <attribute>
             <name>StartDate</name>
             <type>Date</type>
             <sqltable>Payroll_DocumentSQLTable</sqltable>

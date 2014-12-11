@@ -15,29 +15,31 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev: 5314 $
- Last Changed:    $Date: 2010-08-16 11:32:53 -0500 (lun, 16 ago 2010) $
- Last Changed By: $Author: miguel.a.aranya $
+ Revision:        $Rev$
+ Last Changed:    $Date$
+ Last Changed By: $Author$
 
---><datamodel-type xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>94b0f754-2841-4580-9c98-e1e7b9efe46f</uuid>
+-->
+<datamodel-type xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>f8992c2f-16e5-4ea9-a7e4-8c3e64e90d77</uuid>
     <file-application>eFapsApp-Projects</file-application>
-    <file-revision>$Rev: 5314 $</file-revision>
+    <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_Payslip2Advance</name>
+        <name>Payroll_Settlement2Payslip</name>
         <parent>Payroll_Document2DocumentAbstract</parent>
         <attribute>
             <name>FromLink</name>
             <type>Link</type>
-            <typelink>Payroll_Payslip</typelink>
+            <typelink>Payroll_Settlement</typelink>
             <sqltable>ERP_Document2DocumentAbstractSQLTable</sqltable>
             <sqlcolumn>FROMID</sqlcolumn>
         </attribute>
         <attribute>
             <name>ToLink</name>
             <type>Link</type>
-            <typelink>Payroll_Advance</typelink>
+            <typelink>Payroll_Payslip</typelink>
             <sqltable>ERP_Document2DocumentAbstractSQLTable</sqltable>
             <sqlcolumn>TOID</sqlcolumn>
         </attribute>

@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-<!--
-
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2014 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,22 +20,23 @@
  Last Changed By: $Author$
 
 -->
-
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>bdfd7a97-e2c0-4a87-93e6-7c2df51a047e</uuid>
-    <file-application>eFapsApp-Payroll</file-application>
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>7ff3416b-a065-4203-8c89-26540f8cade5</uuid>
+    <file-application>eFapsApp-Sales</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipSearch</name>
+        <name>Payroll_SettlementTree_Doc_Menu_Action_AddPayslip</name>
         <target>
-            <form>Payroll_PayslipForm</form>
-            <table>Payroll_PayslipSearchTable</table>
-            <evaluate program="org.efaps.esjp.common.uisearch.Search">
-                <property name="Type">Payroll_Payslip</property>
-            </evaluate>
+            <search>Payroll_SettlementTree_Doc_Menu_Action_AddPayslip_Search</search>
+            <execute program="org.efaps.esjp.common.uisearch.Connect">
+                <property name="ConnectParentAttribute">FromLink</property>
+                <property name="ConnectChildAttribute">ToLink</property>
+                <property name="ConnectType">Payroll_Settlement2Payslip</property>
+            </execute>
         </target>
-        <property name="TargetMode">search</property>
+        <property name="Target">modal</property>
+        <property name="TargetMode">edit</property>
     </definition>
 </ui-command>

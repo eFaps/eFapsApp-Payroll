@@ -26,13 +26,13 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_Document2DocumentAbstract</name>
-        <parent>ERP_Object2ObjectAbstract</parent>
+        <parent>ERP_Document2DocumentAbstract</parent>
         <purpose abstract="true"/>
         <attribute>
             <name>FromAbstractLink</name>
             <type>Link</type>
             <typelink>Payroll_DocumentAbstract</typelink>
-            <sqltable>ERP_Object2ObjectAbstractSQLTable</sqltable>
+            <sqltable>ERP_Document2DocumentAbstractSQLTable</sqltable>
             <sqlcolumn>FROMID</sqlcolumn>
         </attribute>
     </definition>

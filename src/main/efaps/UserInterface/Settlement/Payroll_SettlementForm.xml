@@ -169,12 +169,6 @@
             <property name="ModeEdit">EDITABLE</property>
             <property name="Attribute">Note</property>
         </field>
-        <field name="crossTotal4Read">
-            <property name="ModeEdit">NONE</property>
-            <property name="Phrase">$&lt;attribute[CrossTotal].format[#,##0.00]&gt; $&lt;linkto[CurrencyId].attribute[Symbol]&gt;</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
-            <property name="Label">Payroll_Settlement/CrossTotal.Label</property>
-        </field>
          <field name="templateGroup" character="Group">
             <property name="GroupCount">2</property>
             <property name="ModeCreate">READONLY</property>

@@ -99,6 +99,9 @@ public abstract class Settlement_Base
         final Instance employeeInst = Instance.get(
                         _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.employee.name));
         _insert.add(CIPayroll.Settlement.EmployeeAbstractLink, employeeInst);
+        final Instance templateInst = Instance.get(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.template.name));
+        _insert.add(CIPayroll.Settlement.TemplateLinkAbstract, templateInst);
         _insert.add(CIPayroll.Settlement.StartDate,
                         _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name));
         _insert.add(CIPayroll.Settlement.EndDate,

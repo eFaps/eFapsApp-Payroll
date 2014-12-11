@@ -33,6 +33,9 @@
             <form>Payroll_SettlementForm</form>
         </target>
         <type>Payroll_Settlement</type>
+        <childs>
+            <child>Payroll_SettlementTree_Doc</child>
+        </childs>
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>

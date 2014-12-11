@@ -42,6 +42,7 @@
         <!-- child -->
         <childs>
             <child>Payroll_PayslipTree_Position</child>
+            <child>Payroll_PayslipTree_Doc</child>
             <child>Payroll_PayslipTree_Payment</child>
         </childs>
         <!-- properties -->
