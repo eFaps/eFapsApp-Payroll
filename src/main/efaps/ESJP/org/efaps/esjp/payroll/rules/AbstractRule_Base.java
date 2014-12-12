@@ -22,7 +22,9 @@ package org.efaps.esjp.payroll.rules;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -48,6 +50,8 @@ import org.efaps.util.EFapsException;
 public abstract class AbstractRule_Base<T>
 {
 
+    protected static String LISTENERKEY = AbstractRule.class.getName() + ".ListenerKey";
+
     /**
      * Instance of the rule.
      */
@@ -68,6 +72,8 @@ public abstract class AbstractRule_Base<T>
     private RuleType ruleType;
 
     private List<RuleConfig> config;
+
+    private final Set<IRuleListener> ruleListeners = new HashSet<>();
 
     protected void init()
         throws EFapsException
@@ -339,6 +345,45 @@ public abstract class AbstractRule_Base<T>
     {
         this.config = _config;
     }
+
+    /**
+     * Getter method for the instance variable {@link #ruleListeners}.
+     *
+     * @return value of instance variable {@link #ruleListeners}
+     */
+    public Set<IRuleListener> getRuleListeners()
+    {
+        return this.ruleListeners;
+    }
+
+    /**
+     * Getter method for the instance variable {@link #ruleListeners}.
+     *
+     * @return value of instance variable {@link #ruleListeners}
+     */
+    public <S extends IRuleListener> Set<S> getRuleListeners(final Class<S> _clazz)
+    {
+        final Set<S> ret = new HashSet<>();
+        for (final Object listener : getRuleListeners()) {
+            if (_clazz.isInstance(listener)) {
+                ret.add(_clazz.cast(listener));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Getter method for the instance variable {@link #ruleListeners}.
+     *
+     * @return value of instance variable {@link #ruleListeners}
+     */
+    public T addRuleListener(final IRuleListener _ruleListener)
+    {
+        getRuleListeners().add(_ruleListener);
+        return getThis();
+    }
+
+
 
     @Override
     public String toString()

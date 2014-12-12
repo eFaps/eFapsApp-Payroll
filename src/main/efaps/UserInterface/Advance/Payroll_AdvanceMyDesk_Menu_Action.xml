@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
  Copyright 2003 - 2010 The eFaps Team
 
@@ -22,23 +20,16 @@
  Last Changed By: $Author$
 
 -->
-
-<ui-menu xmlns="http://www.efaps.org/xsd"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>0c8f7631-6d7c-479c-a01c-0d308c976431</uuid>
+<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>3665753d-60bd-4a22-a8e6-0d8b0582d25b</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipMyDesk_Menu_Action</name>
+        <name>Payroll_AdvanceMyDesk_Menu_Action</name>
         <childs>
-            <child>Payroll_PayslipMyDesk_Menu_Action_Create</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_CreateMultiple</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_EditMassive</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_Checkout</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_Copy</child>
-            <child>Payroll_PayslipMyDesk_Menu_Action_CreateMassive</child>
+            <child>Payroll_AdvanceMyDesk_Menu_Action_CreateAdvance</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_Delete</child>
         </childs>
     </definition>

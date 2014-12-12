@@ -20,31 +20,26 @@
 
 package org.efaps.esjp.payroll.rules;
 
-import java.util.List;
-
-import org.efaps.admin.program.esjp.EFapsRevision;
-import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.admin.event.Parameter;
 import org.efaps.db.Instance;
+import org.efaps.util.EFapsException;
 
 /**
- * This class must be replaced for customization, therefore it is left empty.
- * Functional description can be found in the related "<code>_Base</code>"
- * class.
+ * TODO comment!
  *
  * @author The eFaps Team
  * @version $Id$
  */
-@EFapsUUID("0d7ba4f6-d645-4951-9ba2-a6f5e0df4634")
-@EFapsRevision("$Rev$")
-public abstract class AbstractRule<T>
-    extends AbstractRule_Base<T>
+public interface IDocRuleListener
+    extends IRuleListener
 {
-    public static String LISTENERKEY = AbstractRule_Base.LISTENERKEY;
 
-    public static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
-    {
-        return AbstractRule_Base.getRules(_ruleInsts);
-    }
-
+    /**
+     * @param _parameter
+     * @param _docInst
+     */
+    void execute(final Parameter _parameter,
+                 final Instance _docInst)
+        throws EFapsException;
 
 }

@@ -21,11 +21,15 @@
 package org.efaps.esjp.payroll.rules;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.datamodel.Status;
+import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.db.Insert;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
@@ -68,7 +72,9 @@ public abstract class DataFunctions_Base
     }
 
     /**
-     * @param _keys
+     * @param _keys keys to be analized.
+     * @return the amount for anual
+     * @throws EFapsException on error
      */
     public BigDecimal getAnual(final String... _keys)
         throws EFapsException
@@ -77,37 +83,136 @@ public abstract class DataFunctions_Base
     }
 
     /**
-     * @param _keys
+     * @param _month month to be used as filter
+     * @param _keys keys to be analized.
+     * @return the amount for anual
+     * @throws EFapsException on error
      */
     public BigDecimal getAnualMonth(final Integer _month,
                                     final String... _keys)
         throws EFapsException
     {
         BigDecimal ret = BigDecimal.ZERO;
-        if (_month > 0 ) {
+        if (_month > 0) {
             final Instance employeeInst = (Instance) getContext().get(AbstractParameter.PARAKEY4EMPLOYINST);
-            final DateTime date = (DateTime) getContext().get(AbstractParameter.PARAKEY4DATE);
-            final DateTime startDate = date.dayOfYear().withMinimumValue().minusMinutes(1);
-            final DateTime endDate = date.monthOfYear().setCopy(_month).dayOfMonth().withMaximumValue().plusMinutes(1);
+            if (employeeInst != null && employeeInst.isValid()) {
+                final DateTime date = (DateTime) getContext().get(AbstractParameter.PARAKEY4DATE);
+                final DateTime startDate = date.dayOfYear().withMinimumValue().minusMinutes(1);
+                final DateTime endDate = date.monthOfYear().setCopy(_month).dayOfMonth().withMaximumValue()
+                                .plusMinutes(1);
 
-            final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-            attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
-            attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status, Status.find(CIPayroll.PayslipStatus.Canceled));
-            attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, startDate);
-            attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, endDate);
+                final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
+                attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
+                attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status,
+                                Status.find(CIPayroll.PayslipStatus.Canceled));
+                attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, startDate);
+                attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, endDate);
 
-            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
-            queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key, (Object[]) _keys);
-            queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
-                            attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID));
-            final MultiPrintQuery multi = queryBldr.getPrint();
-            multi.addAttribute(CIPayroll.PositionPayment.Amount);
-            multi.execute();
-            while (multi.next()) {
-                final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
-                ret = ret.add(amount);
+                final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+                queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key, (Object[]) _keys);
+                queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
+                                attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID));
+                final MultiPrintQuery multi = queryBldr.getPrint();
+                multi.addAttribute(CIPayroll.PositionPayment.Amount);
+                multi.execute();
+                while (multi.next()) {
+                    final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
+                    ret = ret.add(amount);
+                }
             }
         }
         return ret;
+    }
+
+    /**
+     * @return the amount for anual
+     * @throws EFapsException on error
+     */
+    public BigDecimal getAdvance()
+        throws EFapsException
+    {
+        BigDecimal ret = BigDecimal.ZERO;
+        final Instance employeeInst = (Instance) getContext().get(AbstractParameter.PARAKEY4EMPLOYINST);
+        final Instance docInst = (Instance) getContext().get(AbstractParameter.PARAKEY4DOCINST);
+        if (employeeInst != null && employeeInst.isValid()) {
+            if (docInst != null && docInst.isValid()) {
+                final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip2Advance);
+                attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip2Advance.FromLink, docInst);
+                final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Advance);
+                queryBldr.addWhereAttrInQuery(CIPayroll.Advance.ID,
+                               attrQueryBldr.getAttributeQuery(CIPayroll.Payslip2Advance.ToLink));
+                final MultiPrintQuery multi = queryBldr.getPrint();
+                multi.addAttribute(CIPayroll.Advance.CrossTotal);
+                multi.execute();
+                while (multi.next()) {
+                    ret = ret.add(multi.<BigDecimal>getAttribute(CIPayroll.Advance.CrossTotal));
+                }
+            } else {
+                final Set<Instance> instances = new HashSet<>();
+                // all advance that are not related yet and belong to the employee
+                final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip2Advance);
+                final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Advance);
+                queryBldr.addWhereAttrNotInQuery(CIPayroll.Advance.ID,
+                               attrQueryBldr.getAttributeQuery(CIPayroll.Payslip2Advance.ToLink));
+                queryBldr.addWhereAttrEqValue(CIPayroll.Advance.EmployeeAbstractLink, employeeInst);
+                queryBldr.addWhereAttrEqValue(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Paid));
+                final MultiPrintQuery multi = queryBldr.getPrint();
+                multi.addAttribute(CIPayroll.Advance.CrossTotal);
+                multi.execute();
+                while (multi.next()) {
+                    ret = ret.add(multi.<BigDecimal>getAttribute(CIPayroll.Advance.CrossTotal));
+                    instances.add(multi.getCurrentInstance());
+                }
+
+                if (!instances.isEmpty()) {
+                    final ConnectAdvance2Payslip connect = new ConnectAdvance2Payslip(instances);
+                    getContext().set(AbstractRule.LISTENERKEY, connect);
+                }
+            }
+        }
+        return ret;
+    }
+
+
+    public static class ConnectAdvance2Payslip
+        implements IDocRuleListener
+    {
+
+        private final Set<Instance> instances;
+
+        public ConnectAdvance2Payslip(final Set<Instance> _instances)
+        {
+            this.instances = _instances;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #instances}.
+         *
+         * @return value of instance variable {@link #instances}
+         */
+        public Set<Instance> getInstances()
+        {
+            return this.instances;
+        }
+
+        @Override
+        public void execute(final Parameter _parameter,
+                            final Instance _docInst)
+            throws EFapsException
+        {
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isCIType(CIPayroll.Payslip)) {
+                for (final Instance instance : getInstances()) {
+                    final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip2Advance);
+                    queryBldr.addWhereAttrEqValue(CIPayroll.Payslip2Advance.ToLink, instance);
+                    if (queryBldr.getQuery().executeWithoutAccessCheck().isEmpty()) {
+                        final Insert insert = new Insert(CIPayroll.Payslip2Advance);
+                        insert.add(CIPayroll.Payslip2Advance.FromLink, _docInst);
+                        insert.add(CIPayroll.Payslip2Advance.ToLink, instance);
+                        insert.execute();
+                    }
+                }
+
+            }
+        }
     }
 }

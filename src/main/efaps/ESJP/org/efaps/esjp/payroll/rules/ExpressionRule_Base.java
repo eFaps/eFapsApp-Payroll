@@ -59,6 +59,10 @@ public abstract class ExpressionRule_Base
             setMessage(Calculator.getMessageLog().getMessage());
             _context.set(getKey4Expression(), val);
             setResult(val);
+
+            if (_context.has(AbstractRule.LISTENERKEY)) {
+                addRuleListener((IRuleListener) _context.get(AbstractRule.LISTENERKEY));
+            }
         } catch (final JexlException e) {
             throw new EFapsException("Catched JexlException", e);
         }

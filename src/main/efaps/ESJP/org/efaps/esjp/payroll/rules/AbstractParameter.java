@@ -47,10 +47,17 @@ public abstract class AbstractParameter<T>
      * Key for a parameter containing the instance of the employee.
      */
     public static final String PARAKEY4EMPLOYINST = AbstractParameter_Base.PARAKEY4EMPLOYINST;
+
+    /**
+     * Key for a parameter containing the instance of the document.
+     */
+    protected static final String PARAKEY4DOCINST = AbstractParameter_Base.PARAKEY4DOCINST;
+
     /**
      * Key for a parameter containing the date.
      */
     public static final String PARAKEY4DATE = AbstractParameter_Base.PARAKEY4DATE;
+
     /**
      * Key for a parameter containing the date.
      */
@@ -65,6 +72,7 @@ public abstract class AbstractParameter<T>
      * Key for a parameter containing the Night Labor Time.
      */
     public static final String PARAKEY4HLT = AbstractParameter_Base.PARAKEY4HLT;
+
     /**
      * Key for a parameter containing the Holiday Labor Time.
      */

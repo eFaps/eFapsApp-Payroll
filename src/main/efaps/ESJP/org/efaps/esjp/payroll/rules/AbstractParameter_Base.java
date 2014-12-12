@@ -60,6 +60,11 @@ public abstract class AbstractParameter_Base<T>
     protected static final String PARAKEY4EMPLOYINST = "EmployeeInstance";
 
     /**
+     * Key for a parameter containing the instance of the document.
+     */
+    protected static final String PARAKEY4DOCINST = "DocInstance";
+
+    /**
      * Key for a parameter containing the date.
      */
     protected static final String PARAKEY4DATE = "Date";
@@ -330,6 +335,12 @@ public abstract class AbstractParameter_Base<T>
                                          final Instance _docInst)
         throws EFapsException
     {
+        if (!_map.containsKey(AbstractParameter.PARAKEY4DOCINST)) {
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+                _map.put(AbstractParameter.PARAKEY4DOCINST, _docInst);
+            }
+        }
+
         if (!_map.containsKey(AbstractParameter.PARAKEY4DATE)) {
             DateTime date = null;
             if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {

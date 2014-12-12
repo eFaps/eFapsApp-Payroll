@@ -94,6 +94,7 @@ import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
 import org.efaps.esjp.payroll.rules.ExpressionRule;
+import org.efaps.esjp.payroll.rules.IDocRuleListener;
 import org.efaps.esjp.payroll.rules.InputRule;
 import org.efaps.esjp.payroll.rules.Result;
 import org.efaps.esjp.sales.PriceUtil;
@@ -343,6 +344,8 @@ public abstract class Payslip_Base
 
             createdDoc.setInstance(insert.getInstance());
 
+            addAdvance(_parameter, createdDoc, emplInst);
+
             final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
             Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
             final Result result = Calculator.getResult(_parameter, rules);
@@ -353,6 +356,27 @@ public abstract class Payslip_Base
         }
         return new Return();
     }
+
+    protected void addAdvance(final Parameter _parameter,
+                              final CreatedDoc _createdDoc,
+                              final Instance _emplInst)
+        throws EFapsException
+    {
+        final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip2Advance);
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Advance);
+        queryBldr.addWhereAttrNotInQuery(CIPayroll.Advance.ID,
+                        attrQueryBldr.getAttributeQuery(CIPayroll.Payslip2Advance.ToLink));
+        queryBldr.addWhereAttrEqValue(CIPayroll.Advance.EmployeeAbstractLink, _emplInst);
+        queryBldr.addWhereAttrEqValue(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Paid));
+        final InstanceQuery query = queryBldr.getQuery();
+        for (final Instance instance : query.execute()) {
+            final Insert insert = new Insert(CIPayroll.Payslip2Advance);
+            insert.add(CIPayroll.Payslip2Advance.FromLink, _createdDoc.getInstance());
+            insert.add(CIPayroll.Payslip2Advance.ToLink, instance);
+            insert.execute();
+        }
+    }
+
 
     protected void updateTotals(final Parameter _parameter,
                                 final Instance _docInst,
@@ -382,6 +406,15 @@ public abstract class Payslip_Base
         insert.add(CIPayroll.Payslip.CurrencyId, baseCurIns);
         insert.add(CIPayroll.Payslip.RateCurrencyId, _rateCurInst);
         insert.execute();
+
+        for (final AbstractRule<?> rule : _result.getRules()) {
+            if (rule.add()) {
+                for (final IDocRuleListener listener : rule.getRuleListeners(IDocRuleListener.class)) {
+                    listener.execute(_parameter, _docInst);
+                }
+            }
+        }
+
     }
 
     public Return edit(final Parameter _parameter)
