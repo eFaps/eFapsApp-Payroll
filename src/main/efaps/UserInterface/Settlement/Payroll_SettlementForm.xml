@@ -241,6 +241,16 @@
             <property name="Label">Payroll_PayslipForm.Sums.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
-
+        <field name="javaScript4edit">
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">HIDDEN</property>
+            <property name="ModeView">NONE</property>
+            <property name="ModePrint">NONE</property>
+            <property name="UIType">SNIPPLET</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                    method="getJavaScript4EditUIValue"
+                    name="Payroll_PayslipForm.javaScript4edit.UI_FIELD_VALUE"
+                    event="UI_FIELD_VALUE"></trigger>
+        </field>
     </definition>
 </ui-form>

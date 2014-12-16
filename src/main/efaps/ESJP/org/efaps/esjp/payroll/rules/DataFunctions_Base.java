@@ -101,7 +101,10 @@ public abstract class DataFunctions_Base
                 final DateTime endDate = date.monthOfYear().setCopy(_month).dayOfMonth().withMaximumValue()
                                 .plusMinutes(1);
 
+                final QueryBuilder relAttrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
                 final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
+                attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
+                                relAttrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
                 attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
                 attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status,
                                 Status.find(CIPayroll.PayslipStatus.Canceled));

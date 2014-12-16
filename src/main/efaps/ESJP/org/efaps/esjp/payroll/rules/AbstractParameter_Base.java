@@ -368,7 +368,8 @@ public abstract class AbstractParameter_Base<T>
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
-                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.LaborTime)[0];
+                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.LaborTime);
+                laborTime = obj == null ? null : (BigDecimal) obj[0];
             } else {
                 try {
                     final String laborTimeStr = _parameter
@@ -394,7 +395,8 @@ public abstract class AbstractParameter_Base<T>
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
-                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.ExtraLaborTime)[0];
+                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.ExtraLaborTime);
+                laborTime = obj == null ? null : (BigDecimal) obj[0];
             } else {
                 try {
                     final String laborTimeStr = _parameter
@@ -420,7 +422,8 @@ public abstract class AbstractParameter_Base<T>
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
-                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime)[0];
+                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime);
+                laborTime = obj == null ? null : (BigDecimal) obj[0];;
             } else {
                 try {
                     final String laborTimeStr = _parameter
@@ -446,7 +449,8 @@ public abstract class AbstractParameter_Base<T>
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
-                laborTime = (BigDecimal) print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.NightLaborTime)[0];
+                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.NightLaborTime);
+                laborTime = obj == null ? null : (BigDecimal) obj[0];
             } else {
                 try {
                     final String laborTimeStr = _parameter

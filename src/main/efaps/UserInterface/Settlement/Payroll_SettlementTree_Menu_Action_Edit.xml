@@ -33,7 +33,7 @@
             <role>Payroll_Modifier</role>
         </access>
         <target>
-            <form>Payroll_PayslipForm</form>
+            <form>Payroll_SettlementForm</form>
             <execute method="edit" program="org.efaps.esjp.payroll.Settlement" />
             <trigger event="UI_ACCESSCHECK"
                 method="check4Status"
