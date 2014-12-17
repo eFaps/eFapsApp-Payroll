@@ -34,6 +34,7 @@
         </target>
         <type>Payroll_Settlement</type>
         <childs>
+            <child>Payroll_SettlementTree_Position</child>
             <child>Payroll_SettlementTree_Doc</child>
         </childs>
         <property name="Target">content</property>

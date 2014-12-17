@@ -40,8 +40,15 @@
             <key>org.efaps.payroll.WhiteList4RuleSandbox</key>
             <value>org.efaps.esjp.payroll.rules.IncomeTax5
 org.joda.time.DateTime
+org.joda.time.Period
+org.joda.time.PeriodType
 java.util.HashMap</value>
             <description></description>
+        </attribute>
+        <attribute>
+            <key>org.efaps.payroll.StaticMethodMapping</key>
+            <value><![CDATA[Period=org.joda.time.Period
+PeriodType=org.joda.time.PeriodType]]></value>
         </attribute>
     </definition>
 </common-systemconfiguration>

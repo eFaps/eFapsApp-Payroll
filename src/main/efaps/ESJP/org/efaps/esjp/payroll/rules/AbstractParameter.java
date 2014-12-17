@@ -51,7 +51,7 @@ public abstract class AbstractParameter<T>
     /**
      * Key for a parameter containing the instance of the document.
      */
-    protected static final String PARAKEY4DOCINST = AbstractParameter_Base.PARAKEY4DOCINST;
+    public static final String PARAKEY4DOCINST = AbstractParameter_Base.PARAKEY4DOCINST;
 
     /**
      * Key for a parameter containing the date.
@@ -77,6 +77,16 @@ public abstract class AbstractParameter<T>
      * Key for a parameter containing the Holiday Labor Time.
      */
     public static final String PARAKEY4NLT = AbstractParameter_Base.PARAKEY4NLT;
+
+    /**
+     * Key for a parameter containing StartDate.
+     */
+    public static final String PARAKEY4STARTDATE =  AbstractParameter_Base.PARAKEY4STARTDATE;
+    /**
+     * Key for a parameter containing the Enddate.
+     */
+    public static final String PARAKEY4ENDDATE =  AbstractParameter_Base.PARAKEY4ENDDATE;
+
 
     /**
      * @param _parameter Parameter as passed by the eFaps API

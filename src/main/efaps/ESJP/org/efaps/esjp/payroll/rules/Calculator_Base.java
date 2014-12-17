@@ -295,7 +295,8 @@ public abstract class Calculator_Base
         {
             JexlMethod ret = null;
             if (_obj != null && _method != null) {
-                if (this.classNames.contains(_obj.getClass().getName())) {
+                if (this.classNames.contains(_obj.getClass().getName())
+                                || _obj instanceof Class && this.classNames.contains(((Class<?>)_obj).getName())) {
                     ret = getMethodExecutor(_obj, _method, _args);
                 }
             }

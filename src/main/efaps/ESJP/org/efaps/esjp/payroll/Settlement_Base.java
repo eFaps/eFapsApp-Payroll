@@ -30,6 +30,9 @@ import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
+import org.efaps.db.InstanceQuery;
+import org.efaps.db.PrintQuery;
+import org.efaps.db.QueryBuilder;
 import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
@@ -62,6 +65,8 @@ public abstract class Settlement_Base
     {
         final CreatedDoc createdDoc = createDoc(_parameter);
         connect2Object(_parameter, createdDoc);
+        connect2Payslip(_parameter, createdDoc);
+
         final Return ret = new Return();
 
         final Payslip payslip = new Payslip();
@@ -85,6 +90,33 @@ public abstract class Settlement_Base
 
         ret.put(ReturnValues.INSTANCE, createdDoc.getInstance());
         return ret;
+    }
+
+    protected void connect2Payslip(final Parameter _parameter,
+                                   final CreatedDoc _createdDoc)
+        throws EFapsException
+    {
+        final PrintQuery print = new PrintQuery(_createdDoc.getInstance());
+        print.addAttribute(CIPayroll.DocumentAbstract.EmployeeAbstractLink);
+        print.execute();
+
+        final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
+
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
+        queryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
+                        attrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
+        queryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink,
+                        print.getAttribute(CIPayroll.DocumentAbstract.EmployeeAbstractLink));
+
+        final InstanceQuery query = queryBldr.getQuery();
+        query.execute();
+        while (query.next()) {
+            final Insert insert = new Insert(CIPayroll.Settlement2Payslip);
+            insert.add(CIPayroll.Settlement2Payslip.FromAbstractLink, _createdDoc.getInstance());
+            insert.add(CIPayroll.Settlement2Payslip.ToAbstractLink, query.getCurrentValue());
+            insert.execute();
+        }
+
     }
 
     /**

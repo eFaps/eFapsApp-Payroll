@@ -24,8 +24,11 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.efaps.admin.event.Parameter;
+import org.efaps.admin.program.esjp.EFapsClassLoader;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.CachedPrintQuery;
@@ -37,6 +40,8 @@ import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.erp.NumberFormatter;
+import org.efaps.esjp.payroll.util.Payroll;
+import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
@@ -88,6 +93,16 @@ public abstract class AbstractParameter_Base<T>
      * Key for a parameter containing the Holiday Labor Time.
      */
     protected static final String PARAKEY4HLT = "HolidayLaborTime";
+
+    /**
+     * Key for a parameter containing StartDate.
+     */
+    protected static final String PARAKEY4STARTDATE = "StartDate";
+
+    /**
+     * Key for a parameter containing the Enddate.
+     */
+    protected static final String PARAKEY4ENDDATE = "EndDate";
 
     /**
      * Logger for this classes.
@@ -247,7 +262,7 @@ public abstract class AbstractParameter_Base<T>
                 print.addSelect(sel);
                 print.execute();
                 employeeInst = print.getSelect(sel);
-            } else if (docInst.getType().isKindOf(CIPayroll.Payslip)) {
+            } else if (docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
                 final PrintQuery print = new PrintQuery(docInst);
                 final SelectBuilder sel = SelectBuilder.get()
                                 .linkto(CIPayroll.Payslip.EmployeeAbstractLink).instance();
@@ -274,6 +289,17 @@ public abstract class AbstractParameter_Base<T>
         throws EFapsException
     {
         final Map<String, Object> ret = new HashMap<>();
+
+        final Properties statics = Payroll.getSysConfig().getAttributeValueAsProperties(
+                        PayrollSettings.STATICMETHODMAPPING, true);
+        for (final Entry<Object, Object> entry : statics.entrySet()) {
+            try {
+                final Class<?> clazz = Class.forName((String) entry.getValue(), true, EFapsClassLoader.getInstance());
+                ret.put((String) entry.getKey(), clazz);
+            } catch (final ClassNotFoundException e) {
+                LOG.error("Catched ClassNotFoundException", e);
+            }
+        }
 
         AbstractParameter.add2Parameters(_parameter, ret, _docInst);
         DateTime date;
@@ -362,7 +388,7 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4LT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
@@ -389,7 +415,7 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4ELT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
@@ -416,14 +442,14 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4HLT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
                 final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime);
-                laborTime = obj == null ? null : (BigDecimal) obj[0];;
+                laborTime = obj == null ? null : (BigDecimal) obj[0];
             } else {
                 try {
                     final String laborTimeStr = _parameter
@@ -443,7 +469,7 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4NLT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
@@ -468,5 +494,50 @@ public abstract class AbstractParameter_Base<T>
                 _map.put(AbstractParameter.PARAKEY4NLT, laborTime);
             }
         }
+
+        if (!_map.containsKey(AbstractParameter.PARAKEY4STARTDATE)) {
+            DateTime date = null;
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate);
+                print.executeWithoutAccessCheck();
+                date = print.getAttribute(CIPayroll.Settlement.StartDate);
+            } else {
+                final String dateStr = _parameter
+                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name);
+                if (dateStr != null && !dateStr.isEmpty()) {
+                    date = new DateTime(dateStr);
+                } else {
+                    date = new DateTime(dateStr);
+                }
+
+            }
+            if (date != null) {
+                _map.put(AbstractParameter.PARAKEY4STARTDATE, date);
+            }
+        }
+
+        if (!_map.containsKey(AbstractParameter.PARAKEY4ENDDATE)) {
+            DateTime date = null;
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate);
+                print.executeWithoutAccessCheck();
+                date = print.getAttribute(CIPayroll.Settlement.EndDate);
+            } else {
+                final String dateStr = _parameter
+                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name);
+                if (dateStr != null && !dateStr.isEmpty()) {
+                    date = new DateTime(dateStr);
+                } else {
+                    date = new DateTime(dateStr);
+                }
+
+            }
+            if (date != null) {
+                _map.put(AbstractParameter.PARAKEY4ENDDATE, date);
+            }
+        }
+
     }
 }

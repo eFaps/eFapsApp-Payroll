@@ -45,4 +45,9 @@ public interface PayrollSettings
      * String with the name of the selected company.
      */
     String RULESANDBOXWHITELIST = "org.efaps.payroll.WhiteList4RuleSandbox";
+
+    /**
+     * String with the name of the selected company.
+     */
+    String STATICMETHODMAPPING = "org.efaps.payroll.StaticMethodMapping";
 }
