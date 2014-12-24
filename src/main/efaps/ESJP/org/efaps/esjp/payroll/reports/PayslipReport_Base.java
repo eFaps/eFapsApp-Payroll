@@ -42,6 +42,7 @@ import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.file.FileUtil;
+import org.efaps.esjp.payroll.util.Payroll.RuleConfig;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
@@ -72,9 +73,9 @@ public abstract class PayslipReport_Base
         /** */
         REMUCODE("remuCode", 4, null),
         /** */
-        AMOUNT("amount", 10, 2),
+        AMOUNT("amount", 7, 2),
         /** */
-        PAYAMOUNT("payAmount", 10, 2);
+        PAYAMOUNT("payAmount", 7, 2);
 
         /**
          * key.
@@ -232,21 +233,20 @@ public abstract class PayslipReport_Base
             queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
                             multi.getCurrentInstance().getId());
             final MultiPrintQuery multi2 = queryBldr2.getPrint();
-            multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
-            final SelectBuilder selCaseName = new SelectBuilder();
-            final SelectBuilder selCaseExp = new SelectBuilder();
-            multi2.addSelect(selCaseName, selCaseExp);
+            multi2.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Key);
+            final SelectBuilder selRuleConfig = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.RuleAbstractLink)
+                            .attribute(CIPayroll.RuleAbstract.Config);
+            multi2.addSelect(selRuleConfig);
             multi2.execute();
             while (multi2.next()) {
                 final Map<String, Object> value = new HashMap<String, Object>();
-                final BigDecimal amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
-                final String caseName = multi2.<String>getSelect(selCaseName);
-                final Boolean caseNameExp = multi2.<Boolean>getSelect(selCaseExp);
-
-                if (caseNameExp != null && caseNameExp) {
+                final BigDecimal amount = multi2.getAttribute(CIPayroll.PositionAbstract.Amount);
+                final String key = multi2.getAttribute(CIPayroll.PositionAbstract.Key);
+                final List<RuleConfig> ruleConfig =  multi2.getSelect(selRuleConfig);
+                if (ruleConfig != null && ruleConfig.contains(RuleConfig.INCLUDEPLAME)) {
                     value.put(PayslipReport_Base.Field.DOCNUM.getKey(), doc);
                     value.put(PayslipReport_Base.Field.DOCTYPE.getKey(), docType);
-                    value.put(PayslipReport_Base.Field.REMUCODE.getKey(), caseName);
+                    value.put(PayslipReport_Base.Field.REMUCODE.getKey(), key);
                     value.put(PayslipReport_Base.Field.AMOUNT.getKey(), amount);
                     value.put(PayslipReport_Base.Field.PAYAMOUNT.getKey(), amount);
                     values.add(value);

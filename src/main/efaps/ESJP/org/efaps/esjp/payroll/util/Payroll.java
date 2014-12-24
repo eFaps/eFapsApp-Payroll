@@ -69,7 +69,11 @@ public final class Payroll
         /**
          * Exclude it if it is Zero.
          */
-        EXCLUDEZERO;
+        EXCLUDEZERO,
+        /**
+         * Exclude it if it is Zero.
+         */
+        INCLUDEPLAME;
 
         /**
          * {@inheritDoc}
