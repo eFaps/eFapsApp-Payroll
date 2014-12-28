@@ -44,7 +44,7 @@
             <property name="ModeEdit">NONE</property>
             <table>Payroll_AdvanceTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_Advance</property>
+                <property name="Type">Payroll_Advance</property>
             </evaluate>
         </field>
     </definition>

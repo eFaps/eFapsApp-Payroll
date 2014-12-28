@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2014 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,68 +19,70 @@
  Last Changed:    $Date: 2012-03-13 11:07:12 -0500 (mar, 13 mar 2012) $
  Last Changed By: $Author: m.aranya@moxter.net $
 
---><ui-table xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+-->
+<ui-table xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>ba425f4e-1eec-4a79-8627-9569577daa4e</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 7367 $</file-revision>
     <definition>
-    <version-expression>(version==latest)</version-expression>
-    <name>Payroll_AdvanceTable</name>
-    <!-- fields -->
-    <field name="type">
-        <property name="Attribute">Type</property>
-        <property name="Label">Payroll_Payslip/Type.Label</property>
-        <property name="ShowTypeIcon">true</property>
-    </field>
-    <field name="name">
-        <property name="Attribute">Name</property>
-        <property name="Label">Payroll_Payslip/Name.Label</property>
-        <property name="ShowTypeIcon">true</property>
-        <property name="HRef">TREE</property>
-    </field>
-    <field name="employee">
-        <property name="ModeCreate">EDITABLE</property>
-        <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
-        <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-        <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
-        <property name="Label">Payroll_Payslip/employee.Label</property>
-        <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
-        <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee"
-            name="Payroll_AdvanceTable.employeeLink.UI_FIELD_AUTOCOMPLETE"
-            program="org.efaps.esjp.humanresource.Employee">
-            <property name="keyValue">Value</property>
-            <property name="Type">HumanResource_Employee</property>
-            <property name="StatusGroup">HumanResource_EmployeeStatus</property>
-            <property name="Status">Worker</property>
-        </trigger>
-    </field>
-    <field name="rateCrossTotal">
-        <property name="Attribute">RateCrossTotal</property>
-        <property name="Label">Payroll_Payslip/Amount2Pay.Label</property>
-        <property name="ModeCreate">EDITABLE</property>
-        <property name="Align">right</property>
-    </field>
-    <field name="rateCrossTotal4View">
-        <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
-        <property name="ModeCreate">NONE</property>
-        <property name="ModeEdit">NONE</property>
-        <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
-    </field>
-    <field name="rateCurrencyId">
-        <property name="Attribute">RateCurrencyId</property>
-        <property name="ModeCreate">EDITABLE</property>
-        <property name="ModeEdit">NONE</property>
-        <property name="ModeView">NONE</property>
-        <trigger program="org.efaps.esjp.payroll.Payslip"
-            method="rateCurrencyFieldValueUI" name="Payroll_AdvanceTable.currencyId.UI_FIELD_VALUE"
-            event="UI_FIELD_VALUE" />
-    </field>
-    <field name="buttonOpenInNewWindow">
-        <icon>eFapsActionNewWindow</icon>
-        <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-        <property name="Target">popup</property>
-        <property name="SortAble">false</property>
-        <property name="Width">15px</property>
-    </field>
-</definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_AdvanceTable</name>
+        <field name="type">
+            <property name="Attribute">Type</property>
+            <property name="Label">Payroll_Payslip/Type.Label</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="name">
+            <property name="Attribute">Name</property>
+            <property name="Label">Payroll_Payslip/Name.Label</property>
+            <property name="ShowTypeIcon">true</property>
+            <property name="HRef">TREE</property>
+        </field>
+        <field name="employee">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
+            <property name="Label">Payroll_Payslip/employee.Label</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee"
+                name="Payroll_AdvanceTable.employeeLink.UI_FIELD_AUTOCOMPLETE"
+                program="org.efaps.esjp.humanresource.Employee">
+                <property name="keyValue">Value</property>
+                <property name="Type">HumanResource_Employee</property>
+                <property name="StatusGroup">HumanResource_EmployeeStatus</property>
+                <property name="Status">Worker</property>
+            </trigger>
+        </field>
+        <field name="rateCrossTotal">
+            <property name="Attribute">RateCrossTotal</property>
+            <property name="Label">Payroll_Payslip/Amount2Pay.Label</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
+        </field>
+        <field name="rateCrossTotal4View">
+            <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
+        </field>
+        <field name="rateCurrencyId">
+            <property name="Attribute">RateCurrencyId</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModeView">NONE</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                method="rateCurrencyFieldValueUI"
+                name="Payroll_AdvanceTable.currencyId.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE" />
+        </field>
+        <field name="buttonOpenInNewWindow">
+            <icon>eFapsActionNewWindow</icon>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Target">popup</property>
+            <property name="SortAble">false</property>
+            <property name="Width">15px</property>
+        </field>
+    </definition>
 </ui-table>
