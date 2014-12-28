@@ -39,6 +39,7 @@ import net.sf.dynamicreports.report.constant.Calculation;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.efaps.admin.common.MsgPhrase;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.dbproperty.DBProperties;
@@ -50,6 +51,7 @@ import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CISales;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
@@ -178,11 +180,15 @@ public abstract class PositionAnalyzeReport_Base
             final SelectBuilder selDoc = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
             final SelectBuilder selDocInst = new SelectBuilder(selDoc).instance();
             final SelectBuilder selDocName = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.Name);
+            final SelectBuilder selDepName = new SelectBuilder(selDoc).linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                .linkfrom(CIHumanResource.Department2EmployeeAdminister.EmployeeLink)
+                .linkto(CIHumanResource.Department2EmployeeAdminister.DepartmentLink)
+                .attribute(CIHumanResource.Department.Name);
             final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
             multi.addMsgPhrase(selDoc, msgPhrase);
-            multi.addSelect(selDocInst, selDocName);
-            multi.addAttribute(CIPayroll.PositionAbstract.Amount,
-                            CIPayroll.PositionAbstract.Description, CIPayroll.PositionAbstract.Key);
+            multi.addSelect(selDocInst, selDocName, selDepName);
+            multi.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Description,
+                            CIPayroll.PositionAbstract.Key);
             multi.execute();
             while (multi.next()) {
                 final Instance docInst = multi.getSelect(selDocInst);
@@ -193,7 +199,8 @@ public abstract class PositionAnalyzeReport_Base
                                 .setPosDescr(multi.<String>getAttribute(CIPayroll.PositionAbstract.Description))
                                 .setPosKey(multi.<String>getAttribute(CIPayroll.PositionAbstract.Key))
                                 .setAmount(multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount))
-                                .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase));
+                                .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
+                                .setDepartment(multi.<String>getSelect(selDepName));
                 datasource.add(bean);
             }
             return new JRBeanCollectionDataSource(datasource);
@@ -244,6 +251,15 @@ public abstract class PositionAnalyzeReport_Base
             throws EFapsException
         {
             final CrosstabBuilder crosstab = DynamicReports.ctab.crosstab();
+            final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+
+            if (filterMap.containsKey("departmentGroup")) {
+                if (BooleanUtils.isTrue((Boolean) filterMap.get("departmentGroup"))) {
+                    final CrosstabRowGroupBuilder<String> rowGroup = DynamicReports.ctab.rowGroup("department",
+                                    String.class).setHeaderWidth(150);
+                    crosstab.addRowGroup(rowGroup);
+                }
+            }
 
             final CrosstabMeasureBuilder<BigDecimal> amountMeasure = DynamicReports.ctab.measure(
                             "amount", BigDecimal.class, Calculation.SUM);
@@ -259,7 +275,6 @@ public abstract class PositionAnalyzeReport_Base
             crosstab.addColumnGroup(columnGroup);
 
             _builder.addSummary(crosstab);
-
         }
 
         /**
@@ -277,6 +292,7 @@ public abstract class PositionAnalyzeReport_Base
     {
 
         private Boolean switched;
+        private String department;
         private String docName;
         private Instance docInst;
         private Instance posInst;
@@ -484,6 +500,28 @@ public abstract class PositionAnalyzeReport_Base
         public DataBean setSwitched(final Boolean _switched)
         {
             this.switched = _switched;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #department}.
+         *
+         * @return value of instance variable {@link #department}
+         */
+        public String getDepartment()
+        {
+            return this.department;
+        }
+
+        /**
+         * Setter method for instance variable {@link #department}.
+         *
+         * @param _department value for instance variable {@link #department}
+         * @return this for chaining
+         */
+        public DataBean setDepartment(final String _department)
+        {
+            this.department = _department;
             return this;
         }
     }
