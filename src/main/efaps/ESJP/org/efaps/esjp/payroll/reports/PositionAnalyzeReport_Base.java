@@ -170,9 +170,14 @@ public abstract class PositionAnalyzeReport_Base
             final Collection<DataBean> datasource = new ArrayList<>();
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
             Boolean switchVal = false;
+            Boolean project = false;
             if (filterMap.containsKey("switch")) {
-                switchVal = (Boolean) filterMap.get("switch");
+                switchVal = BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
             }
+            if (filterMap.containsKey("projectGroup")) {
+                project = BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"));
+            }
+
             final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionDeduction);
             queryBuilder.addType(CIPayroll.PositionNeutral, CIPayroll.PositionPayment);
             add2QueryBuilder(_parameter, queryBuilder);
@@ -180,10 +185,20 @@ public abstract class PositionAnalyzeReport_Base
             final SelectBuilder selDoc = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
             final SelectBuilder selDocInst = new SelectBuilder(selDoc).instance();
             final SelectBuilder selDocName = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.Name);
-            final SelectBuilder selDepName = new SelectBuilder(selDoc).linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
-                .linkfrom(CIHumanResource.Department2EmployeeAdminister.EmployeeLink)
-                .linkto(CIHumanResource.Department2EmployeeAdminister.DepartmentLink)
-                .attribute(CIHumanResource.Department.Name);
+            final SelectBuilder selDepName = new SelectBuilder(selDoc)
+                            .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                            .linkfrom(CIHumanResource.Department2EmployeeAdminister.EmployeeLink)
+                            .linkto(CIHumanResource.Department2EmployeeAdminister.DepartmentLink)
+                            .attribute(CIHumanResource.Department.Name);
+
+            final SelectBuilder selProj = new SelectBuilder(selDoc)
+                            .linkfrom(CIPayroll.Projects_ProjectService2Payslip.ToLink)
+                            .linkto(CIPayroll.Projects_ProjectService2Payslip.FromLink);
+            if (project) {
+                // Project_ProjectMsgPhrase
+                final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
+                multi.addMsgPhrase(selProj, msgPhrase);
+            }
             final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
             multi.addMsgPhrase(selDoc, msgPhrase);
             multi.addSelect(selDocInst, selDocName, selDepName);
@@ -201,6 +216,13 @@ public abstract class PositionAnalyzeReport_Base
                                 .setAmount(multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount))
                                 .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
                                 .setDepartment(multi.<String>getSelect(selDepName));
+                if (project) {
+                    // Project_ProjectMsgPhrase
+                    final MsgPhrase projMsgPhrase = MsgPhrase.get(UUID
+                                    .fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
+                    bean.setProject(multi.getMsgPhrase(selProj, projMsgPhrase));
+                }
+
                 datasource.add(bean);
             }
             return new JRBeanCollectionDataSource(datasource);
@@ -253,6 +275,14 @@ public abstract class PositionAnalyzeReport_Base
             final CrosstabBuilder crosstab = DynamicReports.ctab.crosstab();
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
 
+            if (filterMap.containsKey("projectGroup")) {
+                if (BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"))) {
+                    final CrosstabRowGroupBuilder<String> rowGroup = DynamicReports.ctab.rowGroup("project",
+                                    String.class).setHeaderWidth(150);
+                    crosstab.addRowGroup(rowGroup);
+                }
+            }
+
             if (filterMap.containsKey("departmentGroup")) {
                 if (BooleanUtils.isTrue((Boolean) filterMap.get("departmentGroup"))) {
                     final CrosstabRowGroupBuilder<String> rowGroup = DynamicReports.ctab.rowGroup("department",
@@ -293,6 +323,7 @@ public abstract class PositionAnalyzeReport_Base
 
         private Boolean switched;
         private String department;
+        private String project;
         private String docName;
         private Instance docInst;
         private Instance posInst;
@@ -522,6 +553,28 @@ public abstract class PositionAnalyzeReport_Base
         public DataBean setDepartment(final String _department)
         {
             this.department = _department;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #project}.
+         *
+         * @return value of instance variable {@link #project}
+         */
+        public String getProject()
+        {
+            return this.project;
+        }
+
+        /**
+         * Setter method for instance variable {@link #project}.
+         *
+         * @param _project value for instance variable {@link #project}
+         * @return this for chaining
+         */
+        public DataBean setProject(final String _project)
+        {
+            this.project = _project;
             return this;
         }
     }

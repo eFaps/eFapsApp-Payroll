@@ -27,6 +27,9 @@
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects" exclude="true"/>
+        </application-dependencies>
         <name>Payroll_PositionAnalyzeReportForm</name>
         <field name="filter">
             <property name="HideLabel">true</property>
@@ -71,6 +74,73 @@
                 <property name="DBProperty04">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.status</property>
                 <property name="DBProperty05">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
                 <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
+                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+            </trigger>
+        </field>
+        <field name="report">
+            <property name="HideLabel">true</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <trigger event="UI_FIELD_VALUE" method="generateReport"
+                name="Payroll_PositionAnalyzeReportForm.report.UI_FIELD_VALUE"
+                program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
+                <property name="FilterKey">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.FilterKey</property>
+            </trigger>
+        </field>
+    </definition>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects"/>
+        </application-dependencies>
+        <name>Payroll_PositionAnalyzeReportForm</name>
+        <field name="filter">
+            <property name="HideLabel">true</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <trigger event="UI_FIELD_VALUE" index="1" method="setDefaultFilter"
+                name="Payroll_PositionAnalyzeReportForm.filter.UI_FIELD_VALUE.1"
+                program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
+                <property name="FilterKey">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.FilterKey</property>
+                <property name="ReportField">report4Account</property>
+                <property name="Field01">dateFrom</property>
+                <property name="Field02">dateTo</property>
+                <property name="Field03">employee</property>
+                <property name="Field04">status</property>
+                <property name="Field05">switch</property>
+                <property name="Field06">departmentGroup</property>
+                <property name="Field07">projectGroup</property>
+                <property name="FilterType01">DateTime</property>
+                <property name="FilterType02">DateTime</property>
+                <property name="FilterType03">Instance</property>
+                <property name="FilterType04">Status</property>
+                <property name="FilterType05">Boolean</property>
+                <property name="FilterType06">Boolean</property>
+                <property name="FilterType07">Boolean</property>
+                <property name="FilterDefault01">MONTH:-1</property>
+                <property name="FilterDefault02">TODAY</property>
+                <property name="FilterDefault03">-</property>
+                <property name="FilterDefault04">Digitized</property>
+                <property name="FilterDefault05">true</property>
+                <property name="FilterDefault06">false</property>
+                <property name="FilterDefault07">false</property>
+            </trigger>
+            <trigger event="UI_FIELD_VALUE" index="2" method="getFilterFieldValue"
+                name="Payroll_PositionAnalyzeReportForm.filter.UI_FIELD_VALUE.2"
+                program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
+                <property name="FilterKey">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.FilterKey</property>
+                <property name="Field01">dateFrom</property>
+                <property name="Field02">dateTo</property>
+                <property name="Field03">employee</property>
+                <property name="Field04">status</property>
+                <property name="Field05">switch</property>
+                <property name="Field06">departmentGroup</property>
+                <property name="Field07">projectGroup</property>
+                <property name="DBProperty01">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.dateFrom</property>
+                <property name="DBProperty02">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.dateTo</property>
+                <property name="DBProperty03">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.employee</property>
+                <property name="DBProperty04">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.status</property>
+                <property name="DBProperty05">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
+                <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
+                <property name="DBProperty07">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.projectGroup</property>
                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
             </trigger>
         </field>

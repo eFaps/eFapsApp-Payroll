@@ -27,6 +27,9 @@
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects" exclude="true"/>
+        </application-dependencies>
         <name>Payroll_PositionAnalyzeReportFilterForm</name>
         <field name="dateFrom">
             <property name="ModeEdit">EDITABLE</property>
@@ -85,7 +88,84 @@
         <field name="departmentGroup">
             <property name="ModeEdit">EDITABLE</property>
             <property name="UIProvider">org.efaps.admin.datamodel.ui.BooleanUI</property>
-            <property name="Label"> org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
+            <trigger event="UI_FIELD_VALUE" method="getBooleanFieldValue"
+                name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" />
+        </field>
+    </definition>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects"/>
+        </application-dependencies>
+        <name>Payroll_PositionAnalyzeReportFilterForm</name>
+        <field name="dateFrom">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <property name="Label">ERP_ReportFilterForm4DateFromTo.dateFrom.Label</property>
+            <trigger event="UI_FIELD_VALUE" method="getDateFromFieldValue"
+                name="ERP_ReportFilterForm4DateFromTo.dateFrom.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" />
+        </field>
+        <field name="dateTo">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <property name="Label">ERP_ReportFilterForm4DateFromTo.dateTo.Label</property>
+            <trigger event="UI_FIELD_VALUE" method="getDateToFieldValue"
+                name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" />
+        </field>
+         <field name="employee">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.employee</property>
+            <trigger program="org.efaps.esjp.erp.FilteredReport"
+                method="getInstanceFieldValue"
+                name="Payroll_PositionAnalyzeReportFilterForm.employee.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE" >
+                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+            </trigger>
+            <trigger program="org.efaps.esjp.humanresource.Employee"
+                method="autoComplete4Employee"
+                name="Payroll_PositionAnalyzeReportFilterForm.employee.UI_FIELD_AUTOCOMPLETE"
+                event="UI_FIELD_AUTOCOMPLETE" />
+        </field>
+        <field name="status">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.status</property>
+            <trigger event="UI_FIELD_VALUE" method="getStatusFieldValue"
+                name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" >
+                <property name="StatusGroup">Payroll_PayslipStatus</property>
+                <property name="Status01">Draft</property>
+                <property name="Status02">Open</property>
+                <property name="Status03">Paid</property>
+                <property name="Status04">Booked</property>
+                <property name="Status05">Canceled</property>
+            </trigger>
+        </field>
+        <field name="switch">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.BooleanUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
+            <trigger event="UI_FIELD_VALUE" method="getBooleanFieldValue"
+                name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" />
+        </field>
+        <field name="departmentGroup">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.BooleanUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
+            <trigger event="UI_FIELD_VALUE" method="getBooleanFieldValue"
+                name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" />
+        </field>
+         <field name="projectGroup">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.BooleanUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.projectGroup</property>
             <trigger event="UI_FIELD_VALUE" method="getBooleanFieldValue"
                 name="ERP_ReportFilterForm4DateFromTo.dateTo.UI_FIELD_VALUE"
                 program="org.efaps.esjp.erp.FilteredReport" />

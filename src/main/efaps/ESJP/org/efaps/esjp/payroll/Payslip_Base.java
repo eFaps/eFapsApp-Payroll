@@ -273,6 +273,8 @@ public abstract class Payslip_Base
         updateTotals(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
         updatePositions(_parameter, insert.getInstance(), result, rateCurrInst, rateObj);
 
+        connect2Object(_parameter, createdDoc);
+
         final File file = createReport(_parameter, createdDoc);
         if (file != null) {
             ret.put(ReturnValues.VALUES, file);

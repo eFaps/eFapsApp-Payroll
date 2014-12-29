@@ -31,6 +31,9 @@
     <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects" exclude="true"/>
+        </application-dependencies>
         <name>Payroll_PayslipMyDesk_Menu_Action_Create</name>
         <access>
             <role>Payroll_Admin</role>
@@ -43,6 +46,38 @@
                 <property name="JasperReport">Payroll_Payslip</property>
                 <property name="Mime">pdf</property>
                 <property name="NoDataSource">true</property>
+            </execute>
+        </target>
+        <property name="Target">modal</property>
+        <property name="TargetCreateType">Payroll_Payslip</property>
+        <property name="TargetShowFile">true</property>
+        <property name="TargetMode">create</property>
+        <property name="WindowHeight">660</property>
+        <property name="WindowWidth">1200</property>
+    </definition>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects"/>
+        </application-dependencies>
+        <name>Payroll_PayslipMyDesk_Menu_Action_Create</name>
+        <access>
+            <role>Payroll_Admin</role>
+            <role>Payroll_Modifier</role>
+        </access>
+        <target>
+            <form>Payroll_PayslipForm</form>
+            <execute program="org.efaps.esjp.payroll.Payslip" method="create" >
+                <property name="UseNumberGenerator4Name">true</property>
+                <property name="JasperReport">Payroll_Payslip</property>
+                <property name="Mime">pdf</property>
+                <property name="NoDataSource">true</property>
+
+                <!-- PayRoll_Projects_ProjectService2Payslip -->
+                <property name="ConnectType01">465b22a4-485c-4622-abcb-12c93cb45bdd</property>
+                <property name="ConnectCurrentLink01">ToLink</property>
+                <property name="ConnectForeignLink01">FromLink</property>
+                <property name="ConnectForeignField01">project</property>
             </execute>
         </target>
         <property name="Target">modal</property>
