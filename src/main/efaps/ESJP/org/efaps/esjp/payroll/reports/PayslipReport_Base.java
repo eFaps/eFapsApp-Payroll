@@ -65,6 +65,7 @@ public abstract class PayslipReport_Base
      */
     public enum Field implements Column
     {
+        /** */
         ID("", 6, null),
         /** */
         DOCTYPE("docType", 2, null),
@@ -93,7 +94,9 @@ public abstract class PayslipReport_Base
         private final Integer decimalLength;
 
         /**
-         * @param _key key
+         * @param _key              key
+         * @param _length           Length
+         * @param _decimalLength    decimal length
          */
         private Field(final String _key,
                       final Integer _length,
@@ -229,9 +232,7 @@ public abstract class PayslipReport_Base
             final String docType = multi.<String>getSelect(selDocType);
 
             final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
-            queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type, CIPayroll.PositionSum.getType().getId());
-            queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
-                            multi.getCurrentInstance().getId());
+            queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, multi.getCurrentInstance());
             final MultiPrintQuery multi2 = queryBldr2.getPrint();
             multi2.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Key);
             final SelectBuilder selRuleConfig = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.RuleAbstractLink)

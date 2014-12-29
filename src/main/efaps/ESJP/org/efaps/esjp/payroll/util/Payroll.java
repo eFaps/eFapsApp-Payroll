@@ -48,12 +48,27 @@ public final class Payroll
     {
     }
 
+    /**
+     * Tipo de Regla.
+     */
     public enum RuleType
         implements IEnum
     {
+        /**
+         * Temporal Summary.
+         */
         SUM,
+        /**
+         * Payment.
+         */
         PAYMENT,
+        /**
+         * Deduction.
+         */
         DEDUCTION,
+        /**
+         * Neutral.
+         */
         NEUTRAL;
 
         @Override
@@ -63,6 +78,9 @@ public final class Payroll
         }
     }
 
+    /**
+     * Configuration for Rules.
+     */
     public enum RuleConfig
         implements IBitEnum
     {
@@ -71,7 +89,7 @@ public final class Payroll
          */
         EXCLUDEZERO,
         /**
-         * Exclude it if it is Zero.
+         * INclude it in the report for PLAME.
          */
         INCLUDEPLAME;
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.5.1  -->
-<!-- 2014-11-12T12:35:55 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2014-12-29T14:04:22 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_Payslip" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b4600af4-1a3e-4e27-a0ff-d684d61d9779">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
 	<style name="heading1" mode="Opaque" backcolor="#CCCCCC" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
@@ -352,9 +352,9 @@
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="45" splitType="Stretch">
+		<band height="50" splitType="Stretch">
 			<textField>
-				<reportElement mode="Transparent" x="427" y="6" width="32" height="16" uuid="3c7996be-98e6-4474-bcb9-7d171a84b08a"/>
+				<reportElement mode="Transparent" x="427" y="6" width="32" height="15" uuid="3c7996be-98e6-4474-bcb9-7d171a84b08a"/>
 				<box leftPadding="2" rightPadding="2">
 					<topPen lineWidth="4.0" lineStyle="Double"/>
 				</box>
@@ -373,9 +373,34 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$V{paymentTotal}.subtract( $V{deductionTotal} )]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="327" y="6" width="100" height="15" uuid="8f921fc2-f81f-43bb-994d-b64277abb8c8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Neto a pagar:]]></text>
+			</staticText>
 		</band>
 	</columnFooter>
 	<pageFooter>
-		<band height="54" splitType="Stretch"/>
+		<band height="54" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="20" width="170" height="20" uuid="62fa1643-329d-4e32-b55c-8d98fa1e2dbf"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[RR.HH.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="20" width="170" height="20" uuid="881be26c-92d8-4add-8b18-09d8db5fec7f">
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Recibido]]></text>
+			</staticText>
+		</band>
 	</pageFooter>
 </jasperReport>
