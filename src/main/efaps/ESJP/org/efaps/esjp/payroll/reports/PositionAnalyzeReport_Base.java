@@ -291,6 +291,14 @@ public abstract class PositionAnalyzeReport_Base
                 }
             }
 
+            if (filterMap.containsKey("switch")) {
+                if (BooleanUtils.isTrue((Boolean) filterMap.get("switch"))) {
+                    final CrosstabColumnGroupBuilder<String> columnGroup = DynamicReports.ctab.columnGroup("posType",
+                                    String.class).setShowTotal(false);
+                    crosstab.addColumnGroup(columnGroup);
+                }
+            }
+
             final CrosstabMeasureBuilder<BigDecimal> amountMeasure = DynamicReports.ctab.measure(
                             "amount", BigDecimal.class, Calculation.SUM);
             crosstab.addMeasure(amountMeasure);
@@ -300,7 +308,7 @@ public abstract class PositionAnalyzeReport_Base
             crosstab.addRowGroup(rowGroup);
 
             final CrosstabColumnGroupBuilder<String> columnGroup = DynamicReports.ctab.columnGroup("position",
-                            String.class);
+                            String.class).setShowTotal(true);
 
             crosstab.addColumnGroup(columnGroup);
 
@@ -318,6 +326,9 @@ public abstract class PositionAnalyzeReport_Base
         }
     }
 
+
+
+
     public static class DataBean
     {
 
@@ -331,6 +342,17 @@ public abstract class PositionAnalyzeReport_Base
         private String posDescr;
         private BigDecimal amount;
         private String employee;
+
+
+        public BigDecimal getTotal()
+        {
+            return BigDecimal.ONE;
+        }
+
+        public String getPosType()
+        {
+            return getPosInst().getType().getLabel();
+        }
 
         /**
          * Getter method for the instance variable {@link #document}.

@@ -101,6 +101,8 @@ import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.ui.html.Table;
 import org.efaps.ui.wicket.util.EFapsKey;
+import org.efaps.update.AppDependency;
+import org.efaps.update.util.InstallationException;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -175,6 +177,21 @@ public abstract class Payslip_Base
         query.execute();
         while (query.next()) {
             new Delete(query.getCurrentValue()).execute();
+        }
+
+        try {
+            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+                final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.Projects_ProjectService2Payslip);
+                queryBldr2.addWhereAttrEqValue(CIPayroll.Projects_ProjectService2Payslip.ToDocument,
+                                _parameter.getInstance());
+                final InstanceQuery query2 = queryBldr2.getQuery();
+                query2.execute();
+                while (query2.next()) {
+                    new Delete(query2.getCurrentValue()).execute();
+                }
+            }
+        } catch (final InstallationException e) {
+            throw new EFapsException("Catched Error.", e);
         }
         return new Return();
     }
