@@ -124,6 +124,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/ci/CIProjects*.class</exclude>
+                        <exclude>**/projects/*.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>

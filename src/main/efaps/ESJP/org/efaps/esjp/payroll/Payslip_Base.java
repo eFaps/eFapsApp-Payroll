@@ -83,6 +83,7 @@ import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.ci.CIProjects;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.common.uiform.Field_Base.DropDownPosition;
@@ -97,6 +98,7 @@ import org.efaps.esjp.payroll.rules.ExpressionRule;
 import org.efaps.esjp.payroll.rules.IDocRuleListener;
 import org.efaps.esjp.payroll.rules.InputRule;
 import org.efaps.esjp.payroll.rules.Result;
+import org.efaps.esjp.projects.Project;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.ui.html.Table;
@@ -866,16 +868,40 @@ public abstract class Payslip_Base
     public Return updateFields4Employee(final Parameter _parameter)
         throws EFapsException
     {
-        final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        final Map<String, String> map = new HashMap<String, String>();
+        final List<Map<String, Object>> list = new ArrayList<>();
+        final Map<String, Object> map = new HashMap<>();
 
         final Field field = (Field) _parameter.get(ParameterValues.UIOBJECT);
 
         if (field != null) {
             final Instance instance = Instance.get(_parameter.getParameterValue(field.getName()));
 
-            if (instance.getId() > 0) {
+            if (instance.isValid()) {
                 map.put("employeeData", getFieldValue4Employee(instance));
+                try {
+                    if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+                        final QueryBuilder queryBldr = new QueryBuilder(CIProjects.ProjectService2Employee);
+                        queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, instance);
+                        queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.Status,
+                                        Status.find(CIProjects.ProjectService2EmployeeStatus.Active));
+                        final MultiPrintQuery multi = queryBldr.getPrint();
+                        final SelectBuilder selProj = SelectBuilder.get().linkto(
+                                        CIProjects.ProjectService2Employee.FromLink);
+                        final SelectBuilder selProjInst = new SelectBuilder(selProj).instance();
+                        final SelectBuilder selProjName = new SelectBuilder(selProj).attribute("Name");
+                        multi.addSelect(selProjInst, selProjName);
+                        multi.execute();
+                        while (multi.next()) {
+                            map.put("project", new String[] { multi.<Instance>getSelect(selProjInst).getOid(),
+                                            multi.<String>getSelect(selProjName) });
+                            map.put("projectData", new Project().getProjectData(_parameter,
+                                            multi.<Instance>getSelect(selProjInst)).toString());
+                        }
+                    }
+                } catch (final InstallationException e) {
+                    throw new EFapsException("Catched Error.", e);
+                }
+
             } else {
                 map.put("employeeData", "????");
             }
