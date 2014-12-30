@@ -364,8 +364,8 @@ public abstract class Payslip_Base
             insert.execute();
 
             createdDoc.setInstance(insert.getInstance());
-
             addAdvance(_parameter, createdDoc, emplInst);
+            connect2Project(_parameter, createdDoc, emplInst);
 
             final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
             Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
@@ -395,6 +395,36 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip2Advance.FromLink, _createdDoc.getInstance());
             insert.add(CIPayroll.Payslip2Advance.ToLink, instance);
             insert.execute();
+        }
+    }
+
+    protected void connect2Project(final Parameter _parameter,
+                                   final CreatedDoc _createdDoc,
+                                   final Instance _emplInst)
+        throws EFapsException
+    {
+        try {
+            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+                final QueryBuilder queryBldr = new QueryBuilder(CIProjects.ProjectService2Employee);
+                queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, _emplInst);
+                queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.Status,
+                                Status.find(CIProjects.ProjectService2EmployeeStatus.Active));
+                final MultiPrintQuery multi = queryBldr.getPrint();
+                final SelectBuilder selProj = SelectBuilder.get().linkto(
+                                CIProjects.ProjectService2Employee.FromLink);
+                final SelectBuilder selProjInst = new SelectBuilder(selProj).instance();
+                multi.addSelect(selProjInst);
+                multi.execute();
+                if (multi.next()) {
+                    final Instance projInst = multi.getSelect(selProjInst);
+                    final Insert insert = new Insert(CIPayroll.Projects_ProjectService2Payslip);
+                    insert.add(CIPayroll.Projects_ProjectService2Payslip.FromLink, projInst);
+                    insert.add(CIPayroll.Projects_ProjectService2Payslip.ToLink, _createdDoc.getInstance());
+                    insert.execute();
+                }
+            }
+        } catch (final InstallationException e) {
+            throw new EFapsException("Catched Error.", e);
         }
     }
 
