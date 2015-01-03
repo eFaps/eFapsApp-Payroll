@@ -181,6 +181,14 @@ public abstract class Payslip_Base
             new Delete(query.getCurrentValue()).execute();
         }
 
+        final QueryBuilder queryBldr3 = new QueryBuilder(CIPayroll.Payslip2Advance);
+        queryBldr3.addWhereAttrEqValue(CIPayroll.Payslip2Advance.FromLink, _parameter.getInstance());
+        final InstanceQuery query3 = queryBldr3.getQuery();
+        query3.execute();
+        while (query3.next()) {
+            new Delete(query3.getCurrentValue()).execute();
+        }
+
         try {
             if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
                 final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.Projects_ProjectService2Payslip);
