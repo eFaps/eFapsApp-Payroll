@@ -19,17 +19,18 @@
  Last Changed:    $Date: 2010-08-16 11:58:36 -0500 (lun, 16 ago 2010) $
  Last Changed By: $Author: miguel.a.aranya $
 
---><ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+-->
+<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>04147b54-1e4b-466e-b90a-3f413bfdb60f</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 5319 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_AdvanceTree_Menu_Action</name>
-        <!-- childs -->
         <childs>
             <child>Payroll_AdvanceTree_Menu_Action_Edit</child>
+            <child>ERP_DocumentAbstractTree_Action_EditStatus</child>
         </childs>
     </definition>
-
 </ui-menu>

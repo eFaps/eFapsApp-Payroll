@@ -77,6 +77,12 @@
                 name="Payroll_AdvanceTable.currencyId.UI_FIELD_VALUE"
                 event="UI_FIELD_VALUE" />
         </field>
+        <field name="statusAbstract">
+            <property name="FilterType">PICKLIST</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Attribute">StatusAbstract</property>
+            <property name="Label">Payroll_Payslip/Status.Label</property>
+        </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
