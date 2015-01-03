@@ -83,6 +83,12 @@
             <property name="Attribute">StatusAbstract</property>
             <property name="Label">Payroll_Payslip/Status.Label</property>
         </field>
+        <field name="payslip">
+            <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>
+            <property name="Select">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].attribute[Name]</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Label">Payroll_AdvanceForm.payslip.Label</property>
+        </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
