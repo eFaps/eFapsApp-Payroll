@@ -23,22 +23,28 @@ package org.efaps.esjp.payroll.reports;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.crosstab.CrosstabBuilder;
-import net.sf.dynamicreports.report.builder.crosstab.CrosstabColumnGroupBuilder;
-import net.sf.dynamicreports.report.builder.crosstab.CrosstabMeasureBuilder;
-import net.sf.dynamicreports.report.builder.crosstab.CrosstabRowGroupBuilder;
-import net.sf.dynamicreports.report.constant.Calculation;
+import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder;
+import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
+import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
+import net.sf.dynamicreports.report.builder.style.StyleBuilder;
+import net.sf.dynamicreports.report.builder.subtotal.AggregationSubtotalBuilder;
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 
+import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.commons.lang.BooleanUtils;
 import org.efaps.admin.common.MsgPhrase;
 import org.efaps.admin.datamodel.Status;
@@ -152,8 +158,18 @@ public abstract class PositionAnalyzeReport_Base
     public static class DynPositionAnalyzeReport
         extends AbstractDynamicReport
     {
+        @Override
+        protected StyleBuilder getColumnStyle4Html(final Parameter _parameter)
+            throws EFapsException
+        {
+            return super.getColumnStyle4Html(_parameter).setBorder(DynamicReports.stl.pen1Point());
+        }
 
         private final PositionAnalyzeReport_Base filterReport;
+
+        private Map<Instance, Map<String, Object>> data;
+
+        private List<Column> columns;
 
         /**
          * @param _filterReport report
@@ -163,128 +179,207 @@ public abstract class PositionAnalyzeReport_Base
             this.filterReport = _filterReport;
         }
 
+        /**
+         * Getter method for the instance variable {@link #data}.
+         *
+         * @return value of instance variable {@link #data}
+         */
+        public Map<Instance, Map<String, Object>> getData(final Parameter _parameter)
+            throws EFapsException
+        {
+            if (this.data == null) {
+                this.data = new HashMap<>();
+                final Map<String, Column> columnMap = new HashMap<>();
+                final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+                boolean project = false;
+                if (filterMap.containsKey("projectGroup")) {
+                    project = BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"));
+                }
+                boolean showDetails = true;
+                if (filterMap.containsKey("switch")) {
+                    showDetails = BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
+                }
+
+                final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionDeduction);
+                queryBuilder.addType(CIPayroll.PositionNeutral, CIPayroll.PositionPayment);
+                add2QueryBuilder(_parameter, queryBuilder);
+                final MultiPrintQuery multi = queryBuilder.getPrint();
+                final SelectBuilder selDoc = SelectBuilder.get()
+                                .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
+                final SelectBuilder selDocInst = new SelectBuilder(selDoc).instance();
+                final SelectBuilder selDocName = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.Name);
+                final SelectBuilder selCrossTotal = new SelectBuilder(selDoc)
+                                .attribute(CIPayroll.DocumentAbstract.CrossTotal);
+                final SelectBuilder selAmountCost = new SelectBuilder(selDoc)
+                                .attribute(CIPayroll.DocumentAbstract.AmountCost);
+                final SelectBuilder selDocELT = new SelectBuilder(selDoc)
+                                .attribute(CIPayroll.DocumentAbstract.ExtraLaborTime);
+                final SelectBuilder selDocHLT = new SelectBuilder(selDoc)
+                                .attribute(CIPayroll.DocumentAbstract.HolidayLaborTime);
+                final SelectBuilder selDocLT = new SelectBuilder(selDoc)
+                                .attribute(CIPayroll.DocumentAbstract.LaborTime);
+                final SelectBuilder selDocNLT = new SelectBuilder(selDoc)
+                                .attribute(CIPayroll.DocumentAbstract.NightLaborTime);
+                final SelectBuilder selDepName = new SelectBuilder(selDoc)
+                                .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                .linkfrom(CIHumanResource.Department2EmployeeAdminister.EmployeeLink)
+                                .linkto(CIHumanResource.Department2EmployeeAdminister.DepartmentLink)
+                                .attribute(CIHumanResource.Department.Name);
+                final SelectBuilder selRemun = new SelectBuilder(selDoc)
+                                .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                .clazz(CIHumanResource.ClassTR_Labor).attribute(CIHumanResource.ClassTR_Labor.Remuneration);
+                final SelectBuilder selProj = new SelectBuilder(selDoc)
+                                .linkfrom(CIPayroll.Projects_ProjectService2Payslip.ToLink)
+                                .linkto(CIPayroll.Projects_ProjectService2Payslip.FromLink);
+                if (project) {
+                    // Project_ProjectMsgPhrase
+                    final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
+                    multi.addMsgPhrase(selProj, msgPhrase);
+                }
+                final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
+                multi.addMsgPhrase(selDoc, msgPhrase);
+                multi.addSelect(selCrossTotal, selAmountCost, selDocInst, selDocName, selDepName, selDocELT, selDocHLT,
+                                selDocLT, selDocNLT, selRemun);
+                multi.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Description,
+                                CIPayroll.PositionAbstract.Key);
+                multi.execute();
+                while (multi.next()) {
+                    final Instance docInst = multi.getSelect(selDocInst);
+                    Map<String, Object> map;
+                    if (this.data.containsKey(docInst)) {
+                        map = this.data.get(docInst);
+                    } else {
+                        map = new HashMap<>();
+                        this.data.put(docInst, map);
+                        map.put("Remuneration", multi.getSelect(selRemun));
+                        map.put(CIPayroll.DocumentAbstract.Name.name, multi.getSelect(selDocName));
+                        map.put(CIPayroll.DocumentAbstract.CrossTotal.name, multi.getSelect(selCrossTotal));
+                        map.put(CIPayroll.DocumentAbstract.AmountCost.name, multi.getSelect(selAmountCost));
+                        map.put(CIPayroll.DocumentAbstract.ExtraLaborTime.name, multi.<Object[]>getSelect(selDocELT)[0]);
+                        map.put(CIPayroll.DocumentAbstract.HolidayLaborTime.name,
+                                        multi.<Object[]>getSelect(selDocHLT)[0]);
+                        map.put(CIPayroll.DocumentAbstract.LaborTime.name, multi.<Object[]>getSelect(selDocLT)[0]);
+                        map.put(CIPayroll.DocumentAbstract.NightLaborTime.name, multi.<Object[]>getSelect(selDocNLT)[0]);
+                        map.put(CIPayroll.DocumentAbstract.EmployeeAbstractLink.name,
+                                        multi.getMsgPhrase(selDoc, msgPhrase));
+                        map.put("Department", multi.getSelect(selDepName));
+                        if (project) {
+                            // Project_ProjectMsgPhrase
+                            final MsgPhrase msgPhrase2 = MsgPhrase.get(UUID
+                                            .fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
+                            map.put("Project", multi.getMsgPhrase(selProj, msgPhrase2));
+                        }
+                    }
+
+                    if (showDetails) {
+                        final String key = multi.getAttribute(CIPayroll.PositionAbstract.Key);
+                        if (!columnMap.containsKey(key)) {
+                            final Column col = new Column();
+                            columnMap.put(key, col);
+                            col.setKey(key);
+                            final String descr = multi.getAttribute(CIPayroll.PositionAbstract.Description);
+                            col.setLabel(key + " - " + descr);
+                            col.setGroup(multi.getCurrentInstance().getType().getLabel());
+                        }
+                        map.put(key, multi.getAttribute(CIPayroll.PositionAbstract.Amount));
+                    } else {
+                        final String key = multi.getCurrentInstance().getType().getName();
+                        if (map.containsKey(key)) {
+                            map.put(key, ((BigDecimal) map.get(key)).add(multi
+                                            .<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount)));
+                        } else {
+                            final Column col = new Column();
+                            columnMap.put(key, col);
+                            col.setKey(key);
+                            col.setLabel(multi.getCurrentInstance().getType().getLabel());
+                            col.setGroup(multi.getCurrentInstance().getType().getLabel());
+                            map.put(key, multi.getAttribute(CIPayroll.PositionAbstract.Amount));
+                        }
+                    }
+                }
+                this.columns = new ArrayList<>(columnMap.values());
+                Collections.sort(this.columns, new Comparator<Column>()
+                {
+
+                    @Override
+                    public int compare(final Column _arg0,
+                                       final Column _arg1)
+                    {
+                        return _arg0.getLabel().compareTo(_arg1.getLabel());
+                    }
+                });
+            }
+            return this.data;
+        }
+
         @Override
         protected JRDataSource createDataSource(final Parameter _parameter)
             throws EFapsException
         {
-            final Collection<DataBean> datasource = new ArrayList<>();
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
-            Boolean switchVal = false;
-            Boolean project = false;
             if (filterMap.containsKey("switch")) {
-                switchVal = BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
+                BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
             }
+
+            final Map<Instance, Map<String, Object>> maps = getData(_parameter);
+            final List<Map<String, Object>> values = new ArrayList<>(maps.values());
+            final ComparatorChain<Map<String, Object>> comp = new ComparatorChain<>();
+
             if (filterMap.containsKey("projectGroup")) {
-                project = BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"));
-            }
+                if (BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"))) {
+                    comp.addComparator(new Comparator<Map<String, Object>>()
+                    {
 
-            final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionDeduction);
-            queryBuilder.addType(CIPayroll.PositionNeutral, CIPayroll.PositionPayment);
-            add2QueryBuilder(_parameter, queryBuilder);
-            final MultiPrintQuery multi = queryBuilder.getPrint();
-            final SelectBuilder selDoc = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
-            final SelectBuilder selDocInst = new SelectBuilder(selDoc).instance();
-            final SelectBuilder selDocName = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.Name);
-            final SelectBuilder selDocELT = new SelectBuilder(selDoc)
-                            .attribute(CIPayroll.DocumentAbstract.ExtraLaborTime);
-            final SelectBuilder selDocHLT = new SelectBuilder(selDoc)
-                            .attribute(CIPayroll.DocumentAbstract.HolidayLaborTime);
-            final SelectBuilder selDocLT = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.LaborTime);
-            final SelectBuilder selDocNLT = new SelectBuilder(selDoc)
-                            .attribute(CIPayroll.DocumentAbstract.NightLaborTime);
-            final SelectBuilder selDepName = new SelectBuilder(selDoc)
-                            .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
-                            .linkfrom(CIHumanResource.Department2EmployeeAdminister.EmployeeLink)
-                            .linkto(CIHumanResource.Department2EmployeeAdminister.DepartmentLink)
-            .attribute(CIHumanResource.Department.Name);
-
-            final SelectBuilder selProj = new SelectBuilder(selDoc)
-                            .linkfrom(CIPayroll.Projects_ProjectService2Payslip.ToLink)
-                            .linkto(CIPayroll.Projects_ProjectService2Payslip.FromLink);
-            if (project) {
-                // Project_ProjectMsgPhrase
-                final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
-                multi.addMsgPhrase(selProj, msgPhrase);
-            }
-            final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
-            multi.addMsgPhrase(selDoc, msgPhrase);
-            multi.addSelect(selDocInst, selDocName, selDepName, selDocELT, selDocHLT, selDocLT, selDocNLT);
-            multi.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Description,
-                            CIPayroll.PositionAbstract.Key);
-            multi.execute();
-            final Set<Instance>added = new HashSet<>();
-            while (multi.next()) {
-                final Instance docInst = multi.getSelect(selDocInst);
-                if (!added.contains(docInst)) {
-                    added.add(docInst);
-                    datasource.add(new DataBean()
-                                    .setDocInst(docInst)
-                                    .setSwitched(switchVal)
-                                    .setDocName(multi.<String>getSelect(selDocName))
-                                    .setPosInst(null)
-                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
-                                                    .getAttribute(CIPayroll.DocumentAbstract.LaborTime.name)
-                                                    .getLabelKey()))
-                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocLT)[0])
-                                    .setPosKey("")
-                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
-                                    .setDepartment(multi.<String>getSelect(selDepName)));
-                    datasource.add(new DataBean()
-                                    .setDocInst(docInst)
-                                    .setSwitched(switchVal)
-                                    .setDocName(multi.<String>getSelect(selDocName))
-                                    .setPosInst(null)
-                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
-                                                    .getAttribute(CIPayroll.DocumentAbstract.ExtraLaborTime.name)
-                                                    .getLabelKey()))
-                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocELT)[0])
-                                    .setPosKey("")
-                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
-                                    .setDepartment(multi.<String>getSelect(selDepName)));
-                    datasource.add(new DataBean()
-                                    .setDocInst(docInst)
-                                    .setSwitched(switchVal)
-                                    .setDocName(multi.<String>getSelect(selDocName))
-                                    .setPosInst(null)
-                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
-                                                    .getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime.name)
-                                                    .getLabelKey()))
-                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocHLT)[0])
-                                    .setPosKey("")
-                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
-                                    .setDepartment(multi.<String>getSelect(selDepName)));
-                    datasource.add(new DataBean()
-                                    .setDocInst(docInst)
-                                    .setSwitched(switchVal)
-                                    .setDocName(multi.<String>getSelect(selDocName))
-                                    .setPosInst(null)
-                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
-                                                    .getAttribute(CIPayroll.DocumentAbstract.NightLaborTime.name)
-                                                    .getLabelKey()))
-                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocNLT)[0])
-                                    .setPosKey("")
-                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
-                                    .setDepartment(multi.<String>getSelect(selDepName)));
+                        @Override
+                        public int compare(final Map<String, Object> _o1,
+                                           final Map<String, Object> _o2)
+                        {
+                            final String str1 = _o1.containsKey("Project") && _o1.get("Project") != null ? (String) _o1
+                                            .get("Project") : "";
+                            final String str2 = _o2.containsKey("Project") && _o2.get("Project") != null ? (String) _o2
+                                            .get("Project") : "";
+                            return str1.compareTo(str2);
+                        }
+                    });
                 }
-                final DataBean bean = new DataBean().setDocInst(docInst)
-                                .setSwitched(switchVal)
-                                .setDocName(multi.<String>getSelect(selDocName))
-                                .setPosInst(multi.getCurrentInstance())
-                                .setPosDescr(multi.<String>getAttribute(CIPayroll.PositionAbstract.Description))
-                                .setPosKey(multi.<String>getAttribute(CIPayroll.PositionAbstract.Key))
-                                .setAmount(multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount))
-                                .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
-                                .setDepartment(multi.<String>getSelect(selDepName));
-                if (project) {
-                    // Project_ProjectMsgPhrase
-                    final MsgPhrase projMsgPhrase = MsgPhrase.get(UUID
-                                    .fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
-                    bean.setProject(multi.getMsgPhrase(selProj, projMsgPhrase));
-                }
-
-                datasource.add(bean);
             }
-            return new JRBeanCollectionDataSource(datasource);
+
+            if (filterMap.containsKey("departmentGroup")) {
+                if (BooleanUtils.isTrue((Boolean) filterMap.get("departmentGroup"))) {
+                    comp.addComparator(new Comparator<Map<String, Object>>()
+                    {
+
+                        @Override
+                        public int compare(final Map<String, Object> _o1,
+                                           final Map<String, Object> _o2)
+                        {
+                            final String str1 = _o1.containsKey("Department") && _o1.get("Department") != null
+                                            ? (String) _o1.get("Department") : "";
+                            final String str2 = _o2.containsKey("Department") && _o2.get("Department") != null
+                                            ? (String) _o2.get("Department") : "";
+                            return str1.compareTo(str2);
+                        }
+                    });
+                }
+            }
+            if (comp.size() == 0) {
+                comp.addComparator(new Comparator<Map<String, Object>>()
+                {
+
+                    @Override
+                    public int compare(final Map<String, Object> _o1,
+                                       final Map<String, Object> _o2)
+                    {
+                        final String str1 = _o1.containsKey("Name") && _o1.get("Name") != null ? (String) _o1
+                                        .get("Name") : "";
+                        final String str2 = _o2.containsKey("Name") && _o2.get("Name") != null ? (String) _o2
+                                        .get("Name") : "";
+                        return str1.compareTo(str2);
+                    }
+                });
+            }
+            Collections.sort(values, comp);
+            return new JRMapCollectionDataSource(new ArrayList(values));
         }
 
         /**
@@ -331,47 +426,123 @@ public abstract class PositionAnalyzeReport_Base
                                           final JasperReportBuilder _builder)
             throws EFapsException
         {
-            final CrosstabBuilder crosstab = DynamicReports.ctab.crosstab();
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+            final List<ColumnGridComponentBuilder> groups = new ArrayList<>();
 
+            ColumnGroupBuilder projectGroup = null;
             if (filterMap.containsKey("projectGroup")) {
                 if (BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"))) {
-                    final CrosstabRowGroupBuilder<String> rowGroup = DynamicReports.ctab.rowGroup("project",
-                                    String.class).setHeaderWidth(150);
-                    crosstab.addRowGroup(rowGroup);
+                    final TextColumnBuilder<String> col = DynamicReports.col.column(getLabel("Project"),
+                                    "Project", DynamicReports.type.stringType());
+                    _builder.addColumn(col);
+                    projectGroup  = DynamicReports.grp.group(col);
+                    _builder.addGroup(projectGroup);
                 }
             }
-
+            ColumnGroupBuilder departmentGroup = null;
             if (filterMap.containsKey("departmentGroup")) {
                 if (BooleanUtils.isTrue((Boolean) filterMap.get("departmentGroup"))) {
-                    final CrosstabRowGroupBuilder<String> rowGroup = DynamicReports.ctab.rowGroup("department",
-                                    String.class).setHeaderWidth(150);
-                    crosstab.addRowGroup(rowGroup);
+                    final TextColumnBuilder<String> col = DynamicReports.col.column(getLabel("Department"),
+                                    "Department", DynamicReports.type.stringType());
+                    _builder.addColumn(col);
+                    departmentGroup = DynamicReports.grp.group(col);
+                    _builder.addGroup(departmentGroup);
                 }
             }
-
+            boolean showDetails = true;
             if (filterMap.containsKey("switch")) {
-                if (BooleanUtils.isTrue((Boolean) filterMap.get("switch"))) {
-                    final CrosstabColumnGroupBuilder<String> columnGroup = DynamicReports.ctab.columnGroup("posType",
-                                    String.class).setShowTotal(false);
-                    crosstab.addColumnGroup(columnGroup);
-                }
+                showDetails = BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
             }
 
-            final CrosstabMeasureBuilder<BigDecimal> amountMeasure = DynamicReports.ctab.measure(
-                            "amount", BigDecimal.class, Calculation.SUM);
-            crosstab.addMeasure(amountMeasure);
+            final TextColumnBuilder<String> nameCol = DynamicReports.col.column(getLabel("Name"),
+                            CIPayroll.DocumentAbstract.Name.name, DynamicReports.type.stringType());
+            final TextColumnBuilder<String> employeeCol = DynamicReports.col.column(getLabel("Employee"),
+                            CIPayroll.DocumentAbstract.EmployeeAbstractLink.name, DynamicReports.type.stringType())
+                            .setWidth(200);
+            _builder.addColumn(nameCol, employeeCol);
+            groups.add(nameCol);
+            groups.add(employeeCol);
 
-            final CrosstabRowGroupBuilder<String> rowGroup = DynamicReports.ctab.rowGroup("document", String.class)
-                            .setHeaderWidth(150);
-            crosstab.addRowGroup(rowGroup);
+            if (showDetails) {
+                final TextColumnBuilder<BigDecimal> remCol = DynamicReports.col.column(getLabel("Remuneration"),
+                                "Remuneration", DynamicReports.type.bigDecimalType());
+                final TextColumnBuilder<BigDecimal> ltCol = DynamicReports.col.column(getLabel("LaborTime"),
+                                CIPayroll.DocumentAbstract.LaborTime.name, DynamicReports.type.bigDecimalType());
+                final TextColumnBuilder<BigDecimal> eltCol = DynamicReports.col.column(getLabel("ExtraLaborTime"),
+                                CIPayroll.DocumentAbstract.ExtraLaborTime.name, DynamicReports.type.bigDecimalType());
+                final TextColumnBuilder<BigDecimal> nltCol = DynamicReports.col.column(getLabel("NightLaborTime"),
+                                CIPayroll.DocumentAbstract.NightLaborTime.name, DynamicReports.type.bigDecimalType());
+                final TextColumnBuilder<BigDecimal> hltCol = DynamicReports.col.column(getLabel("HolidayLaborTime"),
+                                CIPayroll.DocumentAbstract.HolidayLaborTime.name, DynamicReports.type.bigDecimalType());
+                _builder.addColumn(remCol, ltCol, eltCol, nltCol, hltCol);
+                groups.add(remCol);
+                groups.add(ltCol);
+                groups.add(eltCol);
+                groups.add(nltCol);
+                groups.add(hltCol);
+            }
 
-            final CrosstabColumnGroupBuilder<String> columnGroup = DynamicReports.ctab.columnGroup("position",
-                            String.class).setShowTotal(true);
+            final Map<String, ColumnTitleGroupBuilder> groupMap = new LinkedHashMap<>();
+            groupMap.put(CIPayroll.PositionPayment.getType().getLabel(),
+                            DynamicReports.grid.titleGroup(CIPayroll.PositionPayment.getType().getLabel()));
+            groupMap.put(CIPayroll.PositionDeduction.getType().getLabel(),
+                            DynamicReports.grid.titleGroup(CIPayroll.PositionDeduction.getType().getLabel()));
+            groupMap.put(CIPayroll.PositionNeutral.getType().getLabel(),
+                            DynamicReports.grid.titleGroup(CIPayroll.PositionNeutral.getType().getLabel()));
 
-            crosstab.addColumnGroup(columnGroup);
+            for (final ColumnTitleGroupBuilder grp : groupMap.values()) {
+                groups.add(grp);
+            }
 
-            _builder.addSummary(crosstab);
+            for (final Column column : getColumns(_parameter)) {
+                final TextColumnBuilder<BigDecimal> column1 = DynamicReports.col.column(column.getLabel(),
+                                column.getKey(), DynamicReports.type.bigDecimalType()).setTitleHeight(50);
+                _builder.addColumn(column1);
+                if (groupMap.containsKey(column.getGroup())) {
+                    groupMap.get(column.getGroup()).add(column1);
+                }
+                if (departmentGroup != null) {
+                    final AggregationSubtotalBuilder<BigDecimal> sum = DynamicReports.sbt.sum(column1);
+                    _builder.addSubtotalAtGroupFooter(departmentGroup, sum);
+                }
+                if (projectGroup != null) {
+                    final AggregationSubtotalBuilder<BigDecimal> sum = DynamicReports.sbt.sum(column1);
+                    _builder.addSubtotalAtGroupFooter(projectGroup, sum);
+                }
+                final AggregationSubtotalBuilder<BigDecimal> sum = DynamicReports.sbt.sum(column1);
+                _builder.addSubtotalAtColumnFooter(sum);
+            }
+
+            final TextColumnBuilder<BigDecimal> crossCol = DynamicReports.col.column(getLabel("CrossTotal"),
+                            CIPayroll.DocumentAbstract.CrossTotal.name, DynamicReports.type.bigDecimalType());
+
+            final TextColumnBuilder<BigDecimal> amountCol = DynamicReports.col.column(getLabel("AmountCost"),
+                            CIPayroll.DocumentAbstract.AmountCost.name, DynamicReports.type.bigDecimalType());
+            _builder.addColumn(crossCol, amountCol);
+            groups.add(crossCol);
+            groups.add(amountCol);
+
+            if (showDetails) {
+                _builder.columnGrid(groups.toArray(new ColumnGridComponentBuilder[groups.size()]));
+            }
+
+            if (departmentGroup != null) {
+                final AggregationSubtotalBuilder<BigDecimal> crossTotal = DynamicReports.sbt.sum(crossCol);
+                final AggregationSubtotalBuilder<BigDecimal> amountTotal = DynamicReports.sbt.sum(amountCol);
+                _builder.addSubtotalAtGroupFooter(departmentGroup, crossTotal);
+                _builder.addSubtotalAtGroupFooter(departmentGroup, amountTotal);
+            }
+            if (projectGroup != null) {
+                final AggregationSubtotalBuilder<BigDecimal> crossTotal = DynamicReports.sbt.sum(crossCol);
+                final AggregationSubtotalBuilder<BigDecimal> amountTotal = DynamicReports.sbt.sum(amountCol);
+                _builder.addSubtotalAtGroupFooter(projectGroup, crossTotal);
+                _builder.addSubtotalAtGroupFooter(projectGroup, amountTotal);
+            }
+            final AggregationSubtotalBuilder<BigDecimal> crossTotal = DynamicReports.sbt.sum(crossCol);
+            final AggregationSubtotalBuilder<BigDecimal> amountTotal = DynamicReports.sbt.sum(amountCol);
+
+            _builder.addSubtotalAtColumnFooter(crossTotal);
+            _builder.addSubtotalAtColumnFooter(amountTotal);
         }
 
         /**
@@ -383,280 +554,104 @@ public abstract class PositionAnalyzeReport_Base
         {
             return this.filterReport;
         }
+
+        protected String getLabel(final String _key)
+        {
+            return DBProperties.getProperty(PositionAnalyzeReport.class.getName() + "." + _key);
+        }
+
+        /**
+         * Getter method for the instance variable {@link #columns}.
+         *
+         * @return value of instance variable {@link #columns}
+         */
+        public List<Column> getColumns(final Parameter _parameter)
+            throws EFapsException
+        {
+            if (this.columns == null) {
+                getData(_parameter);
+            }
+            return this.columns;
+        }
     }
 
-
-
-
-    public static class DataBean
+    public static class Column
     {
 
-        private Boolean switched;
-        private String department;
-        private String project;
-        private String docName;
-        private Instance docInst;
-        private Instance posInst;
-        private String posKey;
-        private String posDescr;
-        private BigDecimal amount;
-        private String employee;
+        private String key;
+        private String label;
+        private String group;
 
-
-        public String getTotal()
+        /**
+         * Getter method for the instance variable {@link #key}.
+         *
+         * @return value of instance variable {@link #key}
+         */
+        public String getKey()
         {
-            return "Total";
-        }
-
-        public String getPosType()
-        {
-            return getPosInst() == null ? "" : getPosInst().getType().getLabel();
+            return this.key;
         }
 
         /**
-         * Getter method for the instance variable {@link #document}.
+         * Setter method for instance variable {@link #key}.
          *
-         * @return value of instance variable {@link #document}
+         * @param _key value for instance variable {@link #key}
          */
-        public String getDocument()
+        public void setKey(final String _key)
         {
-            return getDocName() + " - " + getEmployee();
+            this.key = _key;
         }
 
         /**
-         * Getter method for the instance variable {@link #document}.
+         * Getter method for the instance variable {@link #label}.
          *
-         * @return value of instance variable {@link #document}
+         * @return value of instance variable {@link #label}
          */
-        public String getPosition()
+        public String getLabel()
         {
-            String ret;
-            if (getSwitched()) {
-                ret = getPosKey() + " " + getPosDescr();
+            return this.label;
+        }
+
+        /**
+         * Setter method for instance variable {@link #label}.
+         *
+         * @param _label value for instance variable {@link #label}
+         */
+        public void setLabel(final String _label)
+        {
+            this.label = _label;
+        }
+
+        @Override
+        public boolean equals(final Object _obj)
+        {
+            boolean ret;
+            if (_obj instanceof Column) {
+                ret = getKey().equals(((Column) _obj).getKey());
             } else {
-                ret = getPosInst() == null ? getPosDescr() : getPosInst().getType().getLabel();
+                ret = super.equals(_obj);
             }
             return ret;
         }
 
         /**
-         * Getter method for the instance variable {@link #docInst}.
+         * Getter method for the instance variable {@link #group}.
          *
-         * @return value of instance variable {@link #docInst}
+         * @return value of instance variable {@link #group}
          */
-        public Instance getDocInst()
+        public String getGroup()
         {
-            return this.docInst;
+            return this.group;
         }
 
         /**
-         * Setter method for instance variable {@link #docInst}.
+         * Setter method for instance variable {@link #group}.
          *
-         * @param _docInst value for instance variable {@link #docInst}
-         * @return this for chaining
+         * @param _group value for instance variable {@link #group}
          */
-        public DataBean setDocInst(final Instance _docInst)
+        public void setGroup(final String _group)
         {
-            this.docInst = _docInst;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #docName}.
-         *
-         * @return value of instance variable {@link #docName}
-         */
-        public String getDocName()
-        {
-            return this.docName;
-        }
-
-        /**
-         * Setter method for instance variable {@link #docName}.
-         *
-         * @param _docName value for instance variable {@link #docName}
-         * @return this for chaining
-         */
-        public DataBean setDocName(final String _docName)
-        {
-            this.docName = _docName;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #posKey}.
-         *
-         * @return value of instance variable {@link #posKey}
-         */
-        public String getPosKey()
-        {
-            return this.posKey;
-        }
-
-        /**
-         * Setter method for instance variable {@link #posKey}.
-         *
-         * @param _posKey value for instance variable {@link #posKey}
-         * @return this for chaining
-         */
-        public DataBean setPosKey(final String _posKey)
-        {
-            this.posKey = _posKey;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #posDescr}.
-         *
-         * @return value of instance variable {@link #posDescr}
-         */
-        public String getPosDescr()
-        {
-            return this.posDescr;
-        }
-
-        /**
-         * Setter method for instance variable {@link #posDescr}.
-         *
-         * @param _posDescr value for instance variable {@link #posDescr}
-         * @return this for chaining
-         */
-        public DataBean setPosDescr(final String _posDescr)
-        {
-            this.posDescr = _posDescr;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #amount}.
-         *
-         * @return value of instance variable {@link #amount}
-         */
-        public BigDecimal getAmount()
-        {
-            return this.amount;
-        }
-
-        /**
-         * Setter method for instance variable {@link #amount}.
-         *
-         * @param _amount value for instance variable {@link #amount}
-         * @return this for chaining
-         */
-        public DataBean setAmount(final BigDecimal _amount)
-        {
-            this.amount = _amount;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #employee}.
-         *
-         * @return value of instance variable {@link #employee}
-         */
-        public String getEmployee()
-        {
-            return this.employee;
-        }
-
-        /**
-         * Setter method for instance variable {@link #employee}.
-         *
-         * @param _employee value for instance variable {@link #employee}
-         * @return this for chaining
-         */
-        public DataBean setEmployee(final String _employee)
-        {
-            this.employee = _employee;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #posInst}.
-         *
-         * @return value of instance variable {@link #posInst}
-         */
-        public Instance getPosInst()
-        {
-            return this.posInst;
-        }
-
-        /**
-         * Setter method for instance variable {@link #posInst}.
-         *
-         * @param _posInst value for instance variable {@link #posInst}
-         * @return this for chaining
-         */
-        public DataBean setPosInst(final Instance _posInst)
-        {
-            this.posInst = _posInst;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #switched}.
-         *
-         * @return value of instance variable {@link #switched}
-         */
-        public Boolean getSwitched()
-        {
-            return this.switched;
-        }
-
-        /**
-         * Setter method for instance variable {@link #switched}.
-         *
-         * @param _switched value for instance variable {@link #switched}
-         * @return this for chaining
-         */
-        public DataBean setSwitched(final Boolean _switched)
-        {
-            this.switched = _switched;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #department}.
-         *
-         * @return value of instance variable {@link #department}
-         */
-        public String getDepartment()
-        {
-            return this.department;
-        }
-
-        /**
-         * Setter method for instance variable {@link #department}.
-         *
-         * @param _department value for instance variable {@link #department}
-         * @return this for chaining
-         */
-        public DataBean setDepartment(final String _department)
-        {
-            this.department = _department;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #project}.
-         *
-         * @return value of instance variable {@link #project}
-         */
-        public String getProject()
-        {
-            return this.project;
-        }
-
-        /**
-         * Setter method for instance variable {@link #project}.
-         *
-         * @param _project value for instance variable {@link #project}
-         * @return this for chaining
-         */
-        public DataBean setProject(final String _project)
-        {
-            this.project = _project;
-            return this;
+            this.group = _group;
         }
     }
 
