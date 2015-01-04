@@ -185,11 +185,18 @@ public abstract class PositionAnalyzeReport_Base
             final SelectBuilder selDoc = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
             final SelectBuilder selDocInst = new SelectBuilder(selDoc).instance();
             final SelectBuilder selDocName = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.Name);
+            final SelectBuilder selDocELT = new SelectBuilder(selDoc)
+                            .attribute(CIPayroll.DocumentAbstract.ExtraLaborTime);
+            final SelectBuilder selDocHLT = new SelectBuilder(selDoc)
+                            .attribute(CIPayroll.DocumentAbstract.HolidayLaborTime);
+            final SelectBuilder selDocLT = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.LaborTime);
+            final SelectBuilder selDocNLT = new SelectBuilder(selDoc)
+                            .attribute(CIPayroll.DocumentAbstract.NightLaborTime);
             final SelectBuilder selDepName = new SelectBuilder(selDoc)
                             .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
                             .linkfrom(CIHumanResource.Department2EmployeeAdminister.EmployeeLink)
                             .linkto(CIHumanResource.Department2EmployeeAdminister.DepartmentLink)
-                            .attribute(CIHumanResource.Department.Name);
+            .attribute(CIHumanResource.Department.Name);
 
             final SelectBuilder selProj = new SelectBuilder(selDoc)
                             .linkfrom(CIPayroll.Projects_ProjectService2Payslip.ToLink)
@@ -201,12 +208,64 @@ public abstract class PositionAnalyzeReport_Base
             }
             final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
             multi.addMsgPhrase(selDoc, msgPhrase);
-            multi.addSelect(selDocInst, selDocName, selDepName);
+            multi.addSelect(selDocInst, selDocName, selDepName, selDocELT, selDocHLT, selDocLT, selDocNLT);
             multi.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Description,
                             CIPayroll.PositionAbstract.Key);
             multi.execute();
+            final Set<Instance>added = new HashSet<>();
             while (multi.next()) {
                 final Instance docInst = multi.getSelect(selDocInst);
+                if (!added.contains(docInst)) {
+                    added.add(docInst);
+                    datasource.add(new DataBean()
+                                    .setDocInst(docInst)
+                                    .setSwitched(switchVal)
+                                    .setDocName(multi.<String>getSelect(selDocName))
+                                    .setPosInst(null)
+                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
+                                                    .getAttribute(CIPayroll.DocumentAbstract.LaborTime.name)
+                                                    .getLabelKey()))
+                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocLT)[0])
+                                    .setPosKey("")
+                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
+                                    .setDepartment(multi.<String>getSelect(selDepName)));
+                    datasource.add(new DataBean()
+                                    .setDocInst(docInst)
+                                    .setSwitched(switchVal)
+                                    .setDocName(multi.<String>getSelect(selDocName))
+                                    .setPosInst(null)
+                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
+                                                    .getAttribute(CIPayroll.DocumentAbstract.ExtraLaborTime.name)
+                                                    .getLabelKey()))
+                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocELT)[0])
+                                    .setPosKey("")
+                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
+                                    .setDepartment(multi.<String>getSelect(selDepName)));
+                    datasource.add(new DataBean()
+                                    .setDocInst(docInst)
+                                    .setSwitched(switchVal)
+                                    .setDocName(multi.<String>getSelect(selDocName))
+                                    .setPosInst(null)
+                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
+                                                    .getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime.name)
+                                                    .getLabelKey()))
+                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocHLT)[0])
+                                    .setPosKey("")
+                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
+                                    .setDepartment(multi.<String>getSelect(selDepName)));
+                    datasource.add(new DataBean()
+                                    .setDocInst(docInst)
+                                    .setSwitched(switchVal)
+                                    .setDocName(multi.<String>getSelect(selDocName))
+                                    .setPosInst(null)
+                                    .setPosDescr(DBProperties.getProperty(docInst.getType()
+                                                    .getAttribute(CIPayroll.DocumentAbstract.NightLaborTime.name)
+                                                    .getLabelKey()))
+                                    .setAmount((BigDecimal) multi.<Object[]>getSelect(selDocNLT)[0])
+                                    .setPosKey("")
+                                    .setEmployee(multi.getMsgPhrase(selDoc, msgPhrase))
+                                    .setDepartment(multi.<String>getSelect(selDepName)));
+                }
                 final DataBean bean = new DataBean().setDocInst(docInst)
                                 .setSwitched(switchVal)
                                 .setDocName(multi.<String>getSelect(selDocName))
@@ -344,14 +403,14 @@ public abstract class PositionAnalyzeReport_Base
         private String employee;
 
 
-        public BigDecimal getTotal()
+        public String getTotal()
         {
-            return BigDecimal.ONE;
+            return "Total";
         }
 
         public String getPosType()
         {
-            return getPosInst().getType().getLabel();
+            return getPosInst() == null ? "" : getPosInst().getType().getLabel();
         }
 
         /**
@@ -375,7 +434,7 @@ public abstract class PositionAnalyzeReport_Base
             if (getSwitched()) {
                 ret = getPosKey() + " " + getPosDescr();
             } else {
-                ret = getPosInst().getType().getLabel();
+                ret = getPosInst() == null ? getPosDescr() : getPosInst().getType().getLabel();
             }
             return ret;
         }
