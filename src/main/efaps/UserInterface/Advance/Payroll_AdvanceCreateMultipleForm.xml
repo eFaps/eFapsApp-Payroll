@@ -15,45 +15,35 @@
   limitations under the License.
 
   Author:          The eFaps Team
-  Revision:        $Rev$
-  Last Changed:    $Date$
-  Last Changed By: $Author$
+  Revision:        $Rev: 14540 $
+  Last Changed:    $Date: 2014-11-28 08:21:17 -0500 (Fri, 28 Nov 2014) $
+  Last Changed By: $Author: jan@moxter.net $
 
 -->
 <ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>d25539ee-6330-408f-a6b4-69a4adecf0df</uuid>
+    <uuid>666b2d29-fce6-4942-aade-8551e39e0250</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
+    <file-revision>$Rev: 14540 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipCreateMultipleForm</name>
+        <name>Payroll_AdvanceCreateMultipleForm</name>
         <field name="date">
             <property name="Attribute">Date</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
-            <trigger event="UI_FIELD_VALUE" method="dateValueUI"
-                name="Payroll_PayslipCreateMultipleForm.date.UI_FIELD_VALUE"
-                program="org.efaps.esjp.payroll.Payslip" />
-        </field>
-        <field name="dueDate">
-            <property name="Attribute">DueDate</property>
-            <property name="ModeEdit">EDITABLE</property>
-            <property name="ModeCreate">EDITABLE</property>
-            <trigger event="UI_FIELD_VALUE" method="dateValueUI"
-                name="Payroll_PayslipCreateMultipleForm.duedate.UI_FIELD_VALUE"
-                program="org.efaps.esjp.payroll.Payslip" />
         </field>
         <field name="templates">
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="UIType">CHECKBOX</property>
-            <property name="Label">Payroll_TemplatePayslip.Label</property>
+            <property name="Label">Payroll_TemplateAdvance.Label</property>
             <property name="Required">true</property>
-            <trigger event="UI_FIELD_VALUE" method="getOptionListFieldValue"
-                name="Payroll_PayslipCreateMultipleForm.templates.UI_FIELD_VALUE"
-                program="org.efaps.esjp.common.uiform.Field" >
-                <property name="Type">Payroll_TemplatePayslip</property>
+            <trigger event="UI_FIELD_VALUE"
+                method="getOptionListFieldValue"
+                name="Payroll_AdvanceCreateMultipleForm.templates.UI_FIELD_VALUE"
+                program="org.efaps.esjp.common.uiform.Field">
+                <property name="Type">Payroll_TemplateAdvance</property>
                 <property name="StatusGroup">Payroll_TemplateStatus</property>
                 <property name="Status">Active</property>
                 <property name="Select">attribute[Name]</property>

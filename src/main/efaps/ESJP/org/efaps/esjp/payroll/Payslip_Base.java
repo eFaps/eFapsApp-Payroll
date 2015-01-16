@@ -125,7 +125,7 @@ public abstract class Payslip_Base
     /**
      * Logger for this classes.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(Payslip_Base.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Payslip.class);
 
     protected static String SESSIONKEY = Payslip.class.getName() + ".SessionKey";
 
@@ -321,13 +321,20 @@ public abstract class Payslip_Base
     public Return createMultiple(final Parameter _parameter)
         throws EFapsException
     {
+        final List<Instance> templates = getInstances(_parameter,
+                        CIFormPayroll.Payroll_PayslipCreateMultipleForm.templates.name);
+
         final QueryBuilder attrQueryBldr = new QueryBuilder(CIHumanResource.EmployeeAbstract);
         attrQueryBldr.addWhereAttrEqValue(CIHumanResource.EmployeeAbstract.StatusAbstract,
                         Status.find(CIHumanResource.EmployeeStatus.Worker));
+
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2EmployeeAbstract);
         queryBldr.addWhereAttrInQuery(CIPayroll.Template2EmployeeAbstract.ToAbstractLink,
                         attrQueryBldr.getAttributeQuery(CIHumanResource.EmployeeAbstract.ID));
+        queryBldr.addWhereAttrEqValue(CIPayroll.Template2EmployeeAbstract.FromAbstractLink, templates.toArray());
+
         final MultiPrintQuery multi = queryBldr.getPrint();
+
         final SelectBuilder selTemplInst = SelectBuilder.get()
                         .linkto(CIPayroll.Template2EmployeeAbstract.FromAbstractLink).instance();
         final SelectBuilder selEmplInst = SelectBuilder.get()

@@ -30,6 +30,8 @@
         <name>Payroll_AdvanceMyDesk_Menu_Action</name>
         <childs>
             <child>Payroll_AdvanceMyDesk_Menu_Action_CreateAdvance</child>
+            <child>Payroll_AdvanceMyDesk_Menu_Action_CreateMultiple</child>
+            <child>Payroll_AdvanceMyDesk_Menu_Action_EditMultiple</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_Delete</child>
         </childs>
     </definition>

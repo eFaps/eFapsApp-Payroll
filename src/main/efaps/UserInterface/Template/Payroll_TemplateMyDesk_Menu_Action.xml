@@ -30,6 +30,7 @@
         <name>Payroll_TemplateMyDesk_Menu_Action</name>
         <childs>
             <child>Payroll_TemplateMyDesk_Menu_Action_CreatePayslip</child>
+            <child>Payroll_TemplateMyDesk_Menu_Action_CreateAdvance</child>
             <child>Payroll_TemplateMyDesk_Menu_Action_Delete</child>
         </childs>
     </definition>

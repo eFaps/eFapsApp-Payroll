@@ -15,33 +15,31 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
+ Revision:        $Rev: 14616 $
+ Last Changed:    $Date: 2014-12-12 13:02:35 -0500 (Fri, 12 Dec 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>ea73674c-4fda-4b84-9e69-b6ea31536235</uuid>
+    <uuid>4895a84b-3e2e-4f94-a017-6082ad9a81a1</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
+    <file-revision>$Rev: 14616 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AdvanceMyDesk_Menu_Action_CreateAdvance</name>
+        <name>Payroll_AdvanceMyDesk_Menu_Action_CreateMultiple</name>
         <access>
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
         </access>
         <target>
-            <form>Payroll_AdvanceCreateForm</form>
-            <execute method="create" program="org.efaps.esjp.payroll.Advance">
+            <form>Payroll_AdvanceCreateMultipleForm</form>
+            <execute method="createMultiple" program="org.efaps.esjp.payroll.Advance">
                 <property name="UseNumberGenerator4Name">true</property>
             </execute>
         </target>
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Advance</property>
         <property name="TargetMode">create</property>
-        <property name="WindowHeight">660</property>
-        <property name="WindowWidth">1200</property>
     </definition>
 </ui-command>

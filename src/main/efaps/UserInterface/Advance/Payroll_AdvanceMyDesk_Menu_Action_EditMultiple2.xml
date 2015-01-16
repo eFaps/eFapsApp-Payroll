@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2014 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,31 +15,30 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
+ Revision:        $Rev: 14447 $
+ Last Changed:    $Date: 2014-11-12 20:14:29 -0500 (Wed, 12 Nov 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>ea73674c-4fda-4b84-9e69-b6ea31536235</uuid>
+    <uuid>7476c1a3-b1fc-4e91-8983-d59cc2a03c3a</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
+    <file-revision>$Rev: 14447 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AdvanceMyDesk_Menu_Action_CreateAdvance</name>
+        <name>Payroll_AdvanceMyDesk_Menu_Action_EditMultiple2</name>
         <access>
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
         </access>
         <target>
-            <form>Payroll_AdvanceCreateForm</form>
-            <execute method="create" program="org.efaps.esjp.payroll.Advance">
-                <property name="UseNumberGenerator4Name">true</property>
-            </execute>
+            <form>Payroll_PayslipEditMassiveUpdateForm</form>
+            <execute method="edit4Multiple" program="org.efaps.esjp.payroll.Advance"/>
         </target>
         <property name="Target">modal</property>
-        <property name="TargetCreateType">Payroll_Advance</property>
+        <property name="TargetCreateType">Payroll_Payslip</property>
+        <property name="TargetShowFile">true</property>
         <property name="TargetMode">create</property>
         <property name="WindowHeight">660</property>
         <property name="WindowWidth">1200</property>

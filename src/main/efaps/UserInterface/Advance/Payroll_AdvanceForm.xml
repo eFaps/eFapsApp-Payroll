@@ -71,6 +71,11 @@
             <property name="ModeEdit">NONE</property>
             <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
         </field>
+        <field name="rateCrossTotal4Edit">
+            <property name="Attribute">RateCrossTotal</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
+        </field>
         <field name="rateCurrencyId">
             <property name="Attribute">RateCurrencyId</property>
             <property name="ModeCreate">EDITABLE</property>
@@ -83,6 +88,7 @@
         </field>
         <field name="status">
             <property name="Attribute">Status</property>
+            <property name="ModeEdit">NONE</property>
         </field>
         <field name="payslip">
             <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>

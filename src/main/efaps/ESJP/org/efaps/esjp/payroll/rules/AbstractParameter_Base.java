@@ -52,13 +52,15 @@ import org.slf4j.LoggerFactory;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: AbstractParameter_Base.java 14638 2014-12-17 00:23:45Z
+ *          jan@moxter.net $
  * @param <T> type of parameter
  */
 @EFapsUUID("45fcf09d-d676-4ac1-8f15-5f790f2eaf03")
 @EFapsRevision("$Rev$")
 public abstract class AbstractParameter_Base<T>
 {
+
     /**
      * Key for a parameter containing the instance of the employee.
      */
@@ -388,7 +390,10 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4LT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
+            if (_docInst != null
+                            && _docInst.isValid()
+                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
+                                            CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
@@ -415,7 +420,10 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4ELT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
+            if (_docInst != null
+                            && _docInst.isValid()
+                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
+                                            CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
@@ -442,7 +450,10 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4HLT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
+            if (_docInst != null
+                            && _docInst.isValid()
+                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
+                                            CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
@@ -469,7 +480,10 @@ public abstract class AbstractParameter_Base<T>
         }
         if (!_map.containsKey(AbstractParameter.PARAKEY4NLT)) {
             BigDecimal laborTime = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
+            if (_docInst != null
+                            && _docInst.isValid()
+                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
+                                            CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
