@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-<!--
-
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2014 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -17,30 +15,23 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
+ Revision:        $Rev: 14564 $
+ Last Changed:    $Date: 2014-12-02 14:05:52 -0500 (Tue, 02 Dec 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
-
 <ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>cf354312-fb84-4cf7-9d57-81a8426420e1</uuid>
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>04dc7db5-feac-419f-8c35-1927876b1cd5</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
+    <file-revision>$Rev: 14564 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_MyDesk</name>
+        <name>Payroll_RuleReportMyDesk_Menu</name>
         <childs>
-            <child>Payroll_PayslipMyDesk</child>
-            <child>Payroll_AdvanceMyDesk</child>
-            <child>Payroll_SettlementMyDesk</child>
-            <child>Payroll_ReportMyDesk</child>
-            <child>Payroll_PositionAnalyzeReportMyDesk</child>
-            <child>Payroll_RuleReportMyDesk</child>
-            <child>Payroll_MyDesk_ActionReport</child>
-            <child>Payroll_MyDesk_ExportAFPReport</child>
-            <child>Payroll_MyDesk_Admin</child>
+            <child>Payroll_RuleReportMyDesk_Menu_DownloadExcel</child>
+            <child>Payroll_RuleReportMyDesk_Menu_DownloadPDF</child>
+            <child>Payroll_RuleReportMyDesk_Menu_Filter</child>
         </childs>
     </definition>
 </ui-menu>
