@@ -50,5 +50,9 @@
             <property name="Select">linkto[ToLink].attribute[SecondLastName]</property>
             <property name="Label">HumanResource_EmployeeAbstract/SecondLastName.Label</property>
         </field>
+         <field name="status">
+            <property name="Select">linkto[ToLink].attribute[StatusAbstract]</property>
+            <property name="Label">HumanResource_EmployeeAbstract/StatusAbstract.Label</property>
+        </field>
     </definition>
 </ui-table>
