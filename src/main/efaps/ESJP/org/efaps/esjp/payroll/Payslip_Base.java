@@ -1303,7 +1303,8 @@ public abstract class Payslip_Base
                 case "ExtraLaborTime":
                 case "NightLaborTime":
                 case "LaborTime":
-
+                    table.addRow().addColumn(DBProperties.getProperty("Payroll_Payslip/" + selected + ".Label"))
+                        .getCurrentColumn().setStyle("font-weight: bold;");
                     final MultiPrintQuery multi = new MultiPrintQuery(insts);
                     final SelectBuilder selEmp = SelectBuilder.get()
                                     .linkto(CIPayroll.Payslip.EmployeeAbstractLink);
@@ -1317,6 +1318,7 @@ public abstract class Payslip_Base
                     final SelectBuilder selTime = SelectBuilder.get().attribute(selected).value();
                     multi.addSelect(selEmpFirstName, selEmpLastName, selEmpSecLastName, selTime, selUoM);
                     multi.addAttribute(CIPayroll.Payslip.Name);
+                    multi.setEnforceSorted(true);
                     multi.execute();
                     while (multi.next()) {
                         final String employee = multi.getSelect(selEmpLastName) + " "
@@ -1335,9 +1337,11 @@ public abstract class Payslip_Base
                     break;
                 default:
                     final PrintQuery print = new PrintQuery(selected);
-                    print.addAttribute(CIPayroll.RuleAbstract.Key);
+                    print.addAttribute(CIPayroll.RuleAbstract.Key, CIPayroll.RuleAbstract.Description);
                     print.execute();
                     final String key = print.getAttribute(CIPayroll.RuleAbstract.Key);
+                    table.addRow().addColumn(key + " - " + print.getAttribute(CIPayroll.RuleAbstract.Description))
+                        .getCurrentColumn().setStyle("font-weight: bold;");
 
                     final MultiPrintQuery paySlipMulti = new MultiPrintQuery(insts);
                     final SelectBuilder selEmp2 = SelectBuilder.get()
@@ -1353,6 +1357,7 @@ public abstract class Payslip_Base
                                     .attribute(CIERP.Currency.Symbol);
                     paySlipMulti.addSelect(selCurrSymb, selEmpFirstName2, selEmpLastName2, selEmpSecLastName2);
                     paySlipMulti.addAttribute(CIPayroll.DocumentAbstract.Name);
+                    paySlipMulti.setEnforceSorted(true);
                     paySlipMulti.execute();
 
                     while (paySlipMulti.next()) {
