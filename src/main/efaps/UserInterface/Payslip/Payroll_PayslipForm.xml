@@ -105,6 +105,34 @@
             <property name="ModeCreate">READONLY</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
+        <field name="createGroup" character="Group">
+            <property name="GroupCount">2</property>
+        </field>
+        <field name="creator">
+            <property name="SelectAlternateOID">linkto[Creator].oid</property>
+            <property name="Attribute">Creator</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="ModeSearch">EDITABLE</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="created">
+            <property name="Attribute">Created</property>
+            <property name="ModeSearch">EDITABLE</property>
+        </field>
+        <field name="modifyGroup" character="Group">
+            <property name="GroupCount">2</property>
+        </field>
+        <field name="modifier">
+            <property name="SelectAlternateOID">linkto[Modifier].oid</property>
+            <property name="Attribute">Modifier</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="ModeSearch">EDITABLE</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="modified">
+            <property name="Attribute">Modified</property>
+            <property name="ModeSearch">EDITABLE</property>
+        </field>
         <field name="laborTimeGroup" character="Group">
             <property name="GroupCount">2</property>
             <property name="ModeCreate">READONLY</property>
@@ -335,6 +363,34 @@
             <property name="ModeView">NONE</property>
             <property name="ModeCreate">READONLY</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+        </field>
+        <field name="createGroup" character="Group">
+            <property name="GroupCount">2</property>
+        </field>
+        <field name="creator">
+            <property name="SelectAlternateOID">linkto[Creator].oid</property>
+            <property name="Attribute">Creator</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="ModeSearch">EDITABLE</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="created">
+            <property name="Attribute">Created</property>
+            <property name="ModeSearch">EDITABLE</property>
+        </field>
+        <field name="modifyGroup" character="Group">
+            <property name="GroupCount">2</property>
+        </field>
+        <field name="modifier">
+            <property name="SelectAlternateOID">linkto[Modifier].oid</property>
+            <property name="Attribute">Modifier</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="ModeSearch">EDITABLE</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="modified">
+            <property name="Attribute">Modified</property>
+            <property name="ModeSearch">EDITABLE</property>
         </field>
         <field name="laborTimeGroup" character="Group">
             <property name="GroupCount">2</property>

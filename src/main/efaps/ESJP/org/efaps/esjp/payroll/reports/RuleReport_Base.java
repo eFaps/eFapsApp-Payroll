@@ -44,6 +44,7 @@ import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
 import org.efaps.db.MultiPrintQuery;
+import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIPayroll;
@@ -210,8 +211,11 @@ public abstract class RuleReport_Base
             if (filterMap.containsKey("rule")) {
                 final InstanceFilterValue filter = (InstanceFilterValue) filterMap.get("rule");
                 if (filter.getObject() != null && filter.getObject().isValid()) {
-                    _queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.RuleAbstractLink,
-                                    filter.getObject());
+                    final PrintQuery print = new PrintQuery(filter.getObject());
+                    print.addAttribute(CIPayroll.PositionAbstract.Key);
+                    print.execute();
+                    _queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key,
+                                    print.getAttribute(CIPayroll.PositionAbstract.Key));
                 }
             }
 
