@@ -33,6 +33,14 @@
             <property name="Label">Payroll_Payslip/Type.Label</property>
             <property name="ShowTypeIcon">true</property>
         </field>
+        <field name="date">
+            <property name="FilterType">FREETEXT</property>
+            <property name="FilterRequired">TRUE</property>
+            <property name="FilterBase">DATABASE</property>
+            <property name="FilterDefault">MONTH:1:2</property>
+            <property name="Attribute">Date</property>
+            <property name="Label">ERP_DocumentAbstract/Date.Label</property>
+        </field>
         <field name="name">
             <property name="Attribute">Name</property>
             <property name="Label">Payroll_Payslip/Name.Label</property>
