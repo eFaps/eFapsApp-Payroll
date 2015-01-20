@@ -203,20 +203,14 @@ public abstract class PayslipReport_Base
         AbstractReports_Base.LOG.debug("dateFrom: '{}' dateTo: '{}'", _dateFrom, _dateTo);
         final List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
 
-        final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-        attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, _dateFrom);
-        attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, _dateTo);
-        final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID);
-
-        final QueryBuilder attrQueryBldr2 = new QueryBuilder(CIPayroll.Payslip);
-        attrQueryBldr2.addWhereAttrEqValue(CIPayroll.Payslip.Date, _dateFrom);
-        attrQueryBldr2.addWhereAttrEqValue(CIPayroll.Payslip.DueDate, _dateTo);
-        final AttributeQuery attrQuery2 = attrQueryBldr2.getAttributeQuery(CIPayroll.Payslip.ID);
+        final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
+        attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date, _dateFrom);
+        attrQueryBldr.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date, _dateTo);
+        final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.DocumentAbstract.ID);
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
-        queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
-        queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery2);
-        queryBldr.setOr(true);
+        queryBldr.addType(CIPayroll.Settlement);
+        queryBldr.addWhereAttrInQuery(CIPayroll.DocumentAbstract.ID, attrQuery);
 
         final MultiPrintQuery multi = queryBldr.getPrint();
         final SelectBuilder selDoc = new SelectBuilder()

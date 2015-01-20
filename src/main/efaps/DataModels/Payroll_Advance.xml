@@ -39,5 +39,12 @@
                 name="Payroll_Advance.Status.RANGE_VALUE" event="RANGE_VALUE">
             </trigger>
         </attribute>
+         <attribute>
+            <name>TemplateLink</name>
+            <type>Link</type>
+            <typelink>Payroll_TemplateAdvance</typelink>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>TEMPLATEID</sqlcolumn>
+        </attribute>
     </definition>
 </datamodel-type>
