@@ -118,6 +118,8 @@
             <!-- Payroll_Payroll, Admin_Help_MainMenu -->
             update.add2Help("68acacc0-cf4f-4260-bf16-2a0dfb2edbe0", "dead549e-5cc6-49f9-9a79-8e33aa139f6d", -1);
 
+            // Payroll_Sales_BulkPaymentDefinitionMyDesk_Menu_Action_Create Sales_BulkPaymentDefinitionMyDesk_Menu_Action
+            update.add2Menu("2fcc345e-db48-454a-8091-68cd345cf253", "12362087-4bf5-4205-9770-07e6dd050df2", 1);
 
             <!-- Define attribute definition -->
             <!-- Payroll_AttributeDefinitionAbstractMyDesk_Menu_Action, ERP_AttributeDefinitionMyDesk_Menu-->
