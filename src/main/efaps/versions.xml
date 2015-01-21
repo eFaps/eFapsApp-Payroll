@@ -121,6 +121,9 @@
             // Payroll_Sales_BulkPaymentDefinitionMyDesk_Menu_Action_Create Sales_BulkPaymentDefinitionMyDesk_Menu_Action
             update.add2Menu("2fcc345e-db48-454a-8091-68cd345cf253", "12362087-4bf5-4205-9770-07e6dd050df2", 1);
 
+            // Payroll_Sales_BulkPaymentMyDesk_Menu_Action_Create Sales_BulkPaymentMyDesk_Menu_Action
+            update.add2Menu("d28912a0-ce85-49f2-8f90-23c31192b8c5", "192bbee8-e234-4442-8991-0605313ed3af", 1);
+
             <!-- Define attribute definition -->
             <!-- Payroll_AttributeDefinitionAbstractMyDesk_Menu_Action, ERP_AttributeDefinitionMyDesk_Menu-->
             update.add2Menu("df804de0-e679-4629-aa0c-660b9f5c8c9d", "69e0b34a-2483-4662-9a45-1ce5d4e420e6", 1);
