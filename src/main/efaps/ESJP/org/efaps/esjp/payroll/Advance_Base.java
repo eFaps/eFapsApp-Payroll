@@ -122,7 +122,7 @@ public abstract class Advance_Base
                     insert.add(CIPayroll.Advance.Name, name);
                     insert.add(CIPayroll.Advance.Date, date);
                     insert.add(CIPayroll.Advance.EmployeeAbstractLink, Instance.get(employees[i]));
-                    insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Open));
+                    insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Draft));
                     insert.add(CIPayroll.Advance.RateCrossTotal, ratePay);
                     insert.add(CIPayroll.Advance.RateNetTotal, ratePay);
                     insert.add(CIPayroll.Advance.CrossTotal, pay);
@@ -183,7 +183,7 @@ public abstract class Advance_Base
             insert.add(CIPayroll.Advance.Name, getDocName4Create(_parameter));
             insert.add(CIPayroll.Advance.Date, date);
             insert.add(CIPayroll.Advance.EmployeeAbstractLink, emplInst);
-            insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Open));
+            insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Draft));
             insert.add(CIPayroll.Advance.RateCrossTotal, BigDecimal.ZERO);
             insert.add(CIPayroll.Advance.RateNetTotal, BigDecimal.ZERO);
             insert.add(CIPayroll.Advance.Rate, rateObj);

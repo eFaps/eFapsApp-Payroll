@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+
+ Copyright 2003 - 2010 The eFaps Team
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ Author:          The eFaps Team
+ Revision:        $Rev: 14698 $
+ Last Changed:    $Date: 2014-12-28 20:15:38 -0500 (Sun, 28 Dec 2014) $
+ Last Changed By: $Author: jan@moxter.net $
+
+-->
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>75ad2523-e7b9-4619-a09d-95f2f83bc13f</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <file-revision>$Rev: 14698 $</file-revision>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_AdvanceMyDesk_Menu_Action_SetOpen</name>
+        <access>
+            <role>Payroll_Admin</role>
+            <role>Payroll_Modifier</role>
+        </access>
+        <target>
+            <execute method="setStatus" program="org.efaps.esjp.admin.datamodel.StatusValue">
+                <property name="Status">Open</property>
+                <property name="NoUpdateStatus01">Open</property>
+                <property name="NoUpdateStatus02">Paid</property>
+                <property name="NoUpdateStatus03">Booked</property>
+                <property name="NoUpdateStatus04">Canceled</property>
+                <property name="EvalOID">true</property>
+            </execute>
+        </target>
+        <property name="AskUser">true</property>
+        <property name="Submit">true</property>
+        <property name="SubmitSelectedRows">-1</property>
+    </definition>
+</ui-command>
