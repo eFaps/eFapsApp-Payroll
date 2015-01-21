@@ -33,7 +33,9 @@
         </access>
         <target>
             <search>Payroll_BulkPaymentTree_PayDoc_Menu_Action_AddExisting_Search</search>
-            <execute program="org.efaps.esjp.common.uisearch.Connect">
+            <execute program="org.efaps.esjp.payroll.BulkPayment" method="connectDoc">
+                <property name="StatusGroup">Sales_PaymentDepositOutStatus</property>
+                <property name="Status">Open</property>
                 <property name="ConnectChildAttribute">ToLink</property>
                 <property name="ConnectParentAttribute">FromLink</property>
                 <property name="ConnectType">Payroll_BulkPayment2PaymentDocument</property>
@@ -41,5 +43,6 @@
         </target>
         <property name="Target">modal</property>
         <property name="TargetCmdRevise">true</property>
+        <property name="TargetCreateType">Sales_PaymentDepositOut</property>
     </definition>
 </ui-command>

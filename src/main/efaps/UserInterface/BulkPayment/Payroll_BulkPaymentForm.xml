@@ -126,7 +126,7 @@
             <trigger event="UI_FIELD_VALUE"
                 method="getReport4Detail"
                 name="Sales_BulkPaymentForm.report.UI_FIELD_VALUE"
-                program="org.efaps.esjp.sales.payment.BulkPayment" />
+                program="org.efaps.esjp.payroll.BulkPayment" />
         </field>
     </definition>
 </ui-form>

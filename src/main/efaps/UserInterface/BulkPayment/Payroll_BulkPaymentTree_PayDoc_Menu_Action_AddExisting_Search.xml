@@ -29,10 +29,11 @@
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_BulkPaymentTree_PayDoc_Menu_Action_AddExisting_Search</name>
         <default>
-            <command>Sales_PaymentDocumentDetractionOutSearch</command>
+            <command>Payroll_DocumentSearch</command>
         </default>
         <childs>
-            <child>Sales_PaymentDocumentDetractionOutSearch</child>
+            <child>Payroll_DocumentSearch</child>
+            <child>Payroll_PayslipSearch</child>
         </childs>
     </definition>
 </ui-search>

@@ -33,28 +33,23 @@
             <property name="Label">Payroll_BulkPayment2PaymentDocument/Type.Label</property>
             <property name="HRef">TREE</property>
         </field>
-        <field name="operationType">
-            <property name="Attribute">OperationType</property>
-            <property name="Label">Payroll_BulkPayment2PaymentDocument/OperationType.Label</property>
-        </field>
-        <field name="serviceType">
-            <property name="Attribute">ServiceType</property>
-            <property name="Label">Payroll_BulkPayment2PaymentDocument/ServiceType.Label</property>
-        </field>
-        <field name="name">
+         <field name="name">
             <property name="SelectAlternateOID">linkto[ToLink].oid</property>
             <property name="Phrase">$&lt;linkto[ToLink].type.label&gt; - $&lt;linkto[ToLink].attribute[Name]&gt;</property>
             <property name="Label">Payroll_BulkPayment2PaymentDocumentTable.name.Label</property>
             <property name="HRef">TREE</property>
         </field>
+        <!--
         <field name="employee">
             <property name="Select">linkto[ToLink].linkto[Contact].attribute[Name]</property>
             <property name="Label">Payroll_BulkPayment2PaymentDocumentTable.employee.Label</property>
         </field>
+
         <field name="amount">
             <property name="Select">linkto[ToLink].attribute[Amount]</property>
             <property name="Label">Payroll_BulkPayment2PaymentDocumentTable.amount.Label</property>
         </field>
+         -->
         <field name="status">
             <property name="Select">linkto[ToLink].attribute[Status]</property>
             <property name="Label">Payroll_BulkPayment2PaymentDocumentTable.status.Label</property>

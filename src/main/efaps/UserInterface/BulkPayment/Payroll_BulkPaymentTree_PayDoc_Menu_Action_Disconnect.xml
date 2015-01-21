@@ -15,22 +15,26 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev: 14290 $
- Last Changed:    $Date: 2014-10-22 16:29:02 -0500 (Wed, 22 Oct 2014) $
- Last Changed By: $Author: m.aranya@moxter.net $
+ Revision:        $Rev: 14002 $
+ Last Changed:    $Date: 2014-09-11 13:43:40 -0500 (Thu, 11 Sep 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
-<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>135f25ef-8e18-4ffc-ada2-ccda1ebefca4</uuid>
-    <file-application>eFapsApp-Sales</file-application>
-    <file-revision>$Rev: 14290 $</file-revision>
+    <uuid>3aea8577-b967-4842-8613-8faf3c63920f</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <file-revision>$Rev: 14002 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_BulkPaymentTree_PayDoc_Menu_Action</name>
-        <childs>
-            <child>Payroll_BulkPaymentTree_PayDoc_Menu_Action_AddExisting</child>
-            <child>Payroll_BulkPaymentTree_PayDoc_Menu_Action_Disconnect</child>
-        </childs>
+        <name>Payroll_BulkPaymentTree_PayDoc_Menu_Action_Disconnect</name>
+        <access>
+            <role>Payroll_Admin</role>
+        </access>
+        <target>
+            <execute program="org.efaps.esjp.common.uitable.CommonDelete" />
+        </target>
+        <property name="AskUser">true</property>
+        <property name="Submit">true</property>
     </definition>
-</ui-menu>
+</ui-command>
