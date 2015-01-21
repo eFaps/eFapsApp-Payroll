@@ -1240,13 +1240,19 @@ public abstract class Payslip_Base
     {
         final Return ret = new Return();
         final List<DropDownPosition> values = new ArrayList<DropDownPosition>();
-        final String[] oids = _parameter.getParameterValues("selectedRow");
-        final List<Instance> insts;
-        if (oids != null) {
+        List<Instance> insts = getSelectedInstances(_parameter);
+        if (!insts.isEmpty()) {
+            final MultiPrintQuery multi = new MultiPrintQuery(insts);
+            multi.addAttribute(CIPayroll.DocumentAbstract.StatusAbstract);
+            multi.execute();
             insts = new ArrayList<>();
-            for (final String oid : oids) {
-                final Instance slipInst = Instance.get(oid);
-                insts.add(slipInst);
+            while (multi.next()) {
+                final Status status = Status.get(multi.<Long>getAttribute(CIPayroll.DocumentAbstract.StatusAbstract));
+                if (status.equals(Status.find(CIPayroll.PayslipStatus.Draft))
+                                || status.equals(Status.find(CIPayroll.AdvanceStatus.Draft))
+                                || status.equals(Status.find(CIPayroll.SettlementStatus.Draft))) {
+                    insts.add(multi.getCurrentInstance());
+                }
             }
             Context.getThreadContext().setSessionAttribute(Payslip.SESSIONKEY, insts);
         } else {

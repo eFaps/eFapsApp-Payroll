@@ -19,29 +19,29 @@
  Last Changed:    $Date: 2010-08-16 11:58:36 -0500 (lun, 16 ago 2010) $
  Last Changed By: $Author: miguel.a.aranya $
 
---><datamodel-statusgroup xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+-->
+<datamodel-statusgroup xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>db9c2aa6-67f6-4e32-973c-8dfe5b977d72</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 5319 $</file-revision>
-
     <definition>
-
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_AdvanceStatus</name>
         <parent>Admin_DataModel_StatusAbstract</parent>
-
         <status key="Open">
             <description>Advance was printed, but needs to be payed for.
             </description>
         </status>
-
         <status key="Paid">
             <description>Advance was payed.</description>
         </status>
-
         <status key="Canceled">
             <description>Advance was canceled.
             </description>
+        </status>
+        <status key="Draft">
+            <description>Advance is in draft.</description>
         </status>
     </definition>
 </datamodel-statusgroup>

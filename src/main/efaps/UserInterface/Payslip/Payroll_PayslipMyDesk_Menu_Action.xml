@@ -39,6 +39,7 @@
             <child>Payroll_PayslipMyDesk_Menu_Action_Checkout</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_Copy</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_CreateMassive</child>
+            <child>Payroll_PayslipMyDesk_Menu_Action_SetOpen</child>
             <child>Payroll_PayslipMyDesk_Menu_Action_Delete</child>
         </childs>
     </definition>
