@@ -19,26 +19,24 @@
   Last Changed:    $Date: 2010-08-16 11:58:36 -0500 (lun, 16 ago 2010) $
   Last Changed By: $Author: miguel.a.aranya $
 
---><ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+-->
+<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>4224d4a4-1d4e-4515-972b-4b5845415af2</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 5319 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_AdvanceTree</name>
-        <!-- targets -->
         <target>
             <menu>Payroll_AdvanceTree_Menu</menu>
             <form>Payroll_AdvanceForm</form>
         </target>
-        <!-- type tree for -->
         <type>Payroll_Advance</type>
-        <!-- child -->
         <childs>
+            <child>Payroll_AdvanceTree_Position</child>
             <child>Payroll_AdvanceTree_Payslip</child>
             <child>Payroll_AdvanceTree_Payment</child>
         </childs>
-        <!-- properties -->
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>

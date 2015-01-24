@@ -35,8 +35,10 @@ import org.efaps.admin.event.Return;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.ci.CIType;
+import org.efaps.db.Delete;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
+import org.efaps.db.InstanceQuery;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
@@ -46,6 +48,7 @@ import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.ci.CIProjects;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.CurrencyInst;
@@ -55,6 +58,8 @@ import org.efaps.esjp.payroll.rules.Calculator;
 import org.efaps.esjp.payroll.rules.Result;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocument;
+import org.efaps.update.AppDependency;
+import org.efaps.update.util.InstallationException;
 import org.efaps.util.EFapsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +151,61 @@ public abstract class Advance_Base
         return new Return();
     }
 
+    /**
+     * Create advances.
+     *
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return new Return
+     * @throws EFapsException on error
+     */
+    public Return edit(final Parameter _parameter)
+        throws EFapsException
+    {
+        new Return();
+
+        final Instance instance = _parameter.getInstance();
+
+        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.date.name);
+        final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.laborTime.name);
+        final String laborTimeUoM = _parameter.getParameterValue("laborTimeUoM");
+        final String extraLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_AdvanceForm.extraLaborTime.name);
+        final String extraLaborTimeUoM = _parameter.getParameterValue("extraLaborTimeUoM");
+        final String nightLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_AdvanceForm.nightLaborTime.name);
+        final String nightLaborTimeUoM = _parameter.getParameterValue("nightLaborTimeUoM");
+        final String holidayLaborTime = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_AdvanceForm.holidayLaborTime.name);
+        final String holidayLaborTimeUoM = _parameter.getParameterValue("holidayLaborTimeUoM");
+
+        final Update update = new Update(instance);
+        update.add(CIPayroll.Advance.LaborTime, new Object[] { laborTime, laborTimeUoM });
+        update.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { extraLaborTime, extraLaborTimeUoM });
+        update.add(CIPayroll.Advance.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
+        update.add(CIPayroll.Advance.HolidayLaborTime, new Object[] { holidayLaborTime, holidayLaborTimeUoM });
+        update.add(CIPayroll.Advance.Date, date);
+        update.execute();
+
+        final PrintQuery print = new PrintQuery(instance);
+        final SelectBuilder selRateCurInst = SelectBuilder.get().linkto(CIPayroll.Advance.RateCurrencyId).instance();
+        print.addSelect(selRateCurInst);
+        print.addAttribute(CIPayroll.Advance.Rate);
+        print.execute();
+
+        final Instance rateCurrInst = print.getSelect(selRateCurInst);
+        final Object[] rateObj = print.getAttribute(CIPayroll.Advance.Rate);
+        final Payslip payslip = new Payslip();
+
+        final List<? extends AbstractRule<?>> rules = payslip.analyseRulesFomUI(_parameter,
+                        payslip.getRuleInstFromUI(_parameter));
+        final Result result = Calculator.getResult(_parameter, rules);
+
+        payslip.updateTotals(_parameter, instance, result, rateCurrInst, rateObj);
+        payslip.updatePositions(_parameter, instance, result, rateCurrInst, rateObj);
+
+        return new Return();
+    }
+
     public Return createMultiple(final Parameter _parameter)
         throws EFapsException
     {
@@ -202,11 +262,14 @@ public abstract class Advance_Base
             insert.execute();
 
             createdDoc.setInstance(insert.getInstance());
+            connect2Project(_parameter, createdDoc, emplInst);
 
             final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
             Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
             final Result result = Calculator.getResult(_parameter, rules);
-            new Payslip().updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+            final Payslip payslip = new Payslip();
+            payslip.updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+            payslip.updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
         }
 
         return new Return();
@@ -282,6 +345,7 @@ public abstract class Advance_Base
                 final List<? extends AbstractRule<?>> rules = payslip.analyseRulesFomDoc(_parameter, docInst, mapping);
                 final Result result = Calculator.getResult(_parameter, rules);
                 payslip.updateTotals(_parameter, docInst, result, rateCurrInst, rateObj);
+                payslip.updatePositions(_parameter, docInst, result, rateCurrInst, rateObj);
             }
         }
         return new Return();
@@ -300,4 +364,68 @@ public abstract class Advance_Base
     {
         return CIPayroll.Advance;
     }
+
+    /**
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return Return containing map for autocomplete
+     * @throws EFapsException on error
+     */
+    public Return deletePreTrigger(final Parameter _parameter)
+        throws EFapsException
+    {
+        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _parameter.getInstance());
+        final InstanceQuery query = queryBldr.getQuery();
+        query.execute();
+        while (query.next()) {
+            new Delete(query.getCurrentValue()).execute();
+        }
+
+        try {
+            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+                final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.Projects_ProjectService2Advance);
+                queryBldr2.addWhereAttrEqValue(CIPayroll.Projects_ProjectService2Advance.ToDocument,
+                                _parameter.getInstance());
+                final InstanceQuery query2 = queryBldr2.getQuery();
+                query2.execute();
+                while (query2.next()) {
+                    new Delete(query2.getCurrentValue()).execute();
+                }
+            }
+        } catch (final InstallationException e) {
+            throw new EFapsException("Catched Error.", e);
+        }
+        return new Return();
+    }
+
+    protected void connect2Project(final Parameter _parameter,
+                                   final CreatedDoc _createdDoc,
+                                   final Instance _emplInst)
+        throws EFapsException
+    {
+        try {
+            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+                final QueryBuilder queryBldr = new QueryBuilder(CIProjects.ProjectService2Employee);
+                queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, _emplInst);
+                queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.Status,
+                                Status.find(CIProjects.ProjectService2EmployeeStatus.Active));
+                final MultiPrintQuery multi = queryBldr.getPrint();
+                final SelectBuilder selProj = SelectBuilder.get().linkto(
+                                CIProjects.ProjectService2Employee.FromLink);
+                final SelectBuilder selProjInst = new SelectBuilder(selProj).instance();
+                multi.addSelect(selProjInst);
+                multi.execute();
+                if (multi.next()) {
+                    final Instance projInst = multi.getSelect(selProjInst);
+                    final Insert insert = new Insert(CIPayroll.Projects_ProjectService2Advance);
+                    insert.add(CIPayroll.Projects_ProjectService2Advance.FromLink, projInst);
+                    insert.add(CIPayroll.Projects_ProjectService2Advance.ToLink, _createdDoc.getInstance());
+                    insert.execute();
+                }
+            }
+        } catch (final InstallationException e) {
+            throw new EFapsException("Catched Error.", e);
+        }
+    }
+
 }

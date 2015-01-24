@@ -27,6 +27,9 @@
     <file-revision>$Rev: 7367 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects" exclude="true"/>
+        </application-dependencies>
         <name>Payroll_AdvanceTable</name>
         <field name="type">
             <property name="Attribute">Type</property>
@@ -98,6 +101,99 @@
             <property name="Select">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].attribute[Name]</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_AdvanceForm.payslip.Label</property>
+        </field>
+        <field name="buttonOpenInNewWindow">
+            <icon>eFapsActionNewWindow</icon>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Target">popup</property>
+            <property name="SortAble">false</property>
+            <property name="Width">15px</property>
+        </field>
+    </definition>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <application-dependencies>
+            <application name="eFapsApp-Projects"/>
+        </application-dependencies>
+        <name>Payroll_AdvanceTable</name>
+        <field name="type">
+            <property name="Attribute">Type</property>
+            <property name="Label">Payroll_Payslip/Type.Label</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="date">
+            <property name="FilterType">FREETEXT</property>
+            <property name="FilterRequired">TRUE</property>
+            <property name="FilterBase">DATABASE</property>
+            <property name="FilterDefault">MONTH:1:2</property>
+            <property name="Attribute">Date</property>
+            <property name="Label">ERP_DocumentAbstract/Date.Label</property>
+        </field>
+        <field name="name">
+            <property name="Attribute">Name</property>
+            <property name="Label">Payroll_Payslip/Name.Label</property>
+            <property name="ShowTypeIcon">true</property>
+            <property name="HRef">TREE</property>
+        </field>
+        <field name="employee">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
+            <property name="Label">Payroll_Payslip/employee.Label</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee"
+                name="Payroll_AdvanceTable.employeeLink.UI_FIELD_AUTOCOMPLETE"
+                program="org.efaps.esjp.humanresource.Employee">
+                <property name="keyValue">Value</property>
+                <property name="Type">HumanResource_Employee</property>
+                <property name="StatusGroup">HumanResource_EmployeeStatus</property>
+                <property name="Status">Worker</property>
+            </trigger>
+        </field>
+        <field name="rateCrossTotal">
+            <property name="Attribute">RateCrossTotal</property>
+            <property name="Label">Payroll_Payslip/Amount2Pay.Label</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
+            <property name="ModeView">NONE</property>
+        </field>
+        <field name="rateCrossTotal4View">
+            <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
+            <property name="Align">right</property>
+        </field>
+        <field name="rateCurrencyId">
+            <property name="Attribute">RateCurrencyId</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="ModeView">NONE</property>
+            <trigger program="org.efaps.esjp.payroll.Payslip"
+                method="rateCurrencyFieldValueUI"
+                name="Payroll_AdvanceTable.currencyId.UI_FIELD_VALUE"
+                event="UI_FIELD_VALUE" />
+        </field>
+        <field name="statusAbstract">
+            <property name="FilterType">PICKLIST</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Attribute">StatusAbstract</property>
+            <property name="Label">Payroll_Payslip/Status.Label</property>
+        </field>
+        <field name="payslip">
+            <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>
+            <property name="Select">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].attribute[Name]</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Label">Payroll_AdvanceForm.payslip.Label</property>
+        </field>
+        <field name="project4View">
+            <property name="FilterType">PICKLIST</property>
+            <property name="SelectAlternateOID">linkfrom[PayRoll_Projects_ProjectService2Advance#ToLink].linkto[FromLink].oid</property>
+            <property name="Phrase">$&lt;linkfrom[PayRoll_Projects_ProjectService2Advance#ToLink].linkto[FromLink].attribute[Name]&gt; - $&lt;linkfrom[PayRoll_Projects_ProjectService2Advance#ToLink].linkto[FromLink].attribute[Description]&gt;</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="Label">Payroll_PayslipForm.project.Label</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>

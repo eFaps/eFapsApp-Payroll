@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
  Copyright 2003 - 2010 The eFaps Team
 
@@ -17,28 +15,25 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
+ Revision:        $Rev: 13985 $
+ Last Changed:    $Date: 2014-09-10 11:49:09 -0500 (Wed, 10 Sep 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
-
-<ui-table xmlns="http://www.efaps.org/xsd"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>4167207f-a420-452e-b36b-0c61f69d614c</uuid>
+<ui-table xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>f9bc0a8c-3278-4c34-940c-ec09ede4cd06</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
+    <file-revision>$Rev: 13985 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PayslipPositionTable</name>
-        <!-- fields -->
+        <name>Payroll_AdvancePositionTable</name>
         <field name="type">
             <property name="Attribute">Type</property>
             <property name="Label">Payroll_PositionAbstract/Type.Label</property>
             <property name="ShowTypeIcon">true</property>
         </field>
-         <field name="positionNumber">
+        <field name="positionNumber">
             <property name="Attribute">PositionNumber</property>
             <property name="Label">Payroll_PositionAbstract/PositionNumber.Label</property>
         </field>
@@ -46,6 +41,7 @@
             <property name="SelectAlternateOID">linnkto[RuleAbstractLink].oid</property>
             <property name="Attribute">Key</property>
             <property name="Label">Payroll_PositionAbstract/Key.Label</property>
+            <property name="HRef">TREE</property>
         </field>
         <field name="description">
             <property name="Attribute">Description</property>

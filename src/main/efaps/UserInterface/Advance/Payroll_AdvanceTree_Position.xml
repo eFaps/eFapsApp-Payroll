@@ -15,34 +15,32 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev: 5319 $
- Last Changed:    $Date: 2010-08-16 11:58:36 -0500 (lun, 16 ago 2010) $
- Last Changed By: $Author: miguel.a.aranya $
+ Revision:        $Rev: 13970 $
+ Last Changed:    $Date: 2014-09-08 16:02:58 -0500 (Mon, 08 Sep 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>b5f4be56-bfb5-4f1c-8da5-5d057b3dcf75</uuid>
+    <uuid>426fd57e-7498-4929-9768-5711a3dc6b08</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 5319 $</file-revision>
+    <file-revision>$Rev: 13970 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AdvanceTree_Menu_Action_Edit</name>
+        <name>Payroll_AdvanceTree_Position</name>
         <access>
             <role>Payroll_Admin</role>
-            <role>Payroll_Modifier</role>
         </access>
         <target>
-            <form>Payroll_AdvanceForm</form>
-            <execute program="org.efaps.esjp.payroll.Advance" method="edit" >
-            </execute>
-            <trigger event="UI_ACCESSCHECK" method="check4Status"
-                name="Payroll_AdvanceTree_Menu_Action_SetPaid.UI_ACCESSCHECK"
-                program="org.efaps.esjp.admin.access.AccessCheck4UI">
-                <property name="Status">Draft</property>
-            </trigger>
+            <menu>Payroll_AdvanceTree_Position_Menu</menu>
+            <table>Payroll_AdvancePositionTable</table>
+            <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
+                <property name="Type">Payroll_PositionAbstract</property>
+                <property name="LinkFrom">DocumentAbstractLink</property>
+            </evaluate>
         </target>
-        <property name="Target">modal</property>
-        <property name="TargetMode">edit</property>
+        <property name="Target">content</property>
+        <property name="TargetShowCheckBoxes">true</property>
+        <property name="TargetMode">view</property>
     </definition>
 </ui-command>
