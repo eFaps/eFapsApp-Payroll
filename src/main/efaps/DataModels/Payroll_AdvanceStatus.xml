@@ -43,5 +43,8 @@
         <status key="Draft">
             <description>Advance is in draft.</description>
         </status>
+        <status key="Booked">
+            <description>Settlement was booked. (Contabilizado)</description>
+        </status>
     </definition>
 </datamodel-statusgroup>

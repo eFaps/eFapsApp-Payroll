@@ -20,6 +20,7 @@
 
 package org.efaps.esjp.payroll.reports;
 
+import java.awt.Color;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.commons.lang.BooleanUtils;
 import org.efaps.admin.common.MsgPhrase;
 import org.efaps.admin.datamodel.Status;
+import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
@@ -59,6 +61,7 @@ import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.ci.CIProjects;
 import org.efaps.esjp.ci.CISales;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
 import org.efaps.esjp.erp.FilteredReport;
@@ -158,17 +161,20 @@ public abstract class PositionAnalyzeReport_Base
     public static class DynPositionAnalyzeReport
         extends AbstractDynamicReport
     {
-        @Override
-        protected StyleBuilder getColumnStyle4Html(final Parameter _parameter)
-            throws EFapsException
-        {
-            return super.getColumnStyle4Html(_parameter).setBorder(DynamicReports.stl.pen1Point());
-        }
 
+        /**
+         * Filtered Report.
+         */
         private final PositionAnalyzeReport_Base filterReport;
 
+        /**
+         * Data for the positions.
+         */
         private Map<Instance, Map<String, Object>> data;
 
+        /**
+         * List of columns.
+         */
         private List<Column> columns;
 
         /**
@@ -179,10 +185,19 @@ public abstract class PositionAnalyzeReport_Base
             this.filterReport = _filterReport;
         }
 
+        @Override
+        protected StyleBuilder getColumnStyle4Html(final Parameter _parameter)
+            throws EFapsException
+        {
+            return super.getColumnStyle4Html(_parameter).setBorder(DynamicReports.stl.pen1Point());
+        }
+
         /**
          * Getter method for the instance variable {@link #data}.
          *
+         * @param _parameter Paramdeter as passed by the eFaps API
          * @return value of instance variable {@link #data}
+         * @throws EFapsException on error
          */
         public Map<Instance, Map<String, Object>> getData(final Parameter _parameter)
             throws EFapsException
@@ -227,10 +242,11 @@ public abstract class PositionAnalyzeReport_Base
                                 .attribute(CIHumanResource.Department.Name);
                 final SelectBuilder selRemun = new SelectBuilder(selDoc)
                                 .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
-                                .clazz(CIHumanResource.ClassTR_Labor).attribute(CIHumanResource.ClassTR_Labor.Remuneration);
+                                .clazz(CIHumanResource.ClassTR_Labor)
+                                .attribute(CIHumanResource.ClassTR_Labor.Remuneration);
                 final SelectBuilder selProj = new SelectBuilder(selDoc)
-                                .linkfrom(CIPayroll.Projects_ProjectService2Payslip.ToLink)
-                                .linkto(CIPayroll.Projects_ProjectService2Payslip.FromLink);
+                                .linkfrom(CIProjects.Project2DocumentAbstract.ToAbstract)
+                                .linkto(CIProjects.Project2DocumentAbstract.FromAbstract);
                 if (project) {
                     // Project_ProjectMsgPhrase
                     final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
@@ -255,11 +271,13 @@ public abstract class PositionAnalyzeReport_Base
                         map.put(CIPayroll.DocumentAbstract.Name.name, multi.getSelect(selDocName));
                         map.put(CIPayroll.DocumentAbstract.CrossTotal.name, multi.getSelect(selCrossTotal));
                         map.put(CIPayroll.DocumentAbstract.AmountCost.name, multi.getSelect(selAmountCost));
-                        map.put(CIPayroll.DocumentAbstract.ExtraLaborTime.name, multi.<Object[]>getSelect(selDocELT)[0]);
+                        map.put(CIPayroll.DocumentAbstract.ExtraLaborTime.name,
+                                        multi.<Object[]>getSelect(selDocELT)[0]);
                         map.put(CIPayroll.DocumentAbstract.HolidayLaborTime.name,
                                         multi.<Object[]>getSelect(selDocHLT)[0]);
                         map.put(CIPayroll.DocumentAbstract.LaborTime.name, multi.<Object[]>getSelect(selDocLT)[0]);
-                        map.put(CIPayroll.DocumentAbstract.NightLaborTime.name, multi.<Object[]>getSelect(selDocNLT)[0]);
+                        map.put(CIPayroll.DocumentAbstract.NightLaborTime.name,
+                                        multi.<Object[]>getSelect(selDocNLT)[0]);
                         map.put(CIPayroll.DocumentAbstract.EmployeeAbstractLink.name,
                                         multi.getMsgPhrase(selDoc, msgPhrase));
                         map.put("Department", multi.getSelect(selDepName));
@@ -362,24 +380,40 @@ public abstract class PositionAnalyzeReport_Base
                     });
                 }
             }
-            if (comp.size() == 0) {
-                comp.addComparator(new Comparator<Map<String, Object>>()
-                {
+            comp.addComparator(new Comparator<Map<String, Object>>()
+            {
 
-                    @Override
-                    public int compare(final Map<String, Object> _o1,
-                                       final Map<String, Object> _o2)
-                    {
-                        final String str1 = _o1.containsKey("Name") && _o1.get("Name") != null ? (String) _o1
-                                        .get("Name") : "";
-                        final String str2 = _o2.containsKey("Name") && _o2.get("Name") != null ? (String) _o2
-                                        .get("Name") : "";
-                        return str1.compareTo(str2);
-                    }
-                });
-            }
+                @Override
+                public int compare(final Map<String, Object> _o1,
+                                   final Map<String, Object> _o2)
+                {
+                    final String str1 = _o1.containsKey("EmployeeAbstractLink")
+                                    && _o1.get("EmployeeAbstractLink") != null ? (String) _o1
+                                    .get("EmployeeAbstractLink") : "";
+                    final String str2 = _o2.containsKey("EmployeeAbstractLink")
+                                    && _o2.get("EmployeeAbstractLink") != null ? (String) _o2
+                                    .get("EmployeeAbstractLink") : "";
+                    return str1.compareTo(str2);
+                }
+            });
+
+            comp.addComparator(new Comparator<Map<String, Object>>()
+            {
+
+                @Override
+                public int compare(final Map<String, Object> _o1,
+                                   final Map<String, Object> _o2)
+                {
+                    final String str1 = _o1.containsKey("Name") && _o1.get("Name") != null ? (String) _o1
+                                    .get("Name") : "";
+                    final String str2 = _o2.containsKey("Name") && _o2.get("Name") != null ? (String) _o2
+                                    .get("Name") : "";
+                    return str1.compareTo(str2);
+                }
+            });
+
             Collections.sort(values, comp);
-            return new JRMapCollectionDataSource(new ArrayList(values));
+            return new JRMapCollectionDataSource(new ArrayList<Map<String, ?>>(values));
         }
 
         /**
@@ -392,7 +426,26 @@ public abstract class PositionAnalyzeReport_Base
             throws EFapsException
         {
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
-            final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
+            QueryBuilder attrQueryBldr = null;
+            boolean added = false;
+            if (filterMap.containsKey("type")) {
+                final TypeFilterValue filter = (TypeFilterValue) filterMap.get("type");
+                if (!filter.getObject().isEmpty()) {
+                    for (final Long obj : filter.getObject()) {
+                        final Type type = Type.get(obj);
+                        if (!added) {
+                            added = true;
+                            attrQueryBldr = new QueryBuilder(type);
+                        } else {
+                            attrQueryBldr.addType(type);
+                        }
+                    }
+                }
+            }
+            if (!added) {
+                attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
+            }
+
             if (filterMap.containsKey("dateFrom")) {
                 final DateTime date = (DateTime) filterMap.get("dateFrom");
                 attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date,
@@ -406,8 +459,15 @@ public abstract class PositionAnalyzeReport_Base
             if (filterMap.containsKey("status")) {
                 final StatusFilterValue filter = (StatusFilterValue) filterMap.get("status");
                 if (!filter.getObject().isEmpty()) {
-                    attrQueryBldr.addWhereAttrEqValue(CIPayroll.DocumentAbstract.StatusAbstract,
-                                    filter.getObject().toArray());
+                    // the documents have the same status keys but must be selected
+                    final Set<Status> status = new HashSet<>();
+                    for (final Long obj : filter.getObject()) {
+                        final String key = Status.get(obj).getKey();
+                        status.add(Status.find(CIPayroll.PayslipStatus, key));
+                        status.add(Status.find(CIPayroll.AdvanceStatus, key));
+                        status.add(Status.find(CIPayroll.SettlementStatus, key));
+                    }
+                    attrQueryBldr.addWhereAttrEqValue(CIPayroll.DocumentAbstract.StatusAbstract, status.toArray());
                 }
             }
             if (filterMap.containsKey("employee")) {
@@ -433,9 +493,10 @@ public abstract class PositionAnalyzeReport_Base
             if (filterMap.containsKey("projectGroup")) {
                 if (BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"))) {
                     final TextColumnBuilder<String> col = DynamicReports.col.column(getLabel("Project"),
-                                    "Project", DynamicReports.type.stringType());
+                                    "Project", DynamicReports.type.stringType())
+                                    .setStyle(DynamicReports.stl.style().setBackgroundColor(Color.yellow));
                     _builder.addColumn(col);
-                    projectGroup  = DynamicReports.grp.group(col);
+                    projectGroup = DynamicReports.grp.group(col);
                     _builder.addGroup(projectGroup);
                 }
             }
@@ -496,7 +557,7 @@ public abstract class PositionAnalyzeReport_Base
 
             for (final Column column : getColumns(_parameter)) {
                 final TextColumnBuilder<BigDecimal> column1 = DynamicReports.col.column(column.getLabel(),
-                                column.getKey(), DynamicReports.type.bigDecimalType()).setTitleHeight(50);
+                                column.getKey(), DynamicReports.type.bigDecimalType()).setTitleHeight(100);
                 _builder.addColumn(column1);
                 if (groupMap.containsKey(column.getGroup())) {
                     groupMap.get(column.getGroup()).add(column1);
@@ -555,6 +616,10 @@ public abstract class PositionAnalyzeReport_Base
             return this.filterReport;
         }
 
+        /**
+         * @param _key key the label is wanted for
+         * @return label
+         */
         protected String getLabel(final String _key)
         {
             return DBProperties.getProperty(PositionAnalyzeReport.class.getName() + "." + _key);
@@ -563,7 +628,9 @@ public abstract class PositionAnalyzeReport_Base
         /**
          * Getter method for the instance variable {@link #columns}.
          *
+         * @param _parameter Parameter as passed by the eFaps API
          * @return value of instance variable {@link #columns}
+         * @throws EFapsException on error
          */
         public List<Column> getColumns(final Parameter _parameter)
             throws EFapsException
@@ -575,11 +642,25 @@ public abstract class PositionAnalyzeReport_Base
         }
     }
 
+    /**
+     * Column class.
+     */
     public static class Column
     {
 
+        /**
+         * Key.
+         */
         private String key;
+
+        /**
+         * Label.
+         */
         private String label;
+
+        /**
+         * Group.
+         */
         private String group;
 
         /**
@@ -632,6 +713,12 @@ public abstract class PositionAnalyzeReport_Base
                 ret = super.equals(_obj);
             }
             return ret;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return super.hashCode();
         }
 
         /**
