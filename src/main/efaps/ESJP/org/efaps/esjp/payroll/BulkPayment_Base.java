@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -44,12 +45,14 @@ import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
 import org.efaps.db.AttributeQuery;
+import org.efaps.db.Context;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
@@ -196,6 +199,67 @@ public abstract class BulkPayment_Base
             deposit.create(parameter);
         }
         return new Return();
+    }
+
+    /**
+     * An easy way to edit the Accounts easiely.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return new CreatedDoc
+     * @throws EFapsException on error
+     */
+    public Return editAccount4Definition(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Return ret = new Return();
+        final String[] oids = (String[]) Context
+                        .getThreadContext().getSessionAttribute(
+                    CIFormPayroll.Payroll_BulkPaymentDefinitionEditAccountForm.employee2BulkPaymentDefinitionOids.name);
+        final List<Instance> instances = new ArrayList<>();
+        for (final String oid : oids) {
+            final Instance instance = Instance.get(oid);
+            if (instance.isValid()) {
+                instances.add(instance);
+            }
+        }
+        final Instance fiInst = Instance.get(_parameter.getParameterValue(
+                        CIFormPayroll.Payroll_BulkPaymentDefinitionEditAccountForm.financialInformationType.name));
+        final MultiPrintQuery multi = new MultiPrintQuery(instances);
+        final SelectBuilder sel = SelectBuilder.get().linkto(CIPayroll.Employee2BulkPaymentDefinition.FromLink)
+                        .clazz(CIHumanResource.ClassFinancialInformation)
+                        .attributeset(CIHumanResource.ClassFinancialInformation.FinancialInformationSet);
+        final SelectBuilder selAccount = new SelectBuilder(sel).attribute("Account");
+        final SelectBuilder selFIType = new SelectBuilder(sel).linkto("FinancialInformationType").instance();
+        multi.addSelect(selAccount, selFIType);
+        multi.execute();
+        while (multi.next()) {
+            final Object accountObjs = multi.getSelect(selAccount);
+            final Object fiTypeObjs = multi.getSelect(selFIType);
+            if (accountObjs instanceof List) {
+                @SuppressWarnings("unchecked") final Iterator<String> accountObjsIter = ((List<String>) accountObjs)
+                                .iterator();
+                @SuppressWarnings("unchecked") final Iterator<Instance> fiTypeObjsIter = ((List<Instance>) fiTypeObjs)
+                                .iterator();
+                while (accountObjsIter.hasNext()) {
+                    final String acount = accountObjsIter.next();
+                    final Instance fiTypeInst = fiTypeObjsIter.next();
+                    if (fiInst.equals(fiTypeInst)) {
+                        final Update update = new Update(multi.getCurrentInstance());
+                        update.add(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber, acount);
+                        update.execute();
+                    }
+                }
+            } else if (accountObjs != null) {
+                final String acount = (String) accountObjs;
+                final Instance fiTypeInst = (Instance) fiTypeObjs;
+                if (fiInst.equals(fiTypeInst)) {
+                    final Update update = new Update(multi.getCurrentInstance());
+                    update.add(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber, acount);
+                    update.execute();
+                }
+            }
+        }
+        return ret;
     }
 
     public Return getReport4Detail(final Parameter _parameter)

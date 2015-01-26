@@ -15,23 +15,28 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev: 14002 $
- Last Changed:    $Date: 2014-09-11 13:43:40 -0500 (Thu, 11 Sep 2014) $
+ Revision:        $Rev: 14447 $
+ Last Changed:    $Date: 2014-11-12 20:14:29 -0500 (Wed, 12 Nov 2014) $
  Last Changed By: $Author: jan@moxter.net $
 
 -->
-<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>6a99e0b9-c771-4a6e-80b9-7bc7cf13a475</uuid>
+    <uuid>b32526e1-031b-4046-8fbb-a899fbfb8758</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 14002 $</file-revision>
+    <file-revision>$Rev: 14447 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_BulkPaymentDefinitionTree_Employee_Menu_Action</name>
-        <childs>
-            <child>Payroll_BulkPaymentDefinitionTree_Employee_Menu_Action_SetAccount</child>
-            <child>Payroll_BulkPaymentDefinitionTree_Employee_Menu_Action_AddExisting</child>
-            <child>Payroll_BulkPaymentDefinitionTree_Employee_Menu_Action_Disconnect</child>
-        </childs>
+        <name>Payroll_BulkPaymentDefinitionTree_Employee_Menu_Action_SetAccount</name>
+        <access>
+            <role>Payroll_Admin</role>
+        </access>
+        <target>
+            <form>Payroll_BulkPaymentDefinitionEditAccountForm</form>
+            <execute program="org.efaps.esjp.payroll.BulkPayment" method="editAccount4Definition"/>
+        </target>
+        <property name="Target">modal</property>
+        <property name="TargetMode">create</property>
+        <property name="Submit">true</property>
     </definition>
-</ui-menu>
+</ui-command>
