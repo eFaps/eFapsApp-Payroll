@@ -403,7 +403,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Sistema privado de pensiones:]]></text>
+				<text><![CDATA[Regimen pensionario:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="160" y="68" width="395" height="16" uuid="5f571963-e3d7-4ba0-9ea7-abe1824cd4b7"/>
