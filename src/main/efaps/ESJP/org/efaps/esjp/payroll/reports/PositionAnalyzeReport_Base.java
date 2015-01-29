@@ -210,6 +210,15 @@ public abstract class PositionAnalyzeReport_Base
                 if (filterMap.containsKey("projectGroup")) {
                     project = BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"));
                 }
+                //Payroll_Employee4DocumentMsgPhrase
+                final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
+                MsgPhrase msgPhrase4Project = null;
+                if (project) {
+                    // Project_ProjectMsgPhrase
+                    msgPhrase4Project = MsgPhrase.get(UUID
+                                    .fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
+                }
+
                 boolean showDetails = true;
                 if (filterMap.containsKey("switch")) {
                     showDetails = BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
@@ -251,12 +260,8 @@ public abstract class PositionAnalyzeReport_Base
                                 .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
                                 .attribute(CIHumanResource.Employee.Number);
                 if (project) {
-                    // Project_ProjectMsgPhrase
-                    final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
-                    multi.addMsgPhrase(selProj, msgPhrase);
+                    multi.addMsgPhrase(selProj, msgPhrase4Project);
                 }
-                //Payroll_Employee4DocumentMsgPhrase
-                final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
                 multi.addMsgPhrase(selDoc, msgPhrase);
                 multi.addSelect(selCrossTotal, selAmountCost, selDocInst, selDocName, selDepName, selDocELT, selDocHLT,
                                 selDocLT, selDocNLT, selRemun, selEmplNum);
@@ -293,10 +298,7 @@ public abstract class PositionAnalyzeReport_Base
                         map.put("Department", multi.getSelect(selDepName));
                         map.put("EmployeeNumber", multi.getSelect(selEmplNum));
                         if (project) {
-                            // Project_ProjectMsgPhrase
-                            final MsgPhrase msgPhrase2 = MsgPhrase.get(UUID
-                                            .fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
-                            map.put("Project", multi.getMsgPhrase(selProj, msgPhrase2));
+                            map.put("Project", multi.getMsgPhrase(selProj, msgPhrase4Project));
                         }
                     }
 
@@ -324,6 +326,71 @@ public abstract class PositionAnalyzeReport_Base
                             col.setGroup(multi.getCurrentInstance().getType().getLabel());
                             map.put(key, multi.getAttribute(CIPayroll.PositionAbstract.Amount));
                         }
+                    }
+                }
+                // Artificially add the one that do not have positions (happens with manually created advances)
+                final QueryBuilder docQueryBldr = getAttrQueryBuilder(_parameter);
+                final QueryBuilder attrQueryBuilder = new QueryBuilder(CIPayroll.PositionDeduction);
+                attrQueryBuilder.addType(CIPayroll.PositionNeutral, CIPayroll.PositionPayment);
+                docQueryBldr.addWhereAttrNotInQuery(CIPayroll.DocumentAbstract.ID,
+                                attrQueryBuilder.getAttributeQuery(CIPayroll.PositionAbstract.DocumentAbstractLink));
+                final MultiPrintQuery docMulti = docQueryBldr.getPrint();
+                final SelectBuilder selRemun4Doc = SelectBuilder.get()
+                                .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                .clazz(CIHumanResource.ClassTR_Labor)
+                                .attribute(CIHumanResource.ClassTR_Labor.Remuneration);
+                final SelectBuilder selProj4Doc = SelectBuilder.get()
+                                .linkfrom(CIProjects.Project2DocumentAbstract.ToAbstract)
+                                .linkto(CIProjects.Project2DocumentAbstract.FromAbstract);
+                final SelectBuilder selEmplNum4Doc =SelectBuilder.get()
+                                .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                .attribute(CIHumanResource.Employee.Number);
+                final SelectBuilder selDepName4Doc = SelectBuilder.get()
+                                .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                .linkfrom(CIHumanResource.Department2EmployeeAdminister.EmployeeLink)
+                                .linkto(CIHumanResource.Department2EmployeeAdminister.DepartmentLink)
+                                .attribute(CIHumanResource.Department.Name);
+                if (project) {
+                    multi.addMsgPhrase(selProj4Doc, msgPhrase4Project);
+                }
+                docMulti.addMsgPhrase(msgPhrase);
+                docMulti.addSelect(selDepName4Doc, selRemun4Doc, selEmplNum4Doc);
+
+                docMulti.addAttribute(CIPayroll.DocumentAbstract.Name, CIPayroll.DocumentAbstract.AmountCost,
+                                CIPayroll.DocumentAbstract.CrossTotal, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.NightLaborTime,
+                                CIPayroll.DocumentAbstract.HolidayLaborTime);
+                docMulti.execute();
+                while (docMulti.next()) {
+                    final Map<String, Object> map = new HashMap<>();
+                    this.data.put(docMulti.getCurrentInstance(), map);
+                    map.put("Remuneration", docMulti.getSelect(selRemun4Doc));
+                    map.put(CIPayroll.DocumentAbstract.Name.name,
+                                    docMulti.getAttribute(CIPayroll.DocumentAbstract.Name));
+                    map.put(CIPayroll.DocumentAbstract.CrossTotal.name,
+                                    docMulti.getAttribute(CIPayroll.DocumentAbstract.CrossTotal));
+                    map.put(CIPayroll.DocumentAbstract.AmountCost.name,
+                                    docMulti.getAttribute(CIPayroll.DocumentAbstract.AmountCost));
+                    final BigDecimal laborTime = (BigDecimal) docMulti
+                                    .<Object[]>getAttribute(CIPayroll.DocumentAbstract.LaborTime)[0];
+                    if (showDetails) {
+                        map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime);
+                    } else {
+                        map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime.divide(BigDecimal.valueOf(8),
+                                        BigDecimal.ROUND_HALF_UP));
+                    }
+                    map.put(CIPayroll.DocumentAbstract.ExtraLaborTime.name,
+                                    docMulti.<Object[]>getAttribute(CIPayroll.DocumentAbstract.ExtraLaborTime)[0]);
+                    map.put(CIPayroll.DocumentAbstract.HolidayLaborTime.name,
+                                    docMulti.<Object[]>getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime)[0]);
+                    map.put(CIPayroll.DocumentAbstract.NightLaborTime.name,
+                                    docMulti.<Object[]>getAttribute(CIPayroll.DocumentAbstract.NightLaborTime)[0]);
+                    map.put(CIPayroll.DocumentAbstract.EmployeeAbstractLink.name,
+                                    docMulti.getMsgPhrase(msgPhrase));
+                    map.put("Department", docMulti.getSelect(selDepName4Doc));
+                    map.put("EmployeeNumber", docMulti.getSelect(selEmplNum4Doc));
+                    if (project) {
+                        map.put("Project", docMulti.getMsgPhrase(selProj4Doc, msgPhrase4Project));
                     }
                 }
                 this.columns = new ArrayList<>(columnMap.values());
@@ -432,12 +499,11 @@ public abstract class PositionAnalyzeReport_Base
          * @param _queryBldr queryBldr to add to
          * @throws EFapsException on error
          */
-        protected void add2QueryBuilder(final Parameter _parameter,
-                                        final QueryBuilder _queryBldr)
+        protected QueryBuilder getAttrQueryBuilder(final Parameter _parameter)
             throws EFapsException
         {
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
-            QueryBuilder attrQueryBldr = null;
+            QueryBuilder ret = null;
             boolean added = false;
             if (filterMap.containsKey("type")) {
                 final TypeFilterValue filter = (TypeFilterValue) filterMap.get("type");
@@ -446,25 +512,25 @@ public abstract class PositionAnalyzeReport_Base
                         final Type type = Type.get(obj);
                         if (!added) {
                             added = true;
-                            attrQueryBldr = new QueryBuilder(type);
+                            ret = new QueryBuilder(type);
                         } else {
-                            attrQueryBldr.addType(type);
+                            ret.addType(type);
                         }
                     }
                 }
             }
             if (!added) {
-                attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
+                ret = new QueryBuilder(CIPayroll.DocumentAbstract);
             }
 
             if (filterMap.containsKey("dateFrom")) {
                 final DateTime date = (DateTime) filterMap.get("dateFrom");
-                attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date,
+                ret.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date,
                                 date.withTimeAtStartOfDay().minusSeconds(1));
             }
             if (filterMap.containsKey("dateTo")) {
                 final DateTime date = (DateTime) filterMap.get("dateTo");
-                attrQueryBldr.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date,
+                ret.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date,
                                 date.withTimeAtStartOfDay().plusDays(1));
             }
             if (filterMap.containsKey("status")) {
@@ -478,18 +544,30 @@ public abstract class PositionAnalyzeReport_Base
                         status.add(Status.find(CIPayroll.AdvanceStatus, key));
                         status.add(Status.find(CIPayroll.SettlementStatus, key));
                     }
-                    attrQueryBldr.addWhereAttrEqValue(CIPayroll.DocumentAbstract.StatusAbstract, status.toArray());
+                    ret.addWhereAttrEqValue(CIPayroll.DocumentAbstract.StatusAbstract, status.toArray());
                 }
             }
             if (filterMap.containsKey("employee")) {
                 final InstanceFilterValue filter = (InstanceFilterValue) filterMap.get("employee");
                 if (filter.getObject() != null && filter.getObject().isValid()) {
-                    attrQueryBldr.addWhereAttrEqValue(CIPayroll.DocumentAbstract.EmployeeAbstractLink,
+                    ret.addWhereAttrEqValue(CIPayroll.DocumentAbstract.EmployeeAbstractLink,
                                     filter.getObject());
                 }
             }
+            return ret;
+        }
+
+        /**
+         * @param _parameter Parameter as passed by the eFaps API
+         * @param _queryBldr queryBldr to add to
+         * @throws EFapsException on error
+         */
+        protected void add2QueryBuilder(final Parameter _parameter,
+                                        final QueryBuilder _queryBldr)
+            throws EFapsException
+        {
             _queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
-                            attrQueryBldr.getAttributeQuery(CISales.DocumentAbstract.ID));
+                                getAttrQueryBuilder(_parameter).getAttributeQuery(CISales.DocumentAbstract.ID));
         }
 
         @Override
@@ -569,10 +647,6 @@ public abstract class PositionAnalyzeReport_Base
             groupMap.put(CIPayroll.PositionNeutral.getType().getLabel(),
                             DynamicReports.grid.titleGroup(CIPayroll.PositionNeutral.getType().getLabel()));
 
-            for (final ColumnTitleGroupBuilder grp : groupMap.values()) {
-                groups.add(grp);
-            }
-
             for (final Column column : getColumns(_parameter)) {
                 final TextColumnBuilder<BigDecimal> column1 = DynamicReports.col.column(column.getLabel(),
                                 column.getKey(), DynamicReports.type.bigDecimalType());
@@ -601,10 +675,15 @@ public abstract class PositionAnalyzeReport_Base
             final TextColumnBuilder<BigDecimal> amountCol = DynamicReports.col.column(getLabel("AmountCost"),
                             CIPayroll.DocumentAbstract.AmountCost.name, DynamicReports.type.bigDecimalType());
             _builder.addColumn(crossCol, amountCol);
-            groups.add(crossCol);
-            groups.add(amountCol);
 
             if (showDetails) {
+                for (final ColumnTitleGroupBuilder grp : groupMap.values()) {
+                    if (!grp.getColumnGridTitleGroup().getList().getListCells().isEmpty()) {
+                        groups.add(grp);
+                    }
+                }
+                groups.add(crossCol);
+                groups.add(amountCol);
                 _builder.columnGrid(groups.toArray(new ColumnGridComponentBuilder[groups.size()]));
             }
 

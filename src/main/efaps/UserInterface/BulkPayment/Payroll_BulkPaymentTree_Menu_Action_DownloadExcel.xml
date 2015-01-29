@@ -34,7 +34,7 @@
         <target>
             <execute method="exportReport4Detail" program="org.efaps.esjp.payroll.BulkPayment">
                 <property name="Mime">xls</property>
-                <property name="Template">Sales_BulkPaymentTemplate</property>
+
             </execute>
         </target>
         <property name="Target">hidden</property>
