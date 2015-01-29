@@ -29,8 +29,8 @@
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_Employee4DocumentMsgPhrase</name>
         <parent>HumanResource_EmployeeMsgPhrase</parent>
-        <argument index="1">linkto[EmployeeAbstractLink].attribute[FirstName]</argument>
-        <argument index="2">linkto[EmployeeAbstractLink].attribute[LastName]</argument>
-        <argument index="3">linkto[EmployeeAbstractLink].attribute[SecondLastName]</argument>
+        <argument index="0">linkto[EmployeeAbstractLink].attribute[FirstName]</argument>
+        <argument index="1">linkto[EmployeeAbstractLink].attribute[LastName]</argument>
+        <argument index="2">linkto[EmployeeAbstractLink].attribute[SecondLastName]</argument>
     </definition>
 </common-msgphrase>
