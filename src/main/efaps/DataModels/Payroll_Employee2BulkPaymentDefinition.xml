@@ -61,7 +61,13 @@
             <sqltable>HumanResource_Employee2ObjectSQLTable</sqltable>
             <sqlcolumn>TOID</sqlcolumn>
         </attribute>
-         <attribute>
+        <attribute>
+            <name>Bank</name>
+            <type>String</type>
+            <sqltable>Payroll_Employee2ObjectExtSQLTable</sqltable>
+            <sqlcolumn>STRING2</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>AccountNumber</name>
             <type>String</type>
             <sqltable>Payroll_Employee2ObjectExtSQLTable</sqltable>

@@ -28,6 +28,12 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_Employee2BulkPaymentForm</name>
+         <field name="bank">
+            <property name="Attribute">Bank</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
         <field name="accountNumber">
             <property name="Attribute">AccountNumber</property>
             <property name="ModeEdit">EDITABLE</property>

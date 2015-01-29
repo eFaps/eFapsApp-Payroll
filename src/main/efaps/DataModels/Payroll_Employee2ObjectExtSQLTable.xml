@@ -33,7 +33,8 @@
         <database>
             <table-name>T_PREMPLOYEE2OBJEXT</table-name>
             <parent-table>T_HREMPLOYEE2OBJ</parent-table>
-             <column name="STRING1" type="STRING_SHORT" length="256"/>
+            <column name="STRING1" type="STRING_SHORT" length="256"/>
+            <column name="STRING2" type="STRING_SHORT" length="256"/>
         </database>
     </definition>
 </datamodel-sqltable>

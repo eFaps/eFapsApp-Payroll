@@ -33,6 +33,10 @@
             <property name="Label">Payroll_Template2EmployeeTable.type.Label</property>
             <property name="HRef">TREE</property>
         </field>
+         <field name="bank">
+            <property name="Attribute">Bank</property>
+            <property name="Label">Payroll_Employee2BulkPaymentDefinition/Bank.Label</property>
+        </field>
         <field name="accountNumber">
             <property name="Attribute">AccountNumber</property>
             <property name="Label">Payroll_Employee2BulkPaymentDefinition/AccountNumber.Label</property>

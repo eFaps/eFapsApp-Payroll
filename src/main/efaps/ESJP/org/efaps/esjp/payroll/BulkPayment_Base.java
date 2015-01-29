@@ -53,6 +53,7 @@ import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
 import org.efaps.db.Update;
+import org.efaps.esjp.ci.CIContacts;
 import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
@@ -230,31 +231,40 @@ public abstract class BulkPayment_Base
                         .attributeset(CIHumanResource.ClassFinancialInformation.FinancialInformationSet);
         final SelectBuilder selAccount = new SelectBuilder(sel).attribute("Account");
         final SelectBuilder selFIType = new SelectBuilder(sel).linkto("FinancialInformationType").instance();
-        multi.addSelect(selAccount, selFIType);
+        final SelectBuilder selBank = new SelectBuilder(sel).linkto("BankLink")
+                        .attribute(CIContacts.AttributeDefinitionFinancialInstitution.Value);
+        multi.addSelect(selAccount, selFIType, selBank);
         multi.execute();
         while (multi.next()) {
             final Object accountObjs = multi.getSelect(selAccount);
+            final Object bankObjs = multi.getSelect(selBank);
             final Object fiTypeObjs = multi.getSelect(selFIType);
             if (accountObjs instanceof List) {
-                @SuppressWarnings("unchecked") final Iterator<String> accountObjsIter = ((List<String>) accountObjs)
-                                .iterator();
-                @SuppressWarnings("unchecked") final Iterator<Instance> fiTypeObjsIter = ((List<Instance>) fiTypeObjs)
-                                .iterator();
+                @SuppressWarnings("unchecked")
+                final Iterator<String> accountObjsIter = ((List<String>) accountObjs).iterator();
+                @SuppressWarnings("unchecked")
+                final Iterator<String> bankObjsIter = ((List<String>) bankObjs).iterator();
+                @SuppressWarnings("unchecked")
+                final Iterator<Instance> fiTypeObjsIter = ((List<Instance>) fiTypeObjs).iterator();
                 while (accountObjsIter.hasNext()) {
                     final String acount = accountObjsIter.next();
+                    final String bank = bankObjsIter.next();
                     final Instance fiTypeInst = fiTypeObjsIter.next();
                     if (fiInst.equals(fiTypeInst)) {
                         final Update update = new Update(multi.getCurrentInstance());
                         update.add(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber, acount);
+                        update.add(CIPayroll.Employee2BulkPaymentDefinition.Bank, bank);
                         update.execute();
                     }
                 }
             } else if (accountObjs != null) {
                 final String acount = (String) accountObjs;
+                final String bank = (String) bankObjs;
                 final Instance fiTypeInst = (Instance) fiTypeObjs;
                 if (fiInst.equals(fiTypeInst)) {
                     final Update update = new Update(multi.getCurrentInstance());
                     update.add(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber, acount);
+                    update.add(CIPayroll.Employee2BulkPaymentDefinition.Bank, bank);
                     update.execute();
                 }
             }
@@ -306,10 +316,10 @@ public abstract class BulkPayment_Base
             throws EFapsException
         {
             final DRDataSource ret = new DRDataSource("employeeNumber", "employeeLastName", "employeeSecondLastName",
-                            "employeeFirstName", "accountNumber", "docName", "amount");
+                            "employeeFirstName", "bank", "accountNumber", "docName", "amount");
             final List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
 
-            final Map<Instance, String> employee2Acc = new HashMap<>();
+            final Map<Instance, String[]> employee2Acc = new HashMap<>();
             final PrintQuery print = new PrintQuery(_parameter.getInstance());
             print.addAttribute(CIPayroll.BulkPayment.BulkDefinitionLink);
             print.execute();
@@ -318,7 +328,8 @@ public abstract class BulkPayment_Base
             queryBldrCont.addWhereAttrEqValue(CIPayroll.Employee2BulkPaymentDefinition.ToLink,
                             print.getAttribute(CIPayroll.BulkPayment.BulkDefinitionLink));
             final MultiPrintQuery multiCont = queryBldrCont.getPrint();
-            multiCont.addAttribute(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber);
+            multiCont.addAttribute(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber,
+                            CIPayroll.Employee2BulkPaymentDefinition.Bank);
             final SelectBuilder selEmployeeInst = new SelectBuilder()
                             .linkto(CIPayroll.Employee2BulkPaymentDefinition.FromLink).instance();
             multiCont.addSelect(selEmployeeInst);
@@ -326,7 +337,8 @@ public abstract class BulkPayment_Base
             while (multiCont.next()) {
                 final Instance employeeInst = multiCont.getSelect(selEmployeeInst);
                 final String account = multiCont.getAttribute(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber);
-                employee2Acc.put(employeeInst, account);
+                final String bank = multiCont.getAttribute(CIPayroll.Employee2BulkPaymentDefinition.Bank);
+                employee2Acc.put(employeeInst, new String[] {bank, account});
             }
 
             // TODO add more status
@@ -382,7 +394,8 @@ public abstract class BulkPayment_Base
                 map.put("employeeLastName", docPrint.getSelect(selEmployeeLastName));
                 map.put("employeeSecondLastName", docPrint.getSelect(selEmployeeSecondLastName));
                 map.put("accountNumber",
-                                employee2Acc.containsKey(employeeInst2) ? employee2Acc.get(employeeInst2) : "");
+                                employee2Acc.containsKey(employeeInst2) ? employee2Acc.get(employeeInst2)[1] : "");
+                map.put("bank", employee2Acc.containsKey(employeeInst2) ? employee2Acc.get(employeeInst2)[0] : "");
 
             }
 
@@ -402,6 +415,7 @@ public abstract class BulkPayment_Base
                                 map.get("employeeLastName"),
                                 map.get("employeeSecondLastName"),
                                 map.get("employeeFirstName"),
+                                map.get("bank"),
                                 map.get("accountNumber"),
                                 map.get("docName"),
                                 map.get("amount"));
@@ -427,7 +441,9 @@ public abstract class BulkPayment_Base
             final TextColumnBuilder<String> employeeFirstNameColumn = DynamicReports.col.column(DBProperties
                             .getProperty("org.efaps.esjp.payroll.BulkPayment.Report4Detail.employeeFirstName"),
                             "employeeFirstName", DynamicReports.type.stringType());
-
+            final TextColumnBuilder<String> bankColumn = DynamicReports.col.column(DBProperties
+                            .getProperty("org.efaps.esjp.sales.payment.BulkPayment.Report4Detail.bank"),
+                            "bank", DynamicReports.type.stringType());
             final TextColumnBuilder<String> accountNumberColumn = DynamicReports.col.column(DBProperties
                             .getProperty("org.efaps.esjp.sales.payment.BulkPayment.Report4Detail.accountNumber"),
                             "accountNumber", DynamicReports.type.stringType());
@@ -441,7 +457,7 @@ public abstract class BulkPayment_Base
             final AggregationSubtotalBuilder<BigDecimal> subtotal = DynamicReports.sbt.sum(amountColumn);
 
             _builder.addColumn(employeeNumberColumn, employeeLastNameColumn, employeeSecondLastNameColumn,
-                            employeeFirstNameColumn, accountNumberColumn, docNameColumn, amountColumn);
+                            employeeFirstNameColumn, bankColumn, accountNumberColumn, docNameColumn, amountColumn);
             _builder.addSubtotalAtColumnFooter(subtotal);
         }
     }
