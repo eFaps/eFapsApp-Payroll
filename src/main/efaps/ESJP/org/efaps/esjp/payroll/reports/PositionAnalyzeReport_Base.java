@@ -247,15 +247,19 @@ public abstract class PositionAnalyzeReport_Base
                 final SelectBuilder selProj = new SelectBuilder(selDoc)
                                 .linkfrom(CIProjects.Project2DocumentAbstract.ToAbstract)
                                 .linkto(CIProjects.Project2DocumentAbstract.FromAbstract);
+                final SelectBuilder selEmplNum = new SelectBuilder(selDoc)
+                                .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                .attribute(CIHumanResource.Employee.Number);
                 if (project) {
                     // Project_ProjectMsgPhrase
                     final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
                     multi.addMsgPhrase(selProj, msgPhrase);
                 }
+                //Payroll_Employee4DocumentMsgPhrase
                 final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
                 multi.addMsgPhrase(selDoc, msgPhrase);
                 multi.addSelect(selCrossTotal, selAmountCost, selDocInst, selDocName, selDepName, selDocELT, selDocHLT,
-                                selDocLT, selDocNLT, selRemun);
+                                selDocLT, selDocNLT, selRemun, selEmplNum);
                 multi.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Description,
                                 CIPayroll.PositionAbstract.Key);
                 multi.execute();
@@ -271,16 +275,23 @@ public abstract class PositionAnalyzeReport_Base
                         map.put(CIPayroll.DocumentAbstract.Name.name, multi.getSelect(selDocName));
                         map.put(CIPayroll.DocumentAbstract.CrossTotal.name, multi.getSelect(selCrossTotal));
                         map.put(CIPayroll.DocumentAbstract.AmountCost.name, multi.getSelect(selAmountCost));
+                        final BigDecimal laborTime =  (BigDecimal) multi.<Object[]>getSelect(selDocLT)[0];
+                        if (showDetails) {
+                            map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime);
+                        } else {
+                            map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime.divide(BigDecimal.valueOf(8),
+                                            BigDecimal.ROUND_HALF_UP));
+                        }
                         map.put(CIPayroll.DocumentAbstract.ExtraLaborTime.name,
                                         multi.<Object[]>getSelect(selDocELT)[0]);
                         map.put(CIPayroll.DocumentAbstract.HolidayLaborTime.name,
                                         multi.<Object[]>getSelect(selDocHLT)[0]);
-                        map.put(CIPayroll.DocumentAbstract.LaborTime.name, multi.<Object[]>getSelect(selDocLT)[0]);
                         map.put(CIPayroll.DocumentAbstract.NightLaborTime.name,
                                         multi.<Object[]>getSelect(selDocNLT)[0]);
                         map.put(CIPayroll.DocumentAbstract.EmployeeAbstractLink.name,
                                         multi.getMsgPhrase(selDoc, msgPhrase));
                         map.put("Department", multi.getSelect(selDepName));
+                        map.put("EmployeeNumber", multi.getSelect(selEmplNum));
                         if (project) {
                             // Project_ProjectMsgPhrase
                             final MsgPhrase msgPhrase2 = MsgPhrase.get(UUID
@@ -520,28 +531,35 @@ public abstract class PositionAnalyzeReport_Base
             final TextColumnBuilder<String> employeeCol = DynamicReports.col.column(getLabel("Employee"),
                             CIPayroll.DocumentAbstract.EmployeeAbstractLink.name, DynamicReports.type.stringType())
                             .setWidth(200);
-            _builder.addColumn(nameCol, employeeCol);
+            final TextColumnBuilder<String> employeeNumCol = DynamicReports.col.column(getLabel("EmployeeNumber"),
+                            "EmployeeNumber", DynamicReports.type.stringType());
+            _builder.addColumn(nameCol, employeeCol, employeeNumCol);
             groups.add(nameCol);
             groups.add(employeeCol);
+            groups.add(employeeNumCol);
 
+            final TextColumnBuilder<BigDecimal> remCol = DynamicReports.col.column(getLabel("Remuneration"),
+                            "Remuneration", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> ltCol;
             if (showDetails) {
-                final TextColumnBuilder<BigDecimal> remCol = DynamicReports.col.column(getLabel("Remuneration"),
-                                "Remuneration", DynamicReports.type.bigDecimalType());
-                final TextColumnBuilder<BigDecimal> ltCol = DynamicReports.col.column(getLabel("LaborTime"),
+                ltCol = DynamicReports.col.column(getLabel("LaborTime"),
                                 CIPayroll.DocumentAbstract.LaborTime.name, DynamicReports.type.bigDecimalType());
-                final TextColumnBuilder<BigDecimal> eltCol = DynamicReports.col.column(getLabel("ExtraLaborTime"),
-                                CIPayroll.DocumentAbstract.ExtraLaborTime.name, DynamicReports.type.bigDecimalType());
-                final TextColumnBuilder<BigDecimal> nltCol = DynamicReports.col.column(getLabel("NightLaborTime"),
-                                CIPayroll.DocumentAbstract.NightLaborTime.name, DynamicReports.type.bigDecimalType());
-                final TextColumnBuilder<BigDecimal> hltCol = DynamicReports.col.column(getLabel("HolidayLaborTime"),
-                                CIPayroll.DocumentAbstract.HolidayLaborTime.name, DynamicReports.type.bigDecimalType());
-                _builder.addColumn(remCol, ltCol, eltCol, nltCol, hltCol);
-                groups.add(remCol);
-                groups.add(ltCol);
-                groups.add(eltCol);
-                groups.add(nltCol);
-                groups.add(hltCol);
+            } else {
+                ltCol = DynamicReports.col.column(getLabel("LaborTimeDays"),
+                            CIPayroll.DocumentAbstract.LaborTime.name, DynamicReports.type.bigDecimalType());
             }
+            final TextColumnBuilder<BigDecimal> eltCol = DynamicReports.col.column(getLabel("ExtraLaborTime"),
+                            CIPayroll.DocumentAbstract.ExtraLaborTime.name, DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> nltCol = DynamicReports.col.column(getLabel("NightLaborTime"),
+                            CIPayroll.DocumentAbstract.NightLaborTime.name, DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> hltCol = DynamicReports.col.column(getLabel("HolidayLaborTime"),
+                            CIPayroll.DocumentAbstract.HolidayLaborTime.name, DynamicReports.type.bigDecimalType());
+            _builder.addColumn(remCol, ltCol, eltCol, nltCol, hltCol);
+            groups.add(remCol);
+            groups.add(ltCol);
+            groups.add(eltCol);
+            groups.add(nltCol);
+            groups.add(hltCol);
 
             final Map<String, ColumnTitleGroupBuilder> groupMap = new LinkedHashMap<>();
             groupMap.put(CIPayroll.PositionPayment.getType().getLabel(),
@@ -557,7 +575,10 @@ public abstract class PositionAnalyzeReport_Base
 
             for (final Column column : getColumns(_parameter)) {
                 final TextColumnBuilder<BigDecimal> column1 = DynamicReports.col.column(column.getLabel(),
-                                column.getKey(), DynamicReports.type.bigDecimalType()).setTitleHeight(100);
+                                column.getKey(), DynamicReports.type.bigDecimalType());
+                if (showDetails) {
+                    column1.setTitleHeight(100);
+                }
                 _builder.addColumn(column1);
                 if (groupMap.containsKey(column.getGroup())) {
                     groupMap.get(column.getGroup()).add(column1);

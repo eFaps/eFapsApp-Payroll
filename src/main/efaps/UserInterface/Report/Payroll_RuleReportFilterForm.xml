@@ -51,7 +51,7 @@
             <trigger event="UI_FIELD_VALUE" method="getInstanceFieldValue"
                 name="Payroll_RuleReportFilterForm.employee.UI_FIELD_VALUE"
                 program="org.efaps.esjp.erp.FilteredReport">
-                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             </trigger>
             <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee"
                 name="Payroll_RuleReportFilterForm.employee.UI_FIELD_AUTOCOMPLETE"

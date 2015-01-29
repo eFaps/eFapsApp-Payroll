@@ -59,7 +59,7 @@
             <property name="ModeCreate">EDITABLE</property>
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
+            <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"
@@ -184,7 +184,7 @@
             <property name="ModeCreate">EDITABLE</property>
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
+            <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"

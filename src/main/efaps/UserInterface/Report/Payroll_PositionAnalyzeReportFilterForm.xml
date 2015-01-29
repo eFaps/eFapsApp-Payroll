@@ -68,7 +68,7 @@
                 method="getInstanceFieldValue"
                 name="Payroll_PositionAnalyzeReportFilterForm.employee.UI_FIELD_VALUE"
                 event="UI_FIELD_VALUE" >
-                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             </trigger>
             <trigger program="org.efaps.esjp.humanresource.Employee"
                 method="autoComplete4Employee"
@@ -150,7 +150,7 @@
                 method="getInstanceFieldValue"
                 name="Payroll_PositionAnalyzeReportFilterForm.employee.UI_FIELD_VALUE"
                 event="UI_FIELD_VALUE" >
-                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             </trigger>
             <trigger program="org.efaps.esjp.humanresource.Employee"
                 method="autoComplete4Employee"

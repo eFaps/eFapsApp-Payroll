@@ -61,7 +61,7 @@
                 <property name="DBProperty02">org.efaps.esjp.payroll.reports.RuleReport.dateTo</property>
                 <property name="DBProperty03">org.efaps.esjp.payroll.reports.RuleReport.employee</property>
                 <property name="DBProperty04">org.efaps.esjp.payroll.reports.RuleReport.rule</property>
-                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
                 <property name="Payroll_RuleExpression_Phrase">$&lt;attribute[Key]&gt; - $&lt;attribute[Description]&gt;</property>
                 <property name="Payroll_RuleInput_Phrase">$&lt;attribute[Key]&gt; - $&lt;attribute[Description]&gt;</property>
             </trigger>

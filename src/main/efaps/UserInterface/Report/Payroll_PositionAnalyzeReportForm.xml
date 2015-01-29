@@ -79,7 +79,7 @@
                 <property name="DBProperty05">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.status</property>
                 <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
                 <property name="DBProperty07">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
-                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             </trigger>
         </field>
         <field name="report">
@@ -151,7 +151,7 @@
                 <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
                 <property name="DBProperty07">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
                 <property name="DBProperty08">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.projectGroup</property>
-                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
+                <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             </trigger>
         </field>
         <field name="report">

@@ -78,7 +78,7 @@
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_PayslipForm.employee.Label</property>
-            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
+            <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeEdit">READONLY</property>
             <property name="ModeView">READONLY</property>
@@ -337,7 +337,7 @@
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_PayslipForm.employee.Label</property>
-            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;, $&lt;linkto[EmployeeAbstractLink].attribute[FirstName]&gt;</property>
+            <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeEdit">READONLY</property>
             <property name="ModeView">READONLY</property>

@@ -15,20 +15,21 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
+ Revision:        $Rev: 14564 $
+ Last Changed:    $Date: 2014-12-02 14:05:52 -0500 (Tue, 02 Dec 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
 <common-msgphrase xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>4bf03526-3616-4e57-ad70-1e372029ea9e</uuid>
+    <uuid>b158e7b0-fbc9-4624-bea7-ea2961be16be</uuid>
     <file-application>eFapsApp-HumanResource</file-application>
-    <file-revision>$Rev$</file-revision>
+    <file-revision>$Rev: 14564 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_Employee4DocumentMsgPhrase</name>
-        <parent>HumanResource_EmployeeMsgPhrase</parent>
+        <name>Payroll_EmployeeWithNumber4DocumentMsgPhrase</name>
+        <parent>HumanResource_EmployeeWithNumberMsgPhrase</parent>
+        <argument index="0">linkto[EmployeeAbstractLink].attribute[Number]</argument>
         <argument index="1">linkto[EmployeeAbstractLink].attribute[FirstName]</argument>
         <argument index="2">linkto[EmployeeAbstractLink].attribute[LastName]</argument>
         <argument index="3">linkto[EmployeeAbstractLink].attribute[SecondLastName]</argument>
