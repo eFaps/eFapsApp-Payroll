@@ -32,20 +32,16 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PayslipTree</name>
-        <!-- targets -->
         <target>
             <menu>Payroll_PayslipTree_Menu</menu>
             <form>Payroll_PayslipForm</form>
         </target>
-        <!-- type tree for -->
         <type>Payroll_Payslip</type>
-        <!-- child -->
         <childs>
             <child>Payroll_PayslipTree_Position</child>
             <child>Payroll_PayslipTree_Doc</child>
             <child>Payroll_PayslipTree_Payment</child>
         </childs>
-        <!-- properties -->
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>

@@ -158,6 +158,47 @@ public abstract class Advance_Base
      * @return new Return
      * @throws EFapsException on error
      */
+    public Return editAmount(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Instance instance = _parameter.getInstance();
+
+        final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceEditForm.date.name);
+        final String crossTotalStr = _parameter
+                        .getParameterValue(CIFormPayroll.Payroll_AdvanceEditForm.rateCrossTotal4Edit.name);
+
+        final PrintQuery print = new PrintQuery(instance);
+        print.addAttribute(CIPayroll.Advance.Rate);
+        print.execute();
+        final BigDecimal rate = new Currency().evalRate((Object[]) print.getAttribute(CIPayroll.Advance.Rate), false);
+
+        BigDecimal rateCrossTotal = BigDecimal.ONE;
+        try {
+            rateCrossTotal = (BigDecimal) NumberFormatter.get().getFormatter().parse(crossTotalStr);
+        } catch (final ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        final BigDecimal crossTotal = rateCrossTotal.divide(rate, BigDecimal.ROUND_HALF_UP).setScale(2,
+                        BigDecimal.ROUND_HALF_UP);
+        final Update update = new Update(instance);
+        update.add(CIPayroll.Advance.Date, date);
+        update.add(CIPayroll.Advance.RateCrossTotal, rateCrossTotal);
+        update.add(CIPayroll.Advance.CrossTotal, crossTotal);
+        update.add(CIPayroll.Advance.AmountCost, crossTotal);
+        update.execute();
+
+        return new Return();
+    }
+
+
+    /**
+     * Create advances.
+     *
+     * @param _parameter Parameter as passed from the eFaps API
+     * @return new Return
+     * @throws EFapsException on error
+     */
     public Return edit(final Parameter _parameter)
         throws EFapsException
     {

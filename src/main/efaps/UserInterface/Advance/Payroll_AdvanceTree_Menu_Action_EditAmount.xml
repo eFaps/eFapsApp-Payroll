@@ -34,7 +34,7 @@
         </access>
         <target>
             <form>Payroll_AdvanceEditForm</form>
-            <execute program="org.efaps.esjp.common.uiform.Edit" />
+            <execute program="org.efaps.esjp.payroll.Advance" method="editAmount" />
             <trigger event="UI_ACCESSCHECK" method="check4Status"
                 name="Payroll_AdvanceTree_Menu_Action_EditAmount.UI_ACCESSCHECK"
                 program="org.efaps.esjp.admin.access.AccessCheck4UI">

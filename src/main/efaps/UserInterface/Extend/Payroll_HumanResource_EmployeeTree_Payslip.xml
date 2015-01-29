@@ -26,7 +26,6 @@
 <ui-command xmlns="http://www.efaps.org/xsd"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-
     <uuid>e8cbbebe-2a81-4979-bcb3-e8cb6f6b3ecd</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev$</file-revision>
@@ -40,13 +39,12 @@
         </access>
         <target>
             <menu>Payroll_HumanResource_EmployeeTree_Payslip_Menu</menu>
-            <table>Payroll_PayslipTable</table>
+            <table>Payroll_DocumentUnfilteredTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_DocumentAbstract</property>
-                <property name="LinkFroms">EmployeeAbstractLink</property>
+                <property name="Type">Payroll_DocumentAbstract</property>
+                <property name="LinkFrom">EmployeeAbstractLink</property>
             </evaluate>
         </target>
-        <!-- properties -->
         <property name="Target">content</property>
         <property name="TargetShowCheckBoxes">true</property>
         <property name="TargetMode">view</property>

@@ -96,6 +96,13 @@
             <property name="Attribute">StatusAbstract</property>
             <property name="Label">Payroll_Payslip/Status.Label</property>
         </field>
+        <field name="template4View">
+            <property name="FilterType">PICKLIST</property>
+            <property name="SelectAlternateOID">linkto[TemplateLink].oid</property>
+            <property name="Select">linkto[TemplateLink].attribute[Name]</property>
+            <property name="Label">Payroll_PayslipForm.template.Label</property>
+            <property name="HRef">TREE</property>
+        </field>
         <field name="payslip">
             <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>
             <property name="Select">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].attribute[Name]</property>
@@ -180,6 +187,13 @@
             <property name="ModeEdit">NONE</property>
             <property name="Attribute">StatusAbstract</property>
             <property name="Label">Payroll_Payslip/Status.Label</property>
+        </field>
+        <field name="template4View">
+            <property name="FilterType">PICKLIST</property>
+            <property name="SelectAlternateOID">linkto[TemplateLink].oid</property>
+            <property name="Select">linkto[TemplateLink].attribute[Name]</property>
+            <property name="Label">Payroll_PayslipForm.template.Label</property>
+            <property name="HRef">TREE</property>
         </field>
         <field name="payslip">
             <property name="SelectAlternateOID">linkfrom[Payroll_Payslip2Advance#ToLink].linkto[FromLink].oid</property>

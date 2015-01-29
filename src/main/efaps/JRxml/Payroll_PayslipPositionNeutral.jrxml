@@ -8,13 +8,14 @@
 	</parameter>
 	<queryString language="eFaps">
 		<![CDATA[query type Payroll_PositionNeutral where PayslipLink == $P!{INSTANCE} select attribute[RateAmount] as amount,
-		linkto[RateCurrencyLink].attribute[Symbol] as currency, attribute[Description] as description, attribute[Key] as key]]>
+		linkto[RateCurrencyLink].attribute[Symbol] as currency, attribute[Description] as description, attribute[Key] as key, attribute[PositionNumber] as positionNumber]]>
 	</queryString>
 	<field name="key" class="java.lang.String"/>
 	<field name="description" class="java.lang.String"/>
 	<field name="amount" class="java.math.BigDecimal"/>
 	<field name="currency" class="java.lang.String"/>
-	<sortField name="key"/>
+	<field name="positionNumber" class="java.lang.Integer"/>
+    <sortField name="positionNumber"/>
 	<variable name="sum" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
 	</variable>
