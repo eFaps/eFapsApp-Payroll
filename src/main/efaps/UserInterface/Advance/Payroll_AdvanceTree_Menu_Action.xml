@@ -33,6 +33,7 @@
             <child>Payroll_AdvanceTree_Menu_Action_Edit</child>
             <child>Payroll_AdvanceTree_Menu_Action_SetPaid</child>
             <child>Payroll_AdvanceTree_Menu_Action_SetOpen</child>
+            <child>Payroll_AdvanceTree_Menu_Action_SetTemplate</child>
             <child>ERP_DocumentAbstractTree_Action_EditStatus</child>
         </childs>
     </definition>

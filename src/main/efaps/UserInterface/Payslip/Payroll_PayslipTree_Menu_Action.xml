@@ -32,6 +32,7 @@
         <name>Payroll_PayslipTree_Menu_Action</name>
         <childs>
             <child>Payroll_PayslipTree_Menu_Action_Edit</child>
+            <child>Payroll_PayslipTree_Menu_Action_SetTemplate</child>
             <child>Payroll_PayslipTree_Menu_Action_SetOpen</child>
             <child>Payroll_PayslipTree_Menu_Action_Checkout</child>
             <child>ERP_DocumentAbstractTree_Action_EditStatus</child>
