@@ -112,12 +112,10 @@
             <property name="SelectAlternateOID">linkto[Creator].oid</property>
             <property name="Attribute">Creator</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="ModeSearch">EDITABLE</property>
             <property name="ShowTypeIcon">true</property>
         </field>
         <field name="created">
             <property name="Attribute">Created</property>
-            <property name="ModeSearch">EDITABLE</property>
         </field>
         <field name="modifyGroup" character="Group">
             <property name="GroupCount">2</property>
@@ -126,12 +124,10 @@
             <property name="SelectAlternateOID">linkto[Modifier].oid</property>
             <property name="Attribute">Modifier</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="ModeSearch">EDITABLE</property>
             <property name="ShowTypeIcon">true</property>
         </field>
         <field name="modified">
             <property name="Attribute">Modified</property>
-            <property name="ModeSearch">EDITABLE</property>
         </field>
         <field name="laborTimeGroup" character="Group">
             <property name="GroupCount">2</property>
@@ -371,12 +367,10 @@
             <property name="SelectAlternateOID">linkto[Creator].oid</property>
             <property name="Attribute">Creator</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="ModeSearch">EDITABLE</property>
             <property name="ShowTypeIcon">true</property>
         </field>
         <field name="created">
             <property name="Attribute">Created</property>
-            <property name="ModeSearch">EDITABLE</property>
         </field>
         <field name="modifyGroup" character="Group">
             <property name="GroupCount">2</property>
@@ -385,12 +379,10 @@
             <property name="SelectAlternateOID">linkto[Modifier].oid</property>
             <property name="Attribute">Modifier</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="ModeSearch">EDITABLE</property>
             <property name="ShowTypeIcon">true</property>
         </field>
         <field name="modified">
             <property name="Attribute">Modified</property>
-            <property name="ModeSearch">EDITABLE</property>
         </field>
         <field name="laborTimeGroup" character="Group">
             <property name="GroupCount">2</property>
