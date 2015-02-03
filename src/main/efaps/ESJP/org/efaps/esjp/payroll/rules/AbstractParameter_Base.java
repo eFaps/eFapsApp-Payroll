@@ -509,23 +509,25 @@ public abstract class AbstractParameter_Base<T>
             }
         }
 
+        // check first UserInterface then instance
         if (!_map.containsKey(AbstractParameter.PARAKEY4STARTDATE)) {
             DateTime date = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
+            final String dateStr = _parameter
+                            .getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name);
+            if (dateStr != null && !dateStr.isEmpty()) {
+                date = new DateTime(dateStr);
+            } else if (dateStr == null
+                            && _parameter.getParameters().containsKey(
+                                            CIFormPayroll.Payroll_SettlementForm.startDate.name + "_eFapsDate")) {
+                date = DateUtil.getDateFromParameter(_parameter
+                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name + "_eFapsDate"));
+            } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate);
                 print.executeWithoutAccessCheck();
                 date = print.getAttribute(CIPayroll.Settlement.StartDate);
-            } else {
-                final String dateStr = _parameter
-                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name);
-                if (dateStr != null && !dateStr.isEmpty()) {
-                    date = new DateTime(dateStr);
-                } else {
-                    date = new DateTime(dateStr);
-                }
-
             }
+
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4STARTDATE, date);
             }
@@ -533,25 +535,25 @@ public abstract class AbstractParameter_Base<T>
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4ENDDATE)) {
             DateTime date = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
+            final String dateStr = _parameter
+                            .getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name);
+            if (dateStr != null && !dateStr.isEmpty()) {
+                date = new DateTime(dateStr);
+            } else if (dateStr == null
+                            && _parameter.getParameters().containsKey(
+                                            CIFormPayroll.Payroll_SettlementForm.endDate.name + "_eFapsDate")) {
+                date = DateUtil.getDateFromParameter(_parameter
+                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name + "_eFapsDate"));
+            } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate);
                 print.executeWithoutAccessCheck();
                 date = print.getAttribute(CIPayroll.Settlement.EndDate);
-            } else {
-                final String dateStr = _parameter
-                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name);
-                if (dateStr != null && !dateStr.isEmpty()) {
-                    date = new DateTime(dateStr);
-                } else {
-                    date = new DateTime(dateStr);
-                }
-
             }
+
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4ENDDATE, date);
             }
         }
-
     }
 }
