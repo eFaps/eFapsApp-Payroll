@@ -51,5 +51,23 @@
             <property name="Select">linkto[ToLink].attribute[Description]</property>
             <property name="Label">Payroll_Template2RuleTable.description.Label</property>
         </field>
+         <field name="ruleType">
+            <property name="Select">linkto[ToLink].attribute[RuleType]</property>
+            <property name="Label">Payroll_RuleAbstract/RuleType.Label</property>
+        </field>
+        <field name="config">
+            <property name="Select">linkto[ToLink].attribute[Config]</property>
+            <property name="Label">Payroll_RuleAbstract/Config.Label</property>
+        </field>
+         <field name="note">
+            <property name="Select">linkto[ToLink].attribute[Note]</property>
+            <property name="Label">Payroll_RuleAbstract/Note.Label</property>
+            <property name="ModeSearch">READONLY</property>
+        </field>
+        <field name="status">
+            <property name="Select">linkto[ToLink].attribute[StatusAbstract]</property>
+            <property name="Label">Payroll_RuleAbstract/StatusAbstract.Label</property>
+            <property name="ModeSearch">READONLY</property>
+        </field>
     </definition>
 </ui-table>

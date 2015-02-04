@@ -46,6 +46,7 @@
             <property name="SelectAlternateOID">linnkto[RuleAbstractLink].oid</property>
             <property name="Attribute">Key</property>
             <property name="Label">Payroll_PositionAbstract/Key.Label</property>
+            <property name="HRef">TREE</property>
         </field>
         <field name="description">
             <property name="Attribute">Description</property>

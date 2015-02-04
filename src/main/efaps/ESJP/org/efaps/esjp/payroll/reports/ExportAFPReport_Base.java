@@ -19,51 +19,30 @@
  */
 package org.efaps.esjp.payroll.reports;
 
-import java.io.File;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import org.efaps.admin.common.SystemConfiguration;
-import org.efaps.admin.datamodel.ui.FieldValue;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
-import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
-import org.efaps.admin.ui.field.Field.Display;
-import org.efaps.db.AttributeQuery;
-import org.efaps.db.Context;
-import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
-import org.efaps.esjp.common.file.FileUtil;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
-import org.efaps.esjp.common.jasperreport.EFapsTextReport;
-import org.efaps.esjp.common.uiform.Field;
-import org.efaps.esjp.common.uiform.Field_Base.DropDownPosition;
-import org.efaps.esjp.payroll.util.Payroll;
-import org.efaps.esjp.payroll.util.PayrollSettings;
+import org.efaps.esjp.common.jasperreport.datatype.DateTimeDate;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
@@ -71,96 +50,26 @@ import org.joda.time.DateTime;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z Jorge Cueva $
+ * @version $Id: $
  */
 @EFapsUUID("bb288739-7ecc-498b-9633-f32f21978999")
 @EFapsRevision("$Rev: 295 $")
 public abstract class ExportAFPReport_Base
     extends AbstractReports
 {
-    public enum Mime {
-        TXT,
-        XLS,
-        PDF
-    }
-
-    private static final Map<String, DropDownPosition> REMUTYPE_MAP = new HashMap<String, DropDownPosition>();
-    static {
-        ExportAFPReport_Base.REMUTYPE_MAP.put("0", new DropDownPosition("", ""));
-        ExportAFPReport_Base.REMUTYPE_MAP.put("I", new DropDownPosition("I",
-                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuI")));
-        ExportAFPReport_Base.REMUTYPE_MAP.put("J", new DropDownPosition("J",
-                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuJ")));
-        ExportAFPReport_Base.REMUTYPE_MAP.put("K", new DropDownPosition("K",
-                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuK")));
-        ExportAFPReport_Base.REMUTYPE_MAP.put("L", new DropDownPosition("L",
-                        DBProperties.getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuL")));
-    }
-
-    public Return dropDownAfpRemuType(final Parameter _parameter)
-        throws EFapsException
-    {
-        final Return ret = new Return();
-        final List<DropDownPosition> lst = new ArrayList<DropDownPosition>();
-        lst.addAll(ExportAFPReport_Base.REMUTYPE_MAP.values());
-        final StringBuilder html = new Field().getDropDownField(_parameter, lst);
-        ret.put(ReturnValues.SNIPLETT, html);
-        return ret;
-    }
-
-    public Return formatAfpRemuType(final Parameter _parameter)
-        throws EFapsException
-    {
-        final TargetMode mode = (TargetMode) _parameter.get(ParameterValues.ACCESSMODE);
-        final StringBuilder js = new StringBuilder();
-        final Return retVal = new Return();
-        if (mode.equals(TargetMode.VIEW) || mode.equals(TargetMode.PRINT)) {
-            final FieldValue keyField = (FieldValue) _parameter.get(ParameterValues.UIOBJECT);
-            if (keyField.getDisplay().equals(Display.READONLY)) {
-                final String key = (String) keyField.getValue();
-                if (ExportAFPReport_Base.REMUTYPE_MAP.containsKey(key)) {
-                    final String value = (String) ExportAFPReport_Base.REMUTYPE_MAP.get(key).getOption();
-                    js.append(key)
-                        .append(" - ")
-                        .append(value);
-                }
-            } else {
-                js.append(keyField.getValue());
-            }
-            retVal.put(ReturnValues.VALUES, js.toString());
-        }
-        return retVal;
-    }
 
     public Return createReport(final Parameter _parameter)
         throws EFapsException
     {
-        Return ret = new Return();
-        final String mime = _parameter.getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.mime.name);
-        final Mime def = Mime.valueOf(mime.toUpperCase());
+        final Return ret = new Return();
+        _parameter.getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.mime.name);
         AbstractDynamicReport dyRp = null;
-        File file = null;
-        switch (def) {
-            case TXT:
-                ret = createTextReport(_parameter);
-                break;
-            case XLS:
-                dyRp = getReport(_parameter);
-                dyRp.setFileName(DBProperties.getProperty("org.efaps.esjp.payroll.reports.AFPFileName"));
-                file = dyRp.getExcel(_parameter);
-                ret.put(ReturnValues.VALUES, file);
-                ret.put(ReturnValues.TRUE, true);
-                break;
-            case PDF:
-                dyRp = getReport(_parameter);
-                dyRp.setFileName(DBProperties.getProperty("org.efaps.esjp.payroll.reports.AFPFileName"));
-                file = dyRp.getPDF(_parameter);
-                ret.put(ReturnValues.VALUES, file);
-                ret.put(ReturnValues.TRUE, true);
-                break;
-            default:
-                break;
-        }
+
+        dyRp = getReport(_parameter);
+        dyRp.setFileName(DBProperties.getProperty("org.efaps.esjp.payroll.reports.AFPFileName"));
+
+        ret.put(ReturnValues.VALUES, dyRp.getExcel(_parameter));
+        ret.put(ReturnValues.TRUE, true);
         return ret;
     }
 
@@ -178,126 +87,54 @@ public abstract class ExportAFPReport_Base
         protected JRDataSource createDataSource(final Parameter _parameter)
             throws EFapsException
         {
-            final DRDataSource dataSource = new DRDataSource("codCuspp", "docNum", "lastName", "lastName2", "name",
-                            "movType", "movDate", "remuI", "remuJ", "remuK", "remuL", "rubRisk", "afp");
-
+            final List<DataBean> beans = new ArrayList<>();
             final DateTime dateFrom = new DateTime(_parameter
                             .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateFrom.name));
             final DateTime dateTo = new DateTime(_parameter
                             .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateTo.name));
 
-            final SystemConfiguration config = Payroll.getSysConfig();
-            final String movTypeEndDateOids = config.getAttributeValue(PayrollSettings.MOVEMENTTYPE_ENDDATE);
-            final Set<String> setMovTypeEndDate = new HashSet<String>();
-            if (movTypeEndDateOids != null && !movTypeEndDateOids.isEmpty()) {
-                final String[] movTypeEndDateStr = movTypeEndDateOids.split(";");
-                for (final String movTypeOid : movTypeEndDateStr) {
-                    final Instance instMovType = Instance.get(movTypeOid);
-                    if (instMovType.isValid()) {
-                        setMovTypeEndDate.add(instMovType.getOid());
-                    }
-                }
-            }
-
-            final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-            attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusMinutes(1));
-            attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
-            final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID);
-
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
-            queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
+            queryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusMinutes(1));
+            queryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
 
             final MultiPrintQuery multi = queryBldr.getPrint();
             multi.addAttribute(CIPayroll.Payslip.Date,
-                                CIPayroll.Payslip.DueDate);
-            final SelectBuilder selDoc = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
-            final SelectBuilder selEmpLName = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .attribute(CIHumanResource.Employee.LastName);
-            final SelectBuilder selEmpSLName = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .attribute(CIHumanResource.Employee.SecondLastName);
-            final SelectBuilder selEmpFName = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .attribute(CIHumanResource.Employee.FirstName);
-            final SelectBuilder selCuspp = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .clazz(CIHumanResource.ClassTR_Health)
-                            .attribute(CIHumanResource.ClassTR_Health.CUSPP);
-            final SelectBuilder selRegime = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .clazz(CIHumanResource.ClassTR_Health)
-                            .linkto(CIHumanResource.ClassTR_Health.HealthRegimeLink)
-                            .attribute(CIHumanResource.AttributeDefinitionHealthRegime.Value);
-            final SelectBuilder selMovTypeInst = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.MovementType).instance();
-            final SelectBuilder selMovType = new SelectBuilder()
-                            .linkto(CIPayroll.Payslip.MovementType)
-                            .attribute(CIPayroll.AttributeDefinitionMovementType.Value);
-            multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName,
-                            selCuspp, selRegime, selMovTypeInst, selMovType);
-            multi.execute();
-            final List<Map<String, Object>> lst = new ArrayList<Map<String, Object>>();
-            while (multi.next()) {
-                final Map<String, Object> map = new HashMap<String, Object>();
-                final String doc = multi.<String>getSelect(selDoc);
-                final String lName = multi.<String>getSelect(selEmpLName);
-                final String slName = multi.<String>getSelect(selEmpSLName);
-                final String fName = multi.<String>getSelect(selEmpFName);
-                final String security = multi.<String>getSelect(selRegime);
-                final String securityNumb = multi.<String>getSelect(selCuspp);
-                final Instance movTypeInst = multi.<Instance>getSelect(selMovTypeInst);
-                final String movType = multi.<String>getSelect(selMovType);
-                DateTime movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.Date);
-                if (setMovTypeEndDate.contains(movTypeInst.getOid())) {
-                    movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.DueDate);
-                }
-                map.put("docNum", doc);
-                map.put("lastName", lName);
-                map.put("lastName2", slName);
-                map.put("name", fName);
-                map.put("codCuspp", securityNumb);
-                map.put("afp", security);
-                map.put("movType", movType);
-                map.put("movDate", movDate.toDate());
+                            CIPayroll.Payslip.DueDate, CIPayroll.Payslip.CrossTotal);
 
-                final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
-                queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type,
-                                CIPayroll.PositionSum.getType().getId());
-                queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
-                                multi.getCurrentInstance().getId());
-                final MultiPrintQuery multi2 = queryBldr2.getPrint();
-                multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
-                final SelectBuilder selCaseExp = new SelectBuilder()
-                                .attribute(CIPayroll.PositionAbstract.Amount);
-                multi2.addSelect(selCaseExp);
-                multi2.execute();
-                while (multi2.next()) {
-                    final BigDecimal amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
-                    final String caseExpAfp = multi2.<String>getSelect(selCaseExp);
-                    if (caseExpAfp != null && !caseExpAfp.isEmpty()) {
-                        map.put(caseExpAfp, amount);
-                    }
+            final SelectBuilder selEmpl = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink);
+            final SelectBuilder selCuspp = new SelectBuilder(selEmpl).clazz(CIHumanResource.ClassTR_Health)
+                            .attribute(CIHumanResource.ClassTR_Health.CUSPP);
+            final SelectBuilder selEmplDocType = new SelectBuilder(selEmpl)
+                            .linkto(CIHumanResource.Employee.NumberTypeLink)
+                            .attribute(CIERP.AttributeDefinitionAbstract.MappingKey);
+            final SelectBuilder selEmplNumber = new SelectBuilder(selEmpl).attribute(CIHumanResource.Employee.Number);
+            final SelectBuilder selEmplLastName = new SelectBuilder(selEmpl)
+                            .attribute(CIHumanResource.Employee.LastName);
+            final SelectBuilder selEmplSecondLastName = new SelectBuilder(selEmpl)
+                            .attribute(CIHumanResource.Employee.SecondLastName);
+            final SelectBuilder selEmplName = new SelectBuilder(selEmpl).attribute(CIHumanResource.Employee.FirstName);
+            final SelectBuilder selStartDate = new SelectBuilder(selEmpl).clazz(CIHumanResource.ClassTR)
+                            .attribute(CIHumanResource.ClassTR.StartDate);
+
+            multi.addSelect(selEmplDocType, selEmplNumber, selEmplLastName, selEmplSecondLastName,
+                            selCuspp, selEmplName, selStartDate);
+            multi.execute();
+            while (multi.next()) {
+                final DataBean bean = new DataBean().setCuspp(multi.<String>getSelect(selCuspp))
+                                .evaluateEmplDocType(multi.<String>getSelect(selEmplDocType))
+                                .setEmplNumber(multi.<String>getSelect(selEmplNumber))
+                                .setEmplLastName(multi.<String>getSelect(selEmplLastName))
+                                .setEmplSecondLastName(multi.<String>getSelect(selEmplSecondLastName))
+                                .setEmplName(multi.<String>getSelect(selEmplName))
+                                .setRemuneration(multi.<BigDecimal>getAttribute(CIPayroll.Payslip.CrossTotal));
+                final DateTime startdate = multi.getSelect(selStartDate);
+                if (startdate.isAfter(dateFrom.minusMinutes(1)) && startdate.isBefore(dateTo.plusDays(1))) {
+                    bean.setMoveDate(startdate);
+                    bean.setMoveType(1);
                 }
-                lst.add(map);
+                beans.add(bean);
             }
-            for (final Map<String, Object> map : lst) {
-                dataSource.add(map.get("codCuspp") != null ? map.get("codCuspp") : "",
-                                map.get("docNum"),
-                                map.get("lastName"),
-                                map.get("lastName2"),
-                                map.get("name"),
-                                map.get("movType"),
-                                map.get("movDate"),
-                                map.get("I"),
-                                map.get("J"),
-                                map.get("K"),
-                                map.get("L"),
-                                "",
-                                map.get("afp") != null ? map.get("afp") : "");
-            }
-            return dataSource;
+            return new JRBeanCollectionDataSource(beans);
         }
 
         @Override
@@ -307,246 +144,370 @@ public abstract class ExportAFPReport_Base
         {
             _builder.addColumn(
                             DynamicReports.col.reportRowNumberColumn(),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.CodCuspp"),
-                                            "codCuspp", DynamicReports.type.stringType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.DocNum"),
-                                            "docNum", DynamicReports.type.stringType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.LastName"),
-                                            "lastName", DynamicReports.type.stringType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.LastName2"),
-                                            "lastName2", DynamicReports.type.stringType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.Name"),
-                                            "name", DynamicReports.type.stringType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.MovType"),
-                                            "movType", DynamicReports.type.stringType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.MovDate"),
-                                            "movDate", DynamicReports.type.dateType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuI"),
-                                            "remuI", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuJ"),
-                                            "remuJ", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuK"),
-                                            "remuK", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RemuL"),
-                                            "remuL", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.RubRisk"),
-                                            "rubRisk", DynamicReports.type.stringType()),
-                            DynamicReports.col.column(DBProperties
-                                            .getProperty("org.efaps.esjp.payroll.reports.ExportAFPReport.Afp"),
-                                            "afp", DynamicReports.type.stringType())
+                            DynamicReports.col.column("cuspp", DynamicReports.type.stringType()),
+                            DynamicReports.col.column("emplDocType", DynamicReports.type.integerType()),
+                            DynamicReports.col.column("emplNumber", DynamicReports.type.stringType()),
+                            DynamicReports.col.column("emplLastName", DynamicReports.type.stringType()),
+                            DynamicReports.col.column("emplSecondLastName", DynamicReports.type.stringType()),
+                            DynamicReports.col.column("emplName", DynamicReports.type.stringType()),
+                            DynamicReports.col.column("moveType", DynamicReports.type.integerType()),
+                            DynamicReports.col.column("moveDate", DateTimeDate.get()),
+                            DynamicReports.col.column("remuneration", DynamicReports.type.bigDecimalType()),
+                            DynamicReports.col.column("voluntary1", DynamicReports.type.bigDecimalType()),
+                            DynamicReports.col.column("voluntary2", DynamicReports.type.bigDecimalType()),
+                            DynamicReports.col.column("voluntary3", DynamicReports.type.bigDecimalType()),
+                            DynamicReports.col.column("emplType", DynamicReports.type.stringType()),
+                            DynamicReports.col.column("afp", DynamicReports.type.stringType())
                             );
         }
     }
 
-    public Return createTextReport(final Parameter _parameter)
-        throws EFapsException
+    public static class DataBean
     {
-        return new EFapsTextReport()
+
+        private String cuspp;
+        private String emplNumber;
+        private Integer emplDocType;
+        private String emplLastName;
+        private String emplSecondLastName;
+        private String emplName;
+        private Integer moveType;
+        private DateTime moveDate;
+        private BigDecimal remuneration = BigDecimal.ZERO;
+        private BigDecimal voluntary1 = BigDecimal.ZERO;
+        private BigDecimal voluntary2 = BigDecimal.ZERO;
+        private BigDecimal voluntary3 = BigDecimal.ZERO;
+        private String emplType;
+        private String afp;
+
+        /**
+         * @param _select
+         * @return
+         */
+        public DataBean evaluateEmplDocType(final String _select)
         {
-            @Override
-            protected File getEmptyFile4TextReport()
-                throws EFapsException
-            {
-                final String name = buildName4TextReport(DBProperties
-                                .getProperty("org.efaps.esjp.payroll.reports.AFPFileName"));
-                final File file = new FileUtil().getFile(name, "txt");
-                return file;
+            switch (_select) {
+                case "01":
+                    // DNI
+                    setEmplDocType(0);
+                    break;
+                case "04":
+                    // CE
+                    setEmplDocType(1);
+                    break;
+                case "06":
+                    // RUC
+                    break;
+                case "07":
+                    // PASAPORTE
+                    setEmplDocType(4);
+                    break;
+                case "11":
+                    // PARTIDA DE NACIMIENTO
+                    break;
+                default:
+                    break;
             }
+            return this;
+        }
 
-            @Override
-            protected void addHeaderDefinition(final Parameter _parameter,
-                                               final List<ColumnDefinition> _columnsList)
-                throws EFapsException
-            {
-            }
+        /**
+         * Getter method for the instance variable {@link #cuspp}.
+         *
+         * @return value of instance variable {@link #cuspp}
+         */
+        public String getCuspp()
+        {
+            return this.cuspp;
+        }
 
-            @Override
-            protected List<Object> getHeaderData(final Parameter _parameter)
-                throws EFapsException
-            {
-                return null;
-            }
+        /**
+         * Setter method for instance variable {@link #cuspp}.
+         *
+         * @param _cuspp value for instance variable {@link #cuspp}
+         */
+        public DataBean setCuspp(final String _cuspp)
+        {
+            this.cuspp = _cuspp;
+            return this;
+        }
 
-            @Override
-            protected void addColumnDefinition(final Parameter _parameter,
-                                               final List<ColumnDefinition> _columnsList)
-                throws EFapsException
-            {
-                // without '-' is align to right
-                final DecimalFormat integerFormat = (DecimalFormat) NumberFormat.getInstance(Context.getThreadContext()
-                                .getLocale());
-                integerFormat.setMaximumIntegerDigits(5);
-                integerFormat.setMinimumIntegerDigits(5);
-                integerFormat.setGroupingUsed(false);
-                _columnsList.add(new ColumnDefinition("", 5, 0, null, integerFormat, "0", Type.NUMBERTYPE, null));
-                // with '-' is align to left
-                _columnsList.add(new ColumnDefinition("", 12, 0, null, null, " ", Type.STRINGTYPE, "%1$-12s"));
-                _columnsList.add(new ColumnDefinition("", 10, 0, null, null, " ", Type.STRINGTYPE, "%1$-10s"));
-                _columnsList.add(new ColumnDefinition("", 20, 0, null, null, " ", Type.STRINGTYPE, "%1$-20s"));
-                _columnsList.add(new ColumnDefinition("", 20, 0, null, null, " ", Type.STRINGTYPE, "%1$-20s"));
-                _columnsList.add(new ColumnDefinition("", 20, 0, null, null, " ", Type.STRINGTYPE, "%1$-20s"));
-                _columnsList.add(new ColumnDefinition("", 1, 0, null, null, " ", Type.STRINGTYPE, "%1$-1s"));
-                _columnsList.add(new ColumnDefinition("", 10, 0, null, new SimpleDateFormat("dd/MM/yyyy"),
-                                " ", Type.DATETYPE, "%1$-10s"));
+        /**
+         * Getter method for the instance variable {@link #emplNumber}.
+         *
+         * @return value of instance variable {@link #emplNumber}
+         */
+        public String getEmplNumber()
+        {
+            return this.emplNumber;
+        }
 
-                final DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Context.getThreadContext()
-                                .getLocale());
-                decimalFormat.setMaximumIntegerDigits(7);
-                decimalFormat.setMaximumFractionDigits(2);
-                decimalFormat.setMinimumIntegerDigits(7);
-                decimalFormat.setMinimumFractionDigits(2);
-                decimalFormat.setGroupingUsed(false);
-                decimalFormat.setRoundingMode(RoundingMode.HALF_UP);
-                _columnsList.add(new ColumnDefinition("", 7, 2, true, decimalFormat, "0", Type.NUMBERTYPE, null));
-                _columnsList.add(new ColumnDefinition("", 7, 2, true, decimalFormat, "0", Type.NUMBERTYPE, null));
-                _columnsList.add(new ColumnDefinition("", 7, 2, true, decimalFormat, "0", Type.NUMBERTYPE, null));
-                _columnsList.add(new ColumnDefinition("", 7, 2, true, decimalFormat, "0", Type.NUMBERTYPE, null));
-                _columnsList.add(new ColumnDefinition("", 1, 0, null, null, " ", Type.STRINGTYPE, "%1$-1s"));
-                _columnsList.add(new ColumnDefinition("", 2, 0, null, null, " ", Type.STRINGTYPE, "%1$-2s"));
-            }
+        /**
+         * Setter method for instance variable {@link #emplNumber}.
+         *
+         * @param _emplNumber value for instance variable {@link #emplNumber}
+         */
+        public DataBean setEmplNumber(final String _emplNumber)
+        {
+            this.emplNumber = _emplNumber;
+            return this;
+        }
 
-            @Override
-            protected List<List<Object>> createDataSource(final Parameter _parameter)
-                throws EFapsException
-            {
-                final List<List<Object>> lst = new ArrayList<List<Object>>();
+        /**
+         * Getter method for the instance variable {@link #emplDocType}.
+         *
+         * @return value of instance variable {@link #emplDocType}
+         */
+        public Integer getEmplDocType()
+        {
+            return this.emplDocType;
+        }
 
-                final SystemConfiguration config = Payroll.getSysConfig();
-                final String movTypeEndDateOids = config.getAttributeValue(PayrollSettings.MOVEMENTTYPE_ENDDATE);
-                final Set<String> setMovTypeEndDate = new HashSet<String>();
-                if (movTypeEndDateOids != null && !movTypeEndDateOids.isEmpty()) {
-                    final String[] movTypeEndDateStr = movTypeEndDateOids.split(";");
-                    for (final String movTypeOid : movTypeEndDateStr) {
-                        final Instance instMovType = Instance.get(movTypeOid);
-                        if (instMovType.isValid()) {
-                            setMovTypeEndDate.add(instMovType.getOid());
-                        }
-                    }
-                }
+        /**
+         * Setter method for instance variable {@link #emplDocType}.
+         *
+         * @param _emplDocType value for instance variable {@link #emplDocType}
+         */
+        public DataBean setEmplDocType(final Integer _emplDocType)
+        {
+            this.emplDocType = _emplDocType;
+            return this;
+        }
 
-                final DateTime dateFrom = new DateTime(_parameter
-                                .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateFrom.name));
-                final DateTime dateTo = new DateTime(_parameter
-                                .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateTo.name));
+        /**
+         * Getter method for the instance variable {@link #emplLastName}.
+         *
+         * @return value of instance variable {@link #emplLastName}
+         */
+        public String getEmplLastName()
+        {
+            return this.emplLastName;
+        }
 
-                final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-                attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusMinutes(1));
-                attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
-                final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID);
+        /**
+         * Setter method for instance variable {@link #emplLastName}.
+         *
+         * @param _emplLastName value for instance variable
+         *            {@link #emplLastName}
+         */
+        public DataBean setEmplLastName(final String _emplLastName)
+        {
+            this.emplLastName = _emplLastName;
+            return this;
+        }
 
-                final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
-                queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
+        /**
+         * Getter method for the instance variable {@link #emplSecondLastName}.
+         *
+         * @return value of instance variable {@link #emplSecondLastName}
+         */
+        public String getEmplSecondLastName()
+        {
+            return this.emplSecondLastName;
+        }
 
-                final MultiPrintQuery multi = queryBldr.getPrint();
-                multi.addAttribute(CIPayroll.Payslip.Date,
-                                CIPayroll.Payslip.DueDate);
-                final SelectBuilder selDoc = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
-                final SelectBuilder selEmpLName = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                                .attribute(CIHumanResource.Employee.LastName);
-                final SelectBuilder selEmpSLName = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                                .attribute(CIHumanResource.Employee.SecondLastName);
-                final SelectBuilder selEmpFName = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                                .attribute(CIHumanResource.Employee.FirstName);
-                final SelectBuilder selCuspp = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                                .clazz(CIHumanResource.ClassTR_Health)
-                                .attribute(CIHumanResource.ClassTR_Health.CUSPP);
-                final SelectBuilder selRegime = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                                .clazz(CIHumanResource.ClassTR_Health)
-                                .linkto(CIHumanResource.ClassTR_Health.HealthRegimeLink)
-                                .attribute(CIHumanResource.AttributeDefinitionHealthRegime.Value);
-                final SelectBuilder selMovTypeInst = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.MovementType).instance();
-                final SelectBuilder selMovType = new SelectBuilder()
-                                .linkto(CIPayroll.Payslip.MovementType)
-                                .attribute(CIPayroll.AttributeDefinitionMovementType.Value);
-                multi.addSelect(selDoc, selEmpLName, selEmpFName, selEmpSLName,
-                                selCuspp, selRegime, selMovType, selMovTypeInst);
-                multi.execute();
-                final List<Map<String, Object>> lstMap = new ArrayList<Map<String, Object>>();
-                while (multi.next()) {
-                    final Map<String, Object> map = new HashMap<String, Object>();
-                    final String doc = multi.<String>getSelect(selDoc);
-                    final String lName = multi.<String>getSelect(selEmpLName);
-                    final String slName = multi.<String>getSelect(selEmpSLName);
-                    final String fName = multi.<String>getSelect(selEmpFName);
-                    final String security = multi.<String>getSelect(selRegime);
-                    final String securityNumb = multi.<String>getSelect(selCuspp);
-                    final Instance movTypeInst = multi.<Instance>getSelect(selMovTypeInst);
-                    final String movType = multi.<String>getSelect(selMovType);
-                    DateTime movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.Date);
-                    if (setMovTypeEndDate.contains(movTypeInst.getOid())) {
-                        movDate = multi.<DateTime>getAttribute(CIPayroll.Payslip.DueDate);
-                    }
-                    map.put("docNum", doc);
-                    map.put("lastName", lName);
-                    map.put("lastName2", slName);
-                    map.put("name", fName);
-                    map.put("codCuspp", securityNumb);
-                    map.put("afp", security);
-                    map.put("movType", movType);
-                    map.put("movDate", movDate);
+        /**
+         * Setter method for instance variable {@link #emplSecondLastName}.
+         *
+         * @param _emplSecondLastName value for instance variable
+         *            {@link #emplSecondLastName}
+         */
+        public DataBean setEmplSecondLastName(final String _emplSecondLastName)
+        {
+            this.emplSecondLastName = _emplSecondLastName;
+            return this;
+        }
 
-                    final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.PositionAbstract);
-                    queryBldr2.addWhereAttrNotEqValue(CIPayroll.PositionAbstract.Type,
-                                    CIPayroll.PositionSum.getType().getId());
-                    queryBldr2.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
-                                    multi.getCurrentInstance().getId());
-                    final MultiPrintQuery multi2 = queryBldr2.getPrint();
-                    multi2.addAttribute(CIPayroll.PositionAbstract.Amount);
-                    final SelectBuilder selCaseExp = new SelectBuilder()
-                                    .attribute(CIPayroll.PositionAbstract.Amount);
-                    multi2.addSelect(selCaseExp);
-                    multi2.execute();
-                    while (multi2.next()) {
-                        final BigDecimal amount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount);
-                        final String caseExpAfp = multi2.<String>getSelect(selCaseExp);
-                        if (caseExpAfp != null && !caseExpAfp.isEmpty()) {
-                            map.put(caseExpAfp, amount);
-                        }
-                    }
-                    lstMap.add(map);
-                }
-                Integer cont = 1;
-                for (final Map<String, Object> map : lstMap) {
-                    final List<Object> rowLst = new ArrayList<Object>();
-                    rowLst.add(cont);
-                    rowLst.add(map.get("codCuspp") != null ? map.get("codCuspp") : "");
-                    rowLst.add(map.get("docNum"));
-                    rowLst.add(map.get("lastName"));
-                    rowLst.add(map.get("lastName2"));
-                    rowLst.add(map.get("name"));
-                    rowLst.add(map.get("movType"));
-                    rowLst.add(map.get("movDate"));
-                    rowLst.add(map.get("I"));
-                    rowLst.add(map.get("J"));
-                    rowLst.add(map.get("K"));
-                    rowLst.add(map.get("L"));
-                    rowLst.add("");
-                    rowLst.add(map.get("afp") != null ? map.get("afp") : "");
-                    cont++;
-                    lst.add(rowLst);
-                }
+        /**
+         * Getter method for the instance variable {@link #emplName}.
+         *
+         * @return value of instance variable {@link #emplName}
+         */
+        public String getEmplName()
+        {
+            return this.emplName;
+        }
 
-                return lst;
-            }
-        }.getTextReport(_parameter);
+        /**
+         * Setter method for instance variable {@link #emplName}.
+         *
+         * @param _emplName value for instance variable {@link #emplName}
+         */
+        public DataBean setEmplName(final String _emplName)
+        {
+            this.emplName = _emplName;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #moveType}.
+         *
+         * @return value of instance variable {@link #moveType}
+         */
+        public Integer getMoveType()
+        {
+            return this.moveType;
+        }
+
+        /**
+         * Setter method for instance variable {@link #moveType}.
+         *
+         * @param _moveType value for instance variable {@link #moveType}
+         */
+        public DataBean setMoveType(final Integer _moveType)
+        {
+            this.moveType = _moveType;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #moveDate}.
+         *
+         * @return value of instance variable {@link #moveDate}
+         */
+        public DateTime getMoveDate()
+        {
+            return this.moveDate;
+        }
+
+        /**
+         * Setter method for instance variable {@link #moveDate}.
+         *
+         * @param _moveDate value for instance variable {@link #moveDate}
+         */
+        public DataBean setMoveDate(final DateTime _moveDate)
+        {
+            this.moveDate = _moveDate;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #remuneration}.
+         *
+         * @return value of instance variable {@link #remuneration}
+         */
+        public BigDecimal getRemuneration()
+        {
+            return this.remuneration;
+        }
+
+        /**
+         * Setter method for instance variable {@link #remuneration}.
+         *
+         * @param _remuneration value for instance variable
+         *            {@link #remuneration}
+         */
+        public DataBean setRemuneration(final BigDecimal _remuneration)
+        {
+            this.remuneration = _remuneration;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #voluntary1}.
+         *
+         * @return value of instance variable {@link #voluntary1}
+         */
+        public BigDecimal getVoluntary1()
+        {
+            return this.voluntary1;
+        }
+
+        /**
+         * Setter method for instance variable {@link #voluntary1}.
+         *
+         * @param _voluntary1 value for instance variable {@link #voluntary1}
+         */
+        public DataBean setVoluntary1(final BigDecimal _voluntary1)
+        {
+            this.voluntary1 = _voluntary1;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #voluntary2}.
+         *
+         * @return value of instance variable {@link #voluntary2}
+         */
+        public BigDecimal getVoluntary2()
+        {
+            return this.voluntary2;
+        }
+
+        /**
+         * Setter method for instance variable {@link #voluntary2}.
+         *
+         * @param _voluntary2 value for instance variable {@link #voluntary2}
+         */
+        public DataBean setVoluntary2(final BigDecimal _voluntary2)
+        {
+            this.voluntary2 = _voluntary2;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #voluntary3}.
+         *
+         * @return value of instance variable {@link #voluntary3}
+         */
+        public BigDecimal getVoluntary3()
+        {
+            return this.voluntary3;
+        }
+
+        /**
+         * Setter method for instance variable {@link #voluntary3}.
+         *
+         * @param _voluntary3 value for instance variable {@link #voluntary3}
+         */
+        public DataBean setVoluntary3(final BigDecimal _voluntary3)
+        {
+            this.voluntary3 = _voluntary3;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #emplType}.
+         *
+         * @return value of instance variable {@link #emplType}
+         */
+        public String getEmplType()
+        {
+            return this.emplType;
+        }
+
+        /**
+         * Setter method for instance variable {@link #emplType}.
+         *
+         * @param _emplType value for instance variable {@link #emplType}
+         */
+        public DataBean setEmplType(final String _emplType)
+        {
+            this.emplType = _emplType;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #afp}.
+         *
+         * @return value of instance variable {@link #afp}
+         */
+        public String getAfp()
+        {
+            return this.afp;
+        }
+
+        /**
+         * Setter method for instance variable {@link #afp}.
+         *
+         * @param _afp value for instance variable {@link #afp}
+         */
+        public DataBean setAfp(final String _afp)
+        {
+            this.afp = _afp;
+            return this;
+        }
+
     }
+
 }
