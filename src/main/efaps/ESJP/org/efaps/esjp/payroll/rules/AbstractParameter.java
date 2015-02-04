@@ -87,6 +87,10 @@ public abstract class AbstractParameter<T>
      */
     public static final String PARAKEY4ENDDATE =  AbstractParameter_Base.PARAKEY4ENDDATE;
 
+    /**
+     * Key for a parameter containing the Vacation.
+     */
+    public static final String PARAKEY4VACATION =  AbstractParameter_Base.PARAKEY4VACATION;
 
     /**
      * @param _parameter Parameter as passed by the eFaps API

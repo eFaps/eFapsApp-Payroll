@@ -59,5 +59,11 @@
             <sqltable>Payroll_DocumentSQLTable</sqltable>
             <sqlcolumn>ENDDATE</sqlcolumn>
         </attribute>
+        <attribute>
+            <name>Vacation</name>
+            <type>Integer</type>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>VACATION</sqlcolumn>
+        </attribute>
     </definition>
 </datamodel-type>

@@ -127,10 +127,15 @@
             <property name="ModeEdit">EDITABLE</property>
             <property name="Attribute">StartDate</property>
         </field>
-         <field name="endDate">
+        <field name="endDate">
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeEdit">EDITABLE</property>
             <property name="Attribute">EndDate</property>
+        </field>
+        <field name="vacation">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="Attribute">Vacation</property>
         </field>
         <field character="Group" name="currencyGroup">
             <property name="GroupCount">1</property>

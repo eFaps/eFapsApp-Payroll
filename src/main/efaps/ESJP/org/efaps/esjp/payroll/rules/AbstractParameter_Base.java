@@ -107,6 +107,12 @@ public abstract class AbstractParameter_Base<T>
     protected static final String PARAKEY4ENDDATE = "EndDate";
 
     /**
+     * Key for a parameter containing the Enddate.
+     */
+    protected static final String PARAKEY4VACATION = "Vacation";
+
+
+    /**
      * Logger for this classes.
      */
     private static final Logger LOG = LoggerFactory.getLogger(AbstractParameter.class);
@@ -523,7 +529,8 @@ public abstract class AbstractParameter_Base<T>
                                 .getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name + "_eFapsDate"));
             } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate);
+                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate,
+                                CIPayroll.Settlement.Vacation);
                 print.executeWithoutAccessCheck();
                 date = print.getAttribute(CIPayroll.Settlement.StartDate);
             }
@@ -546,7 +553,8 @@ public abstract class AbstractParameter_Base<T>
                                 .getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name + "_eFapsDate"));
             } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate);
+                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate,
+                                CIPayroll.Settlement.Vacation);
                 print.executeWithoutAccessCheck();
                 date = print.getAttribute(CIPayroll.Settlement.EndDate);
             }
@@ -555,5 +563,25 @@ public abstract class AbstractParameter_Base<T>
                 _map.put(AbstractParameter.PARAKEY4ENDDATE, date);
             }
         }
+
+        if (!_map.containsKey(AbstractParameter.PARAKEY4VACATION)) {
+            Integer vacation = null;
+            final String dateStr = _parameter
+                            .getParameterValue(CIFormPayroll.Payroll_SettlementForm.vacation.name);
+            if (dateStr != null && !dateStr.isEmpty()) {
+                vacation = Integer.parseInt(dateStr);
+            } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate,
+                                CIPayroll.Settlement.Vacation);
+                print.executeWithoutAccessCheck();
+                vacation = print.getAttribute(CIPayroll.Settlement.Vacation);
+            }
+
+            if (vacation != null) {
+                _map.put(AbstractParameter.PARAKEY4VACATION, vacation);
+            }
+        }
+
     }
 }
