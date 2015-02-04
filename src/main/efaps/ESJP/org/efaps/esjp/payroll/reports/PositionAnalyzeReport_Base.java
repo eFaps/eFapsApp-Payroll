@@ -20,6 +20,8 @@
 
 package org.efaps.esjp.payroll.reports;
 
+import static net.sf.dynamicreports.report.builder.DynamicReports.type;
+
 import java.awt.Color;
 import java.io.File;
 import java.math.BigDecimal;
@@ -31,10 +33,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
 import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder;
@@ -42,6 +46,7 @@ import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
 import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.subtotal.AggregationSubtotalBuilder;
+import net.sf.dynamicreports.report.definition.ReportParameters;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 
@@ -300,6 +305,7 @@ public abstract class PositionAnalyzeReport_Base
                         if (project) {
                             map.put("Project", multi.getMsgPhrase(selProj, msgPhrase4Project));
                         }
+                        PositionAnalyzeReport_Base.LOG.debug("Read: {}", map);
                     }
 
                     if (showDetails) {
@@ -342,7 +348,7 @@ public abstract class PositionAnalyzeReport_Base
                 final SelectBuilder selProj4Doc = SelectBuilder.get()
                                 .linkfrom(CIProjects.Project2DocumentAbstract.ToAbstract)
                                 .linkto(CIProjects.Project2DocumentAbstract.FromAbstract);
-                final SelectBuilder selEmplNum4Doc =SelectBuilder.get()
+                final SelectBuilder selEmplNum4Doc = SelectBuilder.get()
                                 .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
                                 .attribute(CIHumanResource.Employee.Number);
                 final SelectBuilder selDepName4Doc = SelectBuilder.get()
@@ -496,8 +502,8 @@ public abstract class PositionAnalyzeReport_Base
 
         /**
          * @param _parameter Parameter as passed by the eFaps API
-         * @param _queryBldr queryBldr to add to
          * @throws EFapsException on error
+         * @return QueryBuilder
          */
         protected QueryBuilder getAttrQueryBuilder(final Parameter _parameter)
             throws EFapsException
@@ -647,11 +653,20 @@ public abstract class PositionAnalyzeReport_Base
             groupMap.put(CIPayroll.PositionNeutral.getType().getLabel(),
                             DynamicReports.grid.titleGroup(CIPayroll.PositionNeutral.getType().getLabel()));
 
+            final Map<String, Set<String>> keyMap = new HashMap<>();
             for (final Column column : getColumns(_parameter)) {
                 final TextColumnBuilder<BigDecimal> column1 = DynamicReports.col.column(column.getLabel(),
                                 column.getKey(), DynamicReports.type.bigDecimalType());
                 if (showDetails) {
                     column1.setTitleHeight(100);
+                    Set<String> keySet;
+                    if (keyMap.containsKey(column.getGroup())) {
+                        keySet = keyMap.get(column.getGroup());
+                    } else {
+                        keySet = new HashSet<>();
+                        keyMap.put(column.getGroup(), keySet);
+                    }
+                    keySet.add(column.getKey());
                 }
                 _builder.addColumn(column1);
                 if (groupMap.containsKey(column.getGroup())) {
@@ -677,9 +692,25 @@ public abstract class PositionAnalyzeReport_Base
             _builder.addColumn(crossCol, amountCol);
 
             if (showDetails) {
-                for (final ColumnTitleGroupBuilder grp : groupMap.values()) {
-                    if (!grp.getColumnGridTitleGroup().getList().getListCells().isEmpty()) {
-                        groups.add(grp);
+                for (final Entry<String, ColumnTitleGroupBuilder> entry : groupMap.entrySet()) {
+                    if (!entry.getValue().getColumnGridTitleGroup().getList().getListCells().isEmpty()) {
+                        final TextColumnBuilder<BigDecimal> col = DynamicReports.col.column(new SumExpression(
+                                        keyMap.get(entry.getKey()))).setDataType(type.bigDecimalType())
+                                        .setTitle(getLabel("Total"));
+                        _builder.addColumn(col);
+                        entry.getValue().add(col);
+                        groups.add(entry.getValue());
+
+                        if (departmentGroup != null) {
+                            final AggregationSubtotalBuilder<BigDecimal> colTotal = DynamicReports.sbt.sum(col);
+                            _builder.addSubtotalAtGroupFooter(departmentGroup, colTotal);
+                        }
+                        if (projectGroup != null) {
+                            final AggregationSubtotalBuilder<BigDecimal> colTotal = DynamicReports.sbt.sum(col);
+                            _builder.addSubtotalAtGroupFooter(projectGroup, colTotal);
+                        }
+                        final AggregationSubtotalBuilder<BigDecimal> colTotal = DynamicReports.sbt.sum(col);
+                        _builder.addSubtotalAtColumnFooter(colTotal);
                     }
                 }
                 groups.add(crossCol);
@@ -842,4 +873,42 @@ public abstract class PositionAnalyzeReport_Base
         }
     }
 
+    /**
+     * Expression to get the sum.
+     */
+    public static class SumExpression
+        extends AbstractSimpleExpression<BigDecimal>
+    {
+
+        /**
+         * Needed for serialization.
+         */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Set of keys.
+         */
+        private final Set<String> keys;
+
+        /**
+         * @param _keys key set
+         */
+        public SumExpression(final Set<String> _keys)
+        {
+            this.keys = _keys;
+        }
+
+        @Override
+        public BigDecimal evaluate(final ReportParameters _reportParameters)
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            for (final String key : this.keys) {
+                final Object value = _reportParameters.getFieldValue(key);
+                if (value != null && value instanceof BigDecimal) {
+                    ret = ret.add((BigDecimal) value);
+                }
+            }
+            return ret;
+        }
+    }
 }
