@@ -33,6 +33,7 @@ import org.efaps.db.Insert;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
+import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
@@ -128,6 +129,68 @@ public abstract class DataFunctions_Base
     }
 
     /**
+     * @param _keys keys to be analized.
+     * @return the amount for anual
+     * @throws EFapsException on error
+     */
+    public BigDecimal getAnualAverage(final String... _keys)
+        throws EFapsException
+    {
+        return getAnualAverage(0, _keys);
+    }
+
+    /**
+     * @param _minMonths month to be used as filter
+     * @param _keys keys to be analized.
+     * @return the amount for anual
+     * @throws EFapsException on error
+     */
+    public BigDecimal getAnualAverage(final Integer _minMonths,
+                                      final String... _keys)
+        throws EFapsException
+    {
+        BigDecimal ret = BigDecimal.ZERO;
+        final Instance employeeInst = (Instance) getContext().get(AbstractParameter.PARAKEY4EMPLOYINST);
+        if (employeeInst != null && employeeInst.isValid()) {
+            final Set<Integer> months = new HashSet<>();
+            final DateTime date = (DateTime) getContext().get(AbstractParameter.PARAKEY4DATE);
+            final DateTime startDate = date.dayOfYear().withMinimumValue().minusMinutes(1);
+            final DateTime endDate = date.monthOfYear().setCopy(12).dayOfMonth().withMaximumValue()
+                            .plusMinutes(1);
+
+            final QueryBuilder relAttrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
+            final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
+            attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
+                            relAttrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
+            attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
+            attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status,
+                            Status.find(CIPayroll.PayslipStatus.Canceled));
+            attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, startDate);
+            attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, endDate);
+
+            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+            queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key, (Object[]) _keys);
+            queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
+                            attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID));
+            final MultiPrintQuery multi = queryBldr.getPrint();
+            final SelectBuilder selDate = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.DocumentAbstractLink)
+                            .attribute(CIPayroll.DocumentAbstract.Date);
+            multi.addSelect(selDate);
+            multi.addAttribute(CIPayroll.PositionPayment.Amount);
+            multi.execute();
+            while (multi.next()) {
+                months.add(multi.<DateTime>getSelect(selDate).getMonthOfYear());
+                final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
+                ret = ret.add(amount);
+            }
+            if (_minMonths < months.size()) {
+                ret = BigDecimal.ZERO;
+            }
+        }
+        return ret;
+    }
+
+    /**
      * @return the amount for anual
      * @throws EFapsException on error
      */
@@ -177,12 +240,21 @@ public abstract class DataFunctions_Base
     }
 
 
+    /**
+     * Connect class.
+     */
     public static class ConnectAdvance2Payslip
         implements IDocRuleListener
     {
 
+        /**
+         * List of instance to be connected.
+         */
         private final Set<Instance> instances;
 
+        /**
+         * @param _instances instance
+         */
         public ConnectAdvance2Payslip(final Set<Instance> _instances)
         {
             this.instances = _instances;
@@ -214,7 +286,6 @@ public abstract class DataFunctions_Base
                         insert.execute();
                     }
                 }
-
             }
         }
     }
