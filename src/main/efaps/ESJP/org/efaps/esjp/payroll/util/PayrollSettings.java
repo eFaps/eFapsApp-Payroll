@@ -37,17 +37,23 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 public interface PayrollSettings
 {
     /**
-     * String with the name of the selected company.
+     * OID for a Link.<br/>
+     * Default Currency for the Form like Invoice etc..
      */
-    String MOVEMENTTYPE_ENDDATE = "org.efaps.payroll.MovementTypeEndDate";
+    String BASE = "org.efaps.payroll.";
 
     /**
      * String with the name of the selected company.
      */
-    String RULESANDBOXWHITELIST = "org.efaps.payroll.WhiteList4RuleSandbox";
+    String RULESANDBOXWHITELIST = PayrollSettings.BASE + "WhiteList4RuleSandbox";
 
     /**
      * String with the name of the selected company.
      */
-    String STATICMETHODMAPPING = "org.efaps.payroll.StaticMethodMapping";
+    String STATICMETHODMAPPING = PayrollSettings.BASE + "StaticMethodMapping";
+
+    /**
+     * String. Key of the Rule used for the AFP Report.
+     */
+    String RULE4AFPTOTAL = PayrollSettings.BASE + "RuleKey4AFPTotal";
 }

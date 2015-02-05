@@ -32,9 +32,9 @@
         <version-expression>(version==latest)</version-expression>
         <name>Payroll-Configuration</name>
         <attribute>
-            <key>org.efaps.payroll.MovementTypeEndDate</key>
-            <value>toBeSet</value>
-            <description>OIDs of the movement type attribute definition that should be added with the end date in the afp report.</description>
+            <key>org.efaps.payroll.RuleKey4AFPTotal</key>
+            <value>REMUNAFP</value>
+            <description></description>
         </attribute>
         <attribute>
             <key>org.efaps.payroll.WhiteList4RuleSandbox</key>
