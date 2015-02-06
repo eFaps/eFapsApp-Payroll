@@ -43,7 +43,7 @@
             <property name="Label">Payroll_PositionAbstract/PositionNumber.Label</property>
         </field>
         <field name="key">
-            <property name="SelectAlternateOID">linnkto[RuleAbstractLink].oid</property>
+            <property name="SelectAlternateOID">linkto[RuleAbstractLink].oid</property>
             <property name="Attribute">Key</property>
             <property name="Label">Payroll_PositionAbstract/Key.Label</property>
             <property name="HRef">TREE</property>
