@@ -44,14 +44,14 @@
                 <property name="Field03">type</property>
                 <property name="Field04">employee</property>
                 <property name="Field05">status</property>
-                <property name="Field06">switch</property>
+                <property name="Field06">details</property>
                 <property name="Field07">departmentGroup</property>
                 <property name="FilterType01">DateTime</property>
                 <property name="FilterType02">DateTime</property>
                 <property name="FilterType03">Type</property>
                 <property name="FilterType04">Instance</property>
                 <property name="FilterType05">Status</property>
-                <property name="FilterType06">Boolean</property>
+                <property name="FilterType06">Enum</property>
                 <property name="FilterType07">Boolean</property>
                 <property name="FilterDefault01">MONTH:-1</property>
                 <property name="FilterDefault02">TODAY</property>
@@ -70,14 +70,14 @@
                 <property name="Field03">type</property>
                 <property name="Field04">employee</property>
                 <property name="Field05">status</property>
-                <property name="Field06">switch</property>
+                <property name="Field06">details</property>
                 <property name="Field07">departmentGroup</property>
                 <property name="DBProperty01">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.dateFrom</property>
                 <property name="DBProperty02">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.dateTo</property>
                 <property name="DBProperty03">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.type</property>
                 <property name="DBProperty04">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.employee</property>
                 <property name="DBProperty05">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.status</property>
-                <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
+                <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.details</property>
                 <property name="DBProperty07">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             </trigger>
@@ -111,7 +111,7 @@
                 <property name="Field03">type</property>
                 <property name="Field04">employee</property>
                 <property name="Field05">status</property>
-                <property name="Field06">switch</property>
+                <property name="Field06">details</property>
                 <property name="Field07">departmentGroup</property>
                 <property name="Field08">projectGroup</property>
                 <property name="FilterType01">DateTime</property>
@@ -119,17 +119,17 @@
                 <property name="FilterType03">Type</property>
                 <property name="FilterType04">Instance</property>
                 <property name="FilterType05">Status</property>
-                <property name="FilterType06">Boolean</property>
-                <property name="FilterType07">Boolean</property>
-                <property name="FilterType08">Boolean</property>
+                <property name="FilterType06">Enum</property>
+                <property name="FilterType07">Enum</property>
+                <property name="FilterType08">Enum</property>
                 <property name="FilterDefault01">MONTH:-1</property>
                 <property name="FilterDefault02">TODAY</property>
                 <property name="FilterDefault03">Payroll_Payslip</property>
                 <property name="FilterDefault04">-</property>
                 <property name="FilterDefault05">Digitized</property>
-                <property name="FilterDefault06">true</property>
-                <property name="FilterDefault07">false</property>
-                <property name="FilterDefault08">false</property>
+                <property name="FilterDefault06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport_Base$DetailsDisplay</property>
+                <property name="FilterDefault07">org.efaps.esjp.erp.FilteredReport_Base$GroupDisplay</property>
+                <property name="FilterDefault08">org.efaps.esjp.erp.FilteredReport_Base$GroupDisplay</property>
             </trigger>
             <trigger event="UI_FIELD_VALUE" index="2" method="getFilterFieldValue"
                 name="Payroll_PositionAnalyzeReportForm.filter.UI_FIELD_VALUE.2"
@@ -140,7 +140,7 @@
                 <property name="Field03">type</property>
                 <property name="Field04">employee</property>
                 <property name="Field05">status</property>
-                <property name="Field06">switch</property>
+                <property name="Field06">details</property>
                 <property name="Field07">departmentGroup</property>
                 <property name="Field08">projectGroup</property>
                 <property name="DBProperty01">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.dateFrom</property>
@@ -148,7 +148,7 @@
                 <property name="DBProperty03">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.type</property>
                 <property name="DBProperty04">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.employee</property>
                 <property name="DBProperty05">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.status</property>
-                <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.switch</property>
+                <property name="DBProperty06">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.details</property>
                 <property name="DBProperty07">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.departmentGroup</property>
                 <property name="DBProperty08">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.projectGroup</property>
                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>

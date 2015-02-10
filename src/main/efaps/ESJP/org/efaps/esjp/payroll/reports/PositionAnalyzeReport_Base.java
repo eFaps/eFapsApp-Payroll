@@ -51,7 +51,6 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 
 import org.apache.commons.collections4.comparators.ComparatorChain;
-import org.apache.commons.lang.BooleanUtils;
 import org.efaps.admin.common.MsgPhrase;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
@@ -69,6 +68,7 @@ import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CIProjects;
 import org.efaps.esjp.ci.CISales;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
+import org.efaps.esjp.common.jasperreport.datatype.DateTimeDate;
 import org.efaps.esjp.erp.FilteredReport;
 import org.efaps.esjp.sales.report.DocumentSumReport;
 import org.efaps.util.EFapsException;
@@ -91,6 +91,19 @@ public abstract class PositionAnalyzeReport_Base
      * Logging instance used in this class.
      */
     private static final Logger LOG = LoggerFactory.getLogger(PositionAnalyzeReport.class);
+
+    /**
+     * Enum used for display.
+     */
+    public enum DetailsDisplay
+    {
+        /** Display as Column */
+        STANDART,
+        /** No display. */
+        NONE,
+        /** Display as Group. */
+        EXTRA;
+    }
 
     /**
      * @param _parameter Parameter as passed by the eFasp API
@@ -211,10 +224,8 @@ public abstract class PositionAnalyzeReport_Base
                 this.data = new HashMap<>();
                 final Map<String, Column> columnMap = new HashMap<>();
                 final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
-                boolean project = false;
-                if (filterMap.containsKey("projectGroup")) {
-                    project = BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"));
-                }
+                final boolean project = filterMap.containsKey("projectGroup")
+                            && !GroupDisplay.NONE.equals(FilteredReport.getEnumValue(filterMap.get("projectGroup")));
                 //Payroll_Employee4DocumentMsgPhrase
                 final MsgPhrase msgPhrase = MsgPhrase.get(UUID.fromString("4bf03526-3616-4e57-ad70-1e372029ea9e"));
                 MsgPhrase msgPhrase4Project = null;
@@ -224,9 +235,9 @@ public abstract class PositionAnalyzeReport_Base
                                     .fromString("64c30826-cb22-4579-a3d5-bd10090f155e"));
                 }
 
-                boolean showDetails = true;
-                if (filterMap.containsKey("switch")) {
-                    showDetails = BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
+                DetailsDisplay details = DetailsDisplay.STANDART;
+                if (filterMap.containsKey("details")) {
+                    details = FilteredReport.getEnumValue(filterMap.get("details"));
                 }
 
                 final QueryBuilder queryBuilder = new QueryBuilder(CIPayroll.PositionDeduction);
@@ -267,6 +278,26 @@ public abstract class PositionAnalyzeReport_Base
                 if (project) {
                     multi.addMsgPhrase(selProj, msgPhrase4Project);
                 }
+                SelectBuilder selEmplPR = null;
+                SelectBuilder selEmplPRT = null;
+                SelectBuilder selEmplST = null;
+                if (DetailsDisplay.EXTRA.equals(details)) {
+                    selEmplPR = new SelectBuilder(selDoc)
+                                    .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                    .clazz(CIHumanResource.ClassTR_Health)
+                                    .linkto(CIHumanResource.ClassTR_Health.PensionRegimeLink)
+                                    .attribute(CIHumanResource.AttributeDefinitionPensionRegime.Value);
+                    selEmplPRT = new SelectBuilder(selDoc)
+                                    .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                    .clazz(CIHumanResource.ClassTR_Health)
+                                    .linkto(CIHumanResource.ClassTR_Health.PensionRegimeTypeLink)
+                                    .attribute(CIHumanResource.AttributeDefinitionPensionRegimeType.Value);
+                    selEmplST = new SelectBuilder(selDoc)
+                                    .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                    .clazz(CIHumanResource.ClassTR).attribute(CIHumanResource.ClassTR.StartDate);
+                    multi.addSelect(selEmplPR, selEmplPRT, selEmplST);
+                }
+
                 multi.addMsgPhrase(selDoc, msgPhrase);
                 multi.addSelect(selCrossTotal, selAmountCost, selDocInst, selDocName, selDepName, selDocELT, selDocHLT,
                                 selDocLT, selDocNLT, selRemun, selEmplNum);
@@ -286,7 +317,7 @@ public abstract class PositionAnalyzeReport_Base
                         map.put(CIPayroll.DocumentAbstract.CrossTotal.name, multi.getSelect(selCrossTotal));
                         map.put(CIPayroll.DocumentAbstract.AmountCost.name, multi.getSelect(selAmountCost));
                         final BigDecimal laborTime =  (BigDecimal) multi.<Object[]>getSelect(selDocLT)[0];
-                        if (showDetails) {
+                        if (!DetailsDisplay.NONE.equals(details)) {
                             map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime);
                         } else {
                             map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime.divide(BigDecimal.valueOf(8),
@@ -305,10 +336,16 @@ public abstract class PositionAnalyzeReport_Base
                         if (project) {
                             map.put("Project", multi.getMsgPhrase(selProj, msgPhrase4Project));
                         }
+                        if (DetailsDisplay.EXTRA.equals(details)) {
+                            map.put("pensionRegimeType", multi.getSelect(selEmplPRT));
+                            map.put("pensionRegime", multi.getSelect(selEmplPR));
+                            map.put("startDate", multi.getSelect(selEmplST));
+                        }
+
                         PositionAnalyzeReport_Base.LOG.debug("Read: {}", map);
                     }
 
-                    if (showDetails) {
+                    if (!DetailsDisplay.NONE.equals(details)) {
                         final String key = multi.getAttribute(CIPayroll.PositionAbstract.Key);
                         if (!columnMap.containsKey(key)) {
                             final Column col = new Column();
@@ -379,7 +416,7 @@ public abstract class PositionAnalyzeReport_Base
                                     docMulti.getAttribute(CIPayroll.DocumentAbstract.AmountCost));
                     final BigDecimal laborTime = (BigDecimal) docMulti
                                     .<Object[]>getAttribute(CIPayroll.DocumentAbstract.LaborTime)[0];
-                    if (showDetails) {
+                    if (!DetailsDisplay.NONE.equals(details)) {
                         map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime);
                     } else {
                         map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime.divide(BigDecimal.valueOf(8),
@@ -419,51 +456,46 @@ public abstract class PositionAnalyzeReport_Base
             throws EFapsException
         {
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
-            if (filterMap.containsKey("switch")) {
-                BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
-            }
 
             final Map<Instance, Map<String, Object>> maps = getData(_parameter);
             final List<Map<String, Object>> values = new ArrayList<>(maps.values());
             final ComparatorChain<Map<String, Object>> comp = new ComparatorChain<>();
 
-            if (filterMap.containsKey("projectGroup")) {
-                if (BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"))) {
-                    comp.addComparator(new Comparator<Map<String, Object>>()
-                    {
+            if (filterMap.containsKey("projectGroup")
+                            && GroupDisplay.GROUP.equals(FilteredReport.getEnumValue(filterMap.get("projectGroup")))) {
+                comp.addComparator(new Comparator<Map<String, Object>>()
+                {
 
-                        @Override
-                        public int compare(final Map<String, Object> _o1,
-                                           final Map<String, Object> _o2)
-                        {
-                            final String str1 = _o1.containsKey("Project") && _o1.get("Project") != null ? (String) _o1
-                                            .get("Project") : "";
-                            final String str2 = _o2.containsKey("Project") && _o2.get("Project") != null ? (String) _o2
-                                            .get("Project") : "";
-                            return str1.compareTo(str2);
-                        }
-                    });
-                }
+                    @Override
+                    public int compare(final Map<String, Object> _o1,
+                                       final Map<String, Object> _o2)
+                    {
+                        final String str1 = _o1.containsKey("Project") && _o1.get("Project") != null ? (String) _o1
+                                        .get("Project") : "";
+                        final String str2 = _o2.containsKey("Project") && _o2.get("Project") != null ? (String) _o2
+                                        .get("Project") : "";
+                        return str1.compareTo(str2);
+                    }
+                });
             }
 
-            if (filterMap.containsKey("departmentGroup")) {
-                if (BooleanUtils.isTrue((Boolean) filterMap.get("departmentGroup"))) {
-                    comp.addComparator(new Comparator<Map<String, Object>>()
+            if (filterMap.containsKey("departmentGroup") && !GroupDisplay.NONE.equals(
+                            FilteredReport.getEnumValue(filterMap.get("departmentGroup")))) {
+                comp.addComparator(new Comparator<Map<String, Object>>()
+                {
+                    @Override
+                    public int compare(final Map<String, Object> _o1,
+                                       final Map<String, Object> _o2)
                     {
-
-                        @Override
-                        public int compare(final Map<String, Object> _o1,
-                                           final Map<String, Object> _o2)
-                        {
-                            final String str1 = _o1.containsKey("Department") && _o1.get("Department") != null
-                                            ? (String) _o1.get("Department") : "";
-                            final String str2 = _o2.containsKey("Department") && _o2.get("Department") != null
-                                            ? (String) _o2.get("Department") : "";
-                            return str1.compareTo(str2);
-                        }
-                    });
-                }
+                        final String str1 = _o1.containsKey("Department") && _o1.get("Department") != null
+                                        ? (String) _o1.get("Department") : "";
+                        final String str2 = _o2.containsKey("Department") && _o2.get("Department") != null
+                                        ? (String) _o2.get("Department") : "";
+                        return str1.compareTo(str2);
+                    }
+                });
             }
+
             comp.addComparator(new Comparator<Map<String, Object>>()
             {
 
@@ -585,29 +617,37 @@ public abstract class PositionAnalyzeReport_Base
             final List<ColumnGridComponentBuilder> groups = new ArrayList<>();
 
             ColumnGroupBuilder projectGroup = null;
-            if (filterMap.containsKey("projectGroup")) {
-                if (BooleanUtils.isTrue((Boolean) filterMap.get("projectGroup"))) {
-                    final TextColumnBuilder<String> col = DynamicReports.col.column(getLabel("Project"),
-                                    "Project", DynamicReports.type.stringType())
-                                    .setStyle(DynamicReports.stl.style().setBackgroundColor(Color.yellow));
-                    _builder.addColumn(col);
+            if (filterMap.containsKey("projectGroup")
+                            && !GroupDisplay.NONE.equals(FilteredReport.getEnumValue(filterMap.get("projectGroup")))) {
+                final TextColumnBuilder<String> col = DynamicReports.col.column(getLabel("Project"),
+                                "Project", DynamicReports.type.stringType())
+                                .setStyle(DynamicReports.stl.style().setBackgroundColor(Color.yellow));
+                _builder.addColumn(col);
+                if (GroupDisplay.GROUP.equals(FilteredReport.getEnumValue(filterMap.get("projectGroup")))) {
                     projectGroup = DynamicReports.grp.group(col);
                     _builder.addGroup(projectGroup);
+                } else {
+                    groups.add(col);
                 }
             }
+
             ColumnGroupBuilder departmentGroup = null;
-            if (filterMap.containsKey("departmentGroup")) {
-                if (BooleanUtils.isTrue((Boolean) filterMap.get("departmentGroup"))) {
-                    final TextColumnBuilder<String> col = DynamicReports.col.column(getLabel("Department"),
-                                    "Department", DynamicReports.type.stringType());
-                    _builder.addColumn(col);
+            if (filterMap.containsKey("departmentGroup") && !GroupDisplay.NONE.equals(
+                            FilteredReport.getEnumValue(filterMap.get("departmentGroup")))) {
+                final TextColumnBuilder<String> col = DynamicReports.col.column(getLabel("Department"),
+                                "Department", DynamicReports.type.stringType());
+                _builder.addColumn(col);
+                if (GroupDisplay.GROUP.equals(FilteredReport.getEnumValue(filterMap.get("departmentGroup")))) {
                     departmentGroup = DynamicReports.grp.group(col);
                     _builder.addGroup(departmentGroup);
+                } else {
+                    groups.add(col);
                 }
             }
-            boolean showDetails = true;
-            if (filterMap.containsKey("switch")) {
-                showDetails = BooleanUtils.isTrue((Boolean) filterMap.get("switch"));
+
+            DetailsDisplay details = DetailsDisplay.STANDART;
+            if (filterMap.containsKey("details")) {
+                details = FilteredReport.getEnumValue(filterMap.get("details"));
             }
 
             final TextColumnBuilder<String> nameCol = DynamicReports.col.column(getLabel("Name"),
@@ -622,15 +662,18 @@ public abstract class PositionAnalyzeReport_Base
             groups.add(employeeCol);
             groups.add(employeeNumCol);
 
+            addColumns(_parameter, _builder, groups);
+
             final TextColumnBuilder<BigDecimal> remCol = DynamicReports.col.column(getLabel("Remuneration"),
                             "Remuneration", DynamicReports.type.bigDecimalType());
+
             final TextColumnBuilder<BigDecimal> ltCol;
-            if (showDetails) {
+            if (!DetailsDisplay.NONE.equals(details)) {
                 ltCol = DynamicReports.col.column(getLabel("LaborTime"),
                                 CIPayroll.DocumentAbstract.LaborTime.name, DynamicReports.type.bigDecimalType());
             } else {
                 ltCol = DynamicReports.col.column(getLabel("LaborTimeDays"),
-                            CIPayroll.DocumentAbstract.LaborTime.name, DynamicReports.type.bigDecimalType());
+                                CIPayroll.DocumentAbstract.LaborTime.name, DynamicReports.type.bigDecimalType());
             }
             final TextColumnBuilder<BigDecimal> eltCol = DynamicReports.col.column(getLabel("ExtraLaborTime"),
                             CIPayroll.DocumentAbstract.ExtraLaborTime.name, DynamicReports.type.bigDecimalType());
@@ -657,7 +700,7 @@ public abstract class PositionAnalyzeReport_Base
             for (final Column column : getColumns(_parameter)) {
                 final TextColumnBuilder<BigDecimal> column1 = DynamicReports.col.column(column.getLabel(),
                                 column.getKey(), DynamicReports.type.bigDecimalType());
-                if (showDetails) {
+                if (!DetailsDisplay.NONE.equals(details)) {
                     column1.setTitleHeight(100);
                     Set<String> keySet;
                     if (keyMap.containsKey(column.getGroup())) {
@@ -691,7 +734,7 @@ public abstract class PositionAnalyzeReport_Base
                             CIPayroll.DocumentAbstract.AmountCost.name, DynamicReports.type.bigDecimalType());
             _builder.addColumn(crossCol, amountCol);
 
-            if (showDetails) {
+            if (!DetailsDisplay.NONE.equals(details)) {
                 for (final Entry<String, ColumnTitleGroupBuilder> entry : groupMap.entrySet()) {
                     if (!entry.getValue().getColumnGridTitleGroup().getList().getListCells().isEmpty()) {
                         final TextColumnBuilder<BigDecimal> col = DynamicReports.col.column(new SumExpression(
@@ -735,6 +778,35 @@ public abstract class PositionAnalyzeReport_Base
 
             _builder.addSubtotalAtColumnFooter(crossTotal);
             _builder.addSubtotalAtColumnFooter(amountTotal);
+        }
+
+        /**
+         * @param _parameter
+         * @param _builder
+         * @param _groups
+         */
+        protected void addColumns(final Parameter _parameter,
+                                  final JasperReportBuilder _builder,
+                                  final List<ColumnGridComponentBuilder> _groups) throws EFapsException
+        {
+            final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+
+            DetailsDisplay details = DetailsDisplay.STANDART;
+            if (filterMap.containsKey("details")) {
+                details = FilteredReport.getEnumValue(filterMap.get("details"));
+            }
+            if (DetailsDisplay.EXTRA.equals(details)) {
+                final TextColumnBuilder<String> pRCol = DynamicReports.col.column(getLabel("PensionRegime"),
+                            "pensionRegime", DynamicReports.type.stringType());
+                final TextColumnBuilder<String> prTpCol = DynamicReports.col.column(getLabel("PensionRegimeType"),
+                                "pensionRegimeType", DynamicReports.type.stringType());
+                final TextColumnBuilder<DateTime> sdCol = DynamicReports.col.column(getLabel("StartDate"),
+                                "startDate", DateTimeDate.get());
+                _builder.addColumn(pRCol, prTpCol, sdCol);
+                _groups.add(pRCol);
+                _groups.add(prTpCol);
+                _groups.add(sdCol);
+            }
         }
 
         /**
