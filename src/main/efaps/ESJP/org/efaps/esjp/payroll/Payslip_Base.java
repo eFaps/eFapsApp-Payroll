@@ -104,6 +104,7 @@ import org.efaps.esjp.projects.Project;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.ui.html.Table;
+import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.update.AppDependency;
 import org.efaps.update.util.InstallationException;
@@ -378,13 +379,13 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.CurrencyId, Currency.getBaseCurrency());
             insert.add(CIPayroll.Payslip.RateCurrencyId, Currency.getBaseCurrency());
             insert.add(CIPayroll.Payslip.LaborTime, new Object[] {
-                            getLaborTime(_parameter,date,dueDate, emplInst), timeDim.getBaseUoM().getId() });
+                            getLaborTime(_parameter, date, dueDate, emplInst), timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] {
-                            getExtraLaborTime(_parameter,date,dueDate, emplInst), timeDim.getBaseUoM().getId() });
+                            getExtraLaborTime(_parameter, date, dueDate, emplInst), timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] {
-                            getHolidayLaborTime(_parameter,date,dueDate, emplInst), timeDim.getBaseUoM().getId() });
+                            getHolidayLaborTime(_parameter, date, dueDate, emplInst), timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.NightLaborTime, new Object[] {
-                            getNightLaborTime(_parameter,date,dueDate, emplInst), timeDim.getBaseUoM().getId() });
+                            getNightLaborTime(_parameter, date, dueDate, emplInst), timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.TemplateLink, templInst);
             insert.execute();
 
@@ -1063,10 +1064,10 @@ public abstract class Payslip_Base
         final Instance emplInst = Instance.get(_parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.employee.name));
         if (emplInst.isValid()) {
-            final DateTime date = new DateTime(
-                            _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.date.name));
-            final DateTime dueDate = new DateTime(_parameter
-                            .getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.dueDate.name));
+            final DateTime date = DateUtil.getDateFromParameter( _parameter.getParameterValue(
+                            CIFormPayroll.Payroll_PayslipForm.date.name + "_eFapsDate"));
+            final DateTime dueDate = DateUtil.getDateFromParameter(_parameter.getParameterValue(
+                            CIFormPayroll.Payroll_PayslipCreateMultipleForm.dueDate.name + "_eFapsDate"));
             final DecimalFormat formatter = NumberFormatter.get().getFormatter();
             final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
             if (laborTime == null || laborTime != null && laborTime.isEmpty()) {
