@@ -36,35 +36,31 @@ import org.joda.time.DateTime;
  */
 @EFapsUUID("ddb6a4d9-9226-4131-825c-eddce5120163")
 @EFapsRevision("$Rev: 13342 $")
-public interface IOnPayslip
+public interface IOnAdvance
     extends IEsjpListener
 {
 
     BigDecimal getLaborTime(final Parameter _parameter,
-                            final Instance _payslipInst,
+                            final Instance _advanceInst,
                             final DateTime _date,
-                            final DateTime _dueDate,
                             final Instance _emplInst)
         throws EFapsException;
 
     BigDecimal getExtraLaborTime(final Parameter _parameter,
-                                 final Instance _payslipInst,
+                                 final Instance _advanceInst,
                                  final DateTime _date,
-                                 final DateTime _dueDate,
                                  final Instance _emplInst)
         throws EFapsException;
 
     BigDecimal getNightLaborTime(final Parameter _parameter,
-                                 final Instance _payslipInst,
+                                 final Instance _advanceInst,
                                  final DateTime _date,
-                                 final DateTime _dueDate,
                                  final Instance _emplInst)
         throws EFapsException;
 
     BigDecimal getHolidayLaborTime(final Parameter _parameter,
-                                   final Instance _payslipInst,
+                                   final Instance _advanceInst,
                                    final DateTime _date,
-                                   final DateTime _dueDate,
                                    final Instance _emplInst)
         throws EFapsException;
 

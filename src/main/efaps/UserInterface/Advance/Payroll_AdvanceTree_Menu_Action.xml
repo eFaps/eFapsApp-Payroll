@@ -31,6 +31,7 @@
         <childs>
             <child>Payroll_AdvanceTree_Menu_Action_EditAmount</child>
             <child>Payroll_AdvanceTree_Menu_Action_Edit</child>
+            <child>Payroll_AdvanceTree_Menu_Action_EvaluateTimes</child>
             <child>Payroll_AdvanceTree_Menu_Action_SetPaid</child>
             <child>Payroll_AdvanceTree_Menu_Action_SetOpen</child>
             <child>Payroll_AdvanceTree_Menu_Action_SetTemplate</child>

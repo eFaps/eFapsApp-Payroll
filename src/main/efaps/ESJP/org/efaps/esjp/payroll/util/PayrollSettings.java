@@ -56,4 +56,9 @@ public interface PayrollSettings
      * String. Key of the Rule used for the AFP Report.
      */
     String RULE4AFPTOTAL = PayrollSettings.BASE + "RuleKey4AFPTotal";
+
+    /**
+     *Properties.
+     */
+    String TIMEEVAL = PayrollSettings.BASE + "TimeEvaluation";
 }
