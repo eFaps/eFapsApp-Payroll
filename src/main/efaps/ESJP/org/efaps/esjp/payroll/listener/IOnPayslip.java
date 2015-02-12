@@ -21,12 +21,15 @@
 package org.efaps.esjp.payroll.listener;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Map;
 
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.program.esjp.IEsjpListener;
 import org.efaps.db.Instance;
+import org.efaps.esjp.erp.CommonDocument_Base.CreatedDoc;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
@@ -66,6 +69,35 @@ public interface IOnPayslip
                                    final DateTime _date,
                                    final DateTime _dueDate,
                                    final Instance _emplInst)
+        throws EFapsException;
+
+    /**
+     * @param _parameter
+     * @param _instance
+     * @param _map
+     * @throws EFapsException on error
+     */
+    void add2UpdateMap4Employee(final Parameter _parameter,
+                                final Instance _employeeInstance,
+                                final Map<String, Object> _map)
+        throws EFapsException;
+
+    /**
+     * @param _parameter
+     * @param _createdDoc
+     * @return
+     */
+    void afterCreate(final Parameter _parameter,
+                     final CreatedDoc _createdDoc)
+        throws EFapsException;
+
+    /**
+     * @param _parameter
+     * @param _emplInst
+     * @return
+     */
+    Collection<? extends Instance> getEmployeeTimeCardInst(final Parameter _parameter,
+                                                           final Instance _emplInst)
         throws EFapsException;
 
 }
