@@ -15,26 +15,26 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev: 14290 $
- Last Changed:    $Date: 2014-10-22 16:29:02 -0500 (Wed, 22 Oct 2014) $
- Last Changed By: $Author: m.aranya@moxter.net $
+ Revision:        $Rev: 14615 $
+ Last Changed:    $Date: 2014-12-11 16:26:33 -0500 (Thu, 11 Dec 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
-<ui-search xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>d13aacae-2800-4e6e-9270-8a5964691364</uuid>
-    <file-application>eFapsApp-Sales</file-application>
-    <file-revision>$Rev: 14290 $</file-revision>
+    <uuid>4714edb0-c83f-45b4-828d-0fc9885a0acc</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <file-revision>$Rev: 14615 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_BulkPaymentTree_PayDoc_Menu_Action_AddExisting_Search</name>
-        <default>
-            <command>Payroll_DocumentSearch</command>
-        </default>
-        <childs>
-            <child>Payroll_DocumentSearch</child>
-            <child>Payroll_PayslipSearch</child>
-            <child>Payroll_AdvanceSearch</child>
-        </childs>
+        <name>Payroll_AdvanceSearch</name>
+        <target>
+            <form>Payroll_AdvanceForm</form>
+            <table>Payroll_AdvanceSearchTable</table>
+            <evaluate program="org.efaps.esjp.common.uisearch.Search">
+                <property name="Type">Payroll_Advance</property>
+            </evaluate>
+        </target>
+        <property name="TargetMode">search</property>
     </definition>
-</ui-search>
+</ui-command>
