@@ -204,8 +204,8 @@ public abstract class PayslipReport_Base
         final List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
 
         final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
-        attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date, _dateFrom);
-        attrQueryBldr.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date, _dateTo);
+        attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date, _dateFrom.minusMinutes(1));
+        attrQueryBldr.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date, _dateTo.plusMinutes(1));
         final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.DocumentAbstract.ID);
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);

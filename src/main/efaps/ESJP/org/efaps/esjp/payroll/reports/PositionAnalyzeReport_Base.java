@@ -281,6 +281,7 @@ public abstract class PositionAnalyzeReport_Base
                 SelectBuilder selEmplPR = null;
                 SelectBuilder selEmplPRT = null;
                 SelectBuilder selEmplST = null;
+                SelectBuilder selPeri = null;
                 if (DetailsDisplay.EXTRA.equals(details)) {
                     selEmplPR = new SelectBuilder(selDoc)
                                     .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
@@ -295,7 +296,12 @@ public abstract class PositionAnalyzeReport_Base
                     selEmplST = new SelectBuilder(selDoc)
                                     .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
                                     .clazz(CIHumanResource.ClassTR).attribute(CIHumanResource.ClassTR.StartDate);
-                    multi.addSelect(selEmplPR, selEmplPRT, selEmplST);
+                    selPeri = new SelectBuilder(selDoc)
+                                    .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                     .clazz(CIHumanResource.ClassTR_Labor)
+                                     .linkto(CIHumanResource.ClassTR_Labor.PeriodicityLink)
+                                     .attribute(CIHumanResource.AttributeDefinitionPeriodicity.Value);
+                    multi.addSelect(selEmplPR, selEmplPRT, selEmplST, selPeri);
                 }
 
                 multi.addMsgPhrase(selDoc, msgPhrase);
@@ -340,6 +346,7 @@ public abstract class PositionAnalyzeReport_Base
                             map.put("pensionRegimeType", multi.getSelect(selEmplPRT));
                             map.put("pensionRegime", multi.getSelect(selEmplPR));
                             map.put("startDate", multi.getSelect(selEmplST));
+                            map.put("periodicity", multi.getSelect(selPeri));
                         }
 
                         PositionAnalyzeReport_Base.LOG.debug("Read: {}", map);
@@ -787,7 +794,8 @@ public abstract class PositionAnalyzeReport_Base
          */
         protected void addColumns(final Parameter _parameter,
                                   final JasperReportBuilder _builder,
-                                  final List<ColumnGridComponentBuilder> _groups) throws EFapsException
+                                  final List<ColumnGridComponentBuilder> _groups)
+            throws EFapsException
         {
             final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
 
@@ -797,15 +805,18 @@ public abstract class PositionAnalyzeReport_Base
             }
             if (DetailsDisplay.EXTRA.equals(details)) {
                 final TextColumnBuilder<String> pRCol = DynamicReports.col.column(getLabel("PensionRegime"),
-                            "pensionRegime", DynamicReports.type.stringType());
+                                "pensionRegime", DynamicReports.type.stringType());
                 final TextColumnBuilder<String> prTpCol = DynamicReports.col.column(getLabel("PensionRegimeType"),
                                 "pensionRegimeType", DynamicReports.type.stringType());
                 final TextColumnBuilder<DateTime> sdCol = DynamicReports.col.column(getLabel("StartDate"),
                                 "startDate", DateTimeDate.get());
-                _builder.addColumn(pRCol, prTpCol, sdCol);
+                final TextColumnBuilder<String> perCol = DynamicReports.col.column(getLabel("Periodicity"),
+                                "periodicity", DynamicReports.type.stringType());
+                _builder.addColumn(pRCol, prTpCol, sdCol, perCol);
                 _groups.add(pRCol);
                 _groups.add(prTpCol);
                 _groups.add(sdCol);
+                _groups.add(perCol);
             }
         }
 
