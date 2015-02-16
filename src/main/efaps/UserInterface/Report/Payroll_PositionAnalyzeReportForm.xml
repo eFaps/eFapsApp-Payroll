@@ -53,7 +53,7 @@
                 <property name="FilterType05">Status</property>
                 <property name="FilterType06">Enum</property>
                 <property name="FilterType07">Boolean</property>
-                <property name="FilterDefault01">MONTH:-1</property>
+                <property name="FilterDefault01">WITHDAYOFMONTH:1</property>
                 <property name="FilterDefault02">TODAY</property>
                 <property name="FilterDefault03">Payroll_Payslip</property>
                 <property name="FilterDefault04">-</property>
@@ -122,7 +122,7 @@
                 <property name="FilterType06">Enum</property>
                 <property name="FilterType07">Enum</property>
                 <property name="FilterType08">Enum</property>
-                <property name="FilterDefault01">MONTH:-1</property>
+                <property name="FilterDefault01">WITHDAYOFMONTH:1</property>
                 <property name="FilterDefault02">TODAY</property>
                 <property name="FilterDefault03">Payroll_Payslip</property>
                 <property name="FilterDefault04">-</property>
