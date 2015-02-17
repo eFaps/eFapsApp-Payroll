@@ -65,6 +65,9 @@ public abstract class LaborTimeReport_Base
      */
     public enum Field implements Column
     {
+        /**
+         *
+         */
         ID("", 6, null),
         /** */
         DOCTYPE("docType", 2, null),
@@ -220,7 +223,8 @@ public abstract class LaborTimeReport_Base
         queryBldr.setOr(true);
 
         final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime);
+        multi.addAttribute(CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime,
+                        CIPayroll.Payslip.NightLaborTime, CIPayroll.Payslip.HolidayLaborTime);
         final SelectBuilder selDoc = new SelectBuilder()
                         .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
         final SelectBuilder selDocType = new SelectBuilder()
@@ -236,6 +240,8 @@ public abstract class LaborTimeReport_Base
             final String docType = multi.<String>getSelect(selDocType);
             final Object[] laborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.LaborTime);
             final Object[] extraLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.ExtraLaborTime);
+            final Object[] nightLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.NightLaborTime);
+            final Object[] holidayLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.HolidayLaborTime);
 
             final UoM laborTimeUom = (UoM) laborTimeOb[1];
             final BigDecimal laborTime = ((BigDecimal) laborTimeOb[0])
@@ -249,17 +255,34 @@ public abstract class LaborTimeReport_Base
             final BigDecimal extraLaborTime = ((BigDecimal) extraLaborTimeOb[0])
                             .multiply(new BigDecimal(extraLaborTimeUom.getNumerator()))
                             .divide(new BigDecimal(extraLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
-
             final Integer extraLaborTimeHour = extraLaborTime.intValue();
             final Integer extraLaborTimeMin = extraLaborTime.subtract(new BigDecimal(extraLaborTime.intValue()))
+                            .multiply(new BigDecimal(60)).intValue();
+
+            final UoM nightLaborTimeUom = (UoM) nightLaborTimeOb[1];
+            final BigDecimal nightLaborTime = ((BigDecimal) nightLaborTimeOb[0])
+                            .multiply(new BigDecimal(nightLaborTimeUom.getNumerator()))
+                            .divide(new BigDecimal(nightLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
+            final Integer nightLaborTimeHour = nightLaborTime.intValue();
+            final Integer nightLaborTimeMin = nightLaborTime.subtract(new BigDecimal(nightLaborTime.intValue()))
+                            .multiply(new BigDecimal(60)).intValue();
+
+            final UoM holidayLaborTimeUom = (UoM) holidayLaborTimeOb[1];
+            final BigDecimal holidayLaborTime = ((BigDecimal) holidayLaborTimeOb[0])
+                            .multiply(new BigDecimal(holidayLaborTimeUom.getNumerator()))
+                            .divide(new BigDecimal(holidayLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
+            final Integer holidayLaborTimeHour = holidayLaborTime.intValue();
+            final Integer holidayLaborTimeMin = holidayLaborTime.subtract(new BigDecimal(holidayLaborTime.intValue()))
                             .multiply(new BigDecimal(60)).intValue();
 
             value.put(LaborTimeReport_Base.Field.DOCNUM.getKey(), doc);
             value.put(LaborTimeReport_Base.Field.DOCTYPE.getKey(), docType);
             value.put(LaborTimeReport_Base.Field.LABTIMEHOUR.getKey(), laborTimeHour);
             value.put(LaborTimeReport_Base.Field.LABTIMEMIN.getKey(), laborTimeMin);
-            value.put(LaborTimeReport_Base.Field.LABEXTIMEHOUR.getKey(), extraLaborTimeHour);
-            value.put(LaborTimeReport_Base.Field.LABEXTIMEMIN.getKey(), extraLaborTimeMin);
+            value.put(LaborTimeReport_Base.Field.LABEXTIMEHOUR.getKey(), extraLaborTimeHour + nightLaborTimeHour
+                            + holidayLaborTimeHour);
+            value.put(LaborTimeReport_Base.Field.LABEXTIMEMIN.getKey(), extraLaborTimeMin + nightLaborTimeMin
+                            + holidayLaborTimeMin);
             values.add(value);
 
         }
