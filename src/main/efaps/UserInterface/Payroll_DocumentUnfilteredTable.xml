@@ -224,11 +224,10 @@
             <property name="Attribute">StatusAbstract</property>
             <property name="Label">Payroll_Payslip/Status.Label</property>
         </field>
-
         <field name="project4View">
             <property name="FilterType">PICKLIST</property>
-            <property name="SelectAlternateOID">linkfrom[PayRoll_Projects_ProjectService2Payslip#ToLink].linkto[FromLink].oid</property>
-            <property name="Phrase">$&lt;linkfrom[PayRoll_Projects_ProjectService2Payslip#ToLink].linkto[FromLink].attribute[Name]&gt; - $&lt;linkfrom[PayRoll_Projects_ProjectService2Payslip#ToLink].linkto[FromLink].attribute[Description]&gt;</property>
+            <property name="SelectAlternateOID">linkfrom[PayRoll_Projects_ProjectService2PayrollDocument#ToAbstract].linkto[FromAbstract].oid</property>
+            <property name="Phrase">$&lt;linkfrom[PayRoll_Projects_ProjectService2PayrollDocument#ToAbstract].linkto[FromAbstract].attribute[Name]&gt; - $&lt;linkfrom[PayRoll_Projects_ProjectService2PayrollDocument#ToAbstract].linkto[FromAbstract].attribute[Description]&gt;</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_PayslipForm.project.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>

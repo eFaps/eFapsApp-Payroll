@@ -31,7 +31,7 @@
             <application name="eFapsApp-Projects"/>
         </application-dependencies>
         <name>PayRoll_Projects_ProjectService2Payslip</name>
-        <parent>Projects_ProjectService2DocumentAbstract</parent>
+        <parent>PayRoll_Projects_ProjectService2PayrollDocument</parent>
         <attribute>
             <name>FromLink</name>
             <type>Link</type>
