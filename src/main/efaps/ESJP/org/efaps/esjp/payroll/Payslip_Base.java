@@ -434,43 +434,57 @@ public abstract class Payslip_Base
     public Return evaluateTimes(final Parameter _parameter)
         throws EFapsException
     {
-        final Instance advanceInst = _parameter.getInstance();
-        final PrintQuery print = new PrintQuery(_parameter.getInstance());
-        final SelectBuilder selEmplInst = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink).instance();
-        print.addSelect(selEmplInst);
-        print.addAttribute(CIPayroll.Payslip.Date, CIPayroll.Payslip.DueDate);
-        print.execute();
-        final DateTime date = print.getAttribute(CIPayroll.Payslip.Date);
-        final DateTime dueDate = print.getAttribute(CIPayroll.Payslip.DueDate);
-        final Instance emplInst = print.getSelect(selEmplInst);
+        final List<Instance> payslipInsts = new ArrayList<>();
 
-        final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
-                        .getDimension();
+        final Instance tmpinst = _parameter.getInstance();
+        if (tmpinst != null && tmpinst.isValid()) {
+            payslipInsts.add(tmpinst);
+        } else {
+            payslipInsts.addAll(getSelectedInstances(_parameter));
+        }
 
-        final BigDecimal lT = getLaborTime(_parameter, advanceInst, date, dueDate, emplInst);
-        final BigDecimal elT = getExtraLaborTime(_parameter, advanceInst, date, dueDate, emplInst);
-        final BigDecimal nlT = getNightLaborTime(_parameter, advanceInst, date, dueDate, emplInst);
-        final BigDecimal hlT = getHolidayLaborTime(_parameter, advanceInst, date, dueDate, emplInst);
+        for (final Instance payslipInst : payslipInsts) {
+            final PrintQuery print = new PrintQuery(payslipInst);
+            final SelectBuilder selEmplInst = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
+                            .instance();
+            print.addSelect(selEmplInst);
+            print.addAttribute(CIPayroll.Payslip.Date, CIPayroll.Payslip.DueDate, CIPayroll.Payslip.Status);
+            print.execute();
+            final Status status = Status.get(print.<Long>getAttribute(CIPayroll.Payslip.Status));
+            if (Status.find(CIPayroll.PayslipStatus.Draft).equals(status)) {
+                final DateTime date = print.getAttribute(CIPayroll.Payslip.Date);
+                final DateTime dueDate = print.getAttribute(CIPayroll.Payslip.DueDate);
+                final Instance emplInst = print.getSelect(selEmplInst);
 
-        if (lT != null || elT != null || nlT != null || hlT != null) {
-            final Update update = new Update(advanceInst);
-            if (lT != null) {
-                update.add(CIPayroll.Payslip.LaborTime, new Object[] { lT, timeDim.getBaseUoM().getId() });
+                final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
+                                .getDimension();
+
+                final BigDecimal lT = getLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
+                final BigDecimal elT = getExtraLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
+                final BigDecimal nlT = getNightLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
+                final BigDecimal hlT = getHolidayLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
+
+                if (lT != null || elT != null || nlT != null || hlT != null) {
+                    final Update update = new Update(payslipInst);
+                    if (lT != null) {
+                        update.add(CIPayroll.Payslip.LaborTime, new Object[] { lT, timeDim.getBaseUoM().getId() });
+                    }
+                    if (elT != null) {
+                        update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { elT, timeDim.getBaseUoM().getId() });
+                    }
+                    if (nlT != null) {
+                        update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nlT, timeDim.getBaseUoM().getId() });
+                    }
+                    if (hlT != null) {
+                        update.add(CIPayroll.Payslip.HolidayLaborTime,
+                                        new Object[] { hlT, timeDim.getBaseUoM().getId() });
+                    }
+                    update.execute();
+                }
             }
-            if (elT != null) {
-                update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { elT, timeDim.getBaseUoM().getId() });
-            }
-            if (nlT != null) {
-                update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nlT, timeDim.getBaseUoM().getId() });
-            }
-            if (hlT != null) {
-                update.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { hlT, timeDim.getBaseUoM().getId() });
-            }
-            update.execute();
         }
         return new Return();
     }
-
 
     protected BigDecimal getLaborTime(final Parameter _parameter,
                                       final Instance _payslipInst,
