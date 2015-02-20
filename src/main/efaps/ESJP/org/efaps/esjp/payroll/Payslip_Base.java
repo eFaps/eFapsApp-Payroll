@@ -1541,7 +1541,8 @@ public abstract class Payslip_Base
                 case "ExtraLaborTime":
                 case "NightLaborTime":
                 case "LaborTime":
-                    table.addRow().addColumn(DBProperties.getProperty("Payroll_Payslip/" + selected + ".Label"))
+                    table.addRow().addColumn(DBProperties.getProperty("Payroll_Payslip/" + selected + ".Label")
+                                    + "<span id=\"btn\"><span>")
                         .getCurrentColumn().setStyle("font-weight: bold;");
                     final MultiPrintQuery multi = new MultiPrintQuery(insts);
                     final SelectBuilder selEmp = SelectBuilder.get()
@@ -1578,7 +1579,8 @@ public abstract class Payslip_Base
                     print.addAttribute(CIPayroll.RuleAbstract.Key, CIPayroll.RuleAbstract.Description);
                     print.execute();
                     final String key = print.getAttribute(CIPayroll.RuleAbstract.Key);
-                    table.addRow().addColumn(key + " - " + print.getAttribute(CIPayroll.RuleAbstract.Description))
+                    table.addRow().addColumn(key + " - " + print.getAttribute(CIPayroll.RuleAbstract.Description)
+                                    + "<span id=\"btn\"><span>")
                         .getCurrentColumn().setStyle("font-weight: bold;");
 
                     final MultiPrintQuery paySlipMulti = new MultiPrintQuery(insts);
@@ -1644,8 +1646,26 @@ public abstract class Payslip_Base
                     .append("\").disabled = evt.currentTarget.checked ? '' : 'disabled';")
                     .append("});\n");
             }
+            js.append( "  new ToggleButton({\n" +
+                            "    showLabel: true,\n" +
+                            "    label: 'activar todos',\n" +
+                            "    checked: false,\n" +
+                            "    onChange: function (val) {\n" +
+                            "      this.set('label', val ? 'desactivar todos' : 'activar todos' );\n" +
+                            "      query('input[type=checkbox]').forEach(function (node) {\n" +
+                            "        node.checked = val;\n" +
+                            "      });\n" +
+                            "      query('[name=\\'newValue\\']').forEach(function (node) {\n" +
+                            "        node.disabled = !val;\n" +
+                            "      })\n" +
+                            "    }\n" +
+                            "  }, 'btn').startup();\n" +
+                            "\n" +
+                            "");
+
             final StringBuilder html = InterfaceUtils.wrappInScriptTag(_parameter,
-                            InterfaceUtils.wrapInDojoRequire(_parameter, js, DojoLibs.ON, DojoLibs.DOM), true, 1500);
+                            InterfaceUtils.wrapInDojoRequire(_parameter, js, DojoLibs.ON, DojoLibs.DOM, DojoLibs.QUERY,
+                                            DojoLibs.TOGGLEBUTTON), true, 1500);
             html.insert(0, table.toHtml()).append("<input type=\"hidden\" name=\"selected\" value=\"")
                 .append(selected).append("\">");
             ret.put(ReturnValues.SNIPLETT, html);
