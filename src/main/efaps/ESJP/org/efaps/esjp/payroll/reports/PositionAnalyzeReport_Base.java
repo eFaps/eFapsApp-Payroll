@@ -52,6 +52,7 @@ import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 
 import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.efaps.admin.common.MsgPhrase;
+import org.efaps.admin.datamodel.IEnum;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.dbproperty.DBProperties;
@@ -71,6 +72,7 @@ import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
 import org.efaps.esjp.common.jasperreport.datatype.DateTimeDate;
 import org.efaps.esjp.erp.FilteredReport;
 import org.efaps.esjp.sales.report.DocumentSumReport;
+import org.efaps.ui.wicket.util.EnumUtil;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -97,7 +99,7 @@ public abstract class PositionAnalyzeReport_Base
      */
     public enum DetailsDisplay
     {
-        /** Display as Column */
+        /** Display as Column. */
         STANDART,
         /** No display. */
         NONE,
@@ -282,6 +284,8 @@ public abstract class PositionAnalyzeReport_Base
                 SelectBuilder selEmplPRT = null;
                 SelectBuilder selEmplST = null;
                 SelectBuilder selPeri = null;
+                SelectBuilder selEmplEmpl = null;
+                SelectBuilder selEmplAct = null;
                 if (DetailsDisplay.EXTRA.equals(details)) {
                     selEmplPR = new SelectBuilder(selDoc)
                                     .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
@@ -301,7 +305,14 @@ public abstract class PositionAnalyzeReport_Base
                                      .clazz(CIHumanResource.ClassTR_Labor)
                                      .linkto(CIHumanResource.ClassTR_Labor.PeriodicityLink)
                                      .attribute(CIHumanResource.AttributeDefinitionPeriodicity.Value);
-                    multi.addSelect(selEmplPR, selEmplPRT, selEmplST, selPeri);
+                    selEmplEmpl = new SelectBuilder(selDoc)
+                                    .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                    .linkto(CIHumanResource.Employee.EmployLink)
+                                    .attribute(CIHumanResource.AttributeDefinitionEmploy.Value);
+                    selEmplAct = new SelectBuilder(selDoc)
+                                    .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
+                                    .attribute(CIHumanResource.Employee.Activation);
+                    multi.addSelect(selEmplPR, selEmplPRT, selEmplST, selPeri, selEmplEmpl, selEmplAct);
                 }
 
                 multi.addMsgPhrase(selDoc, msgPhrase);
@@ -347,8 +358,22 @@ public abstract class PositionAnalyzeReport_Base
                             map.put("pensionRegime", multi.getSelect(selEmplPR));
                             map.put("startDate", multi.getSelect(selEmplST));
                             map.put("periodicity", multi.getSelect(selPeri));
+                            map.put("emplEmpl", multi.getSelect(selEmplEmpl));
+                            final Object valueTmp = multi.getSelect(selEmplAct);
+                            if (valueTmp != null && valueTmp instanceof List) {
+                                final StringBuilder bldr = new StringBuilder();
+                                boolean first = true;
+                                for (final Object obj : (List<?>) valueTmp) {
+                                    if (first) {
+                                        first = false;
+                                    } else {
+                                        bldr.append(", ");
+                                    }
+                                    bldr.append(EnumUtil.getUILabel((IEnum) obj));
+                                }
+                                map.put("emplAct", bldr.toString());
+                            }
                         }
-
                         PositionAnalyzeReport_Base.LOG.debug("Read: {}", map);
                     }
 
@@ -812,11 +837,18 @@ public abstract class PositionAnalyzeReport_Base
                                 "startDate", DateTimeDate.get());
                 final TextColumnBuilder<String> perCol = DynamicReports.col.column(getLabel("Periodicity"),
                                 "periodicity", DynamicReports.type.stringType());
-                _builder.addColumn(pRCol, prTpCol, sdCol, perCol);
+                final TextColumnBuilder<String> emplEmplCol = DynamicReports.col.column(getLabel("Employ"),
+                                "emplEmpl", DynamicReports.type.stringType());
+                final TextColumnBuilder<String> emplActCol = DynamicReports.col.column(getLabel("Activation"),
+                                "emplAct", DynamicReports.type.stringType());
+
+                _builder.addColumn(pRCol, prTpCol, sdCol, perCol, emplEmplCol, emplActCol);
                 _groups.add(pRCol);
                 _groups.add(prTpCol);
                 _groups.add(sdCol);
                 _groups.add(perCol);
+                _groups.add(emplEmplCol);
+                _groups.add(emplActCol);
             }
         }
 
