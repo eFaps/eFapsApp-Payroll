@@ -29,6 +29,7 @@
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_AlterationAbatementTree_Detail_Menu_Action</name>
         <childs>
+            <child>Payroll_AlterationAbatementTree_Detail_Menu_Action_Create</child>
             <child>Payroll_AlterationAbatementTree_Detail_Menu_Action_Delete</child>
         </childs>
     </definition>

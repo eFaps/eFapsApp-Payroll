@@ -33,7 +33,7 @@
             <name>Payroll_AlterationIncrementLink</name>
             <type>Link</type>
             <typelink>Payroll_AlterationIncrement</typelink>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>DOCID</sqlcolumn>
         </attribute>
     </definition>

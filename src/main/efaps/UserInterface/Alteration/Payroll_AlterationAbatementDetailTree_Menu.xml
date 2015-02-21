@@ -22,15 +22,14 @@
 -->
 <ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>3acada47-26f3-49cf-9443-df70af08ef20</uuid>
+    <uuid>43269d90-daf4-4dda-8c72-4a0738e3e5df</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 5319 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AlterationIncrementTree_Detail_Menu_Action</name>
+        <name>Payroll_AlterationAbatementDetailTree_Menu</name>
         <childs>
-            <child>Payroll_AlterationIncrementTree_Detail_Menu_Action_Create</child>
-            <child>Payroll_AlterationIncrementTree_Detail_Menu_Action_Delete</child>
+            <child>Payroll_AlterationAbatementDetailTree_Menu_Action</child>
         </childs>
     </definition>
 </ui-menu>

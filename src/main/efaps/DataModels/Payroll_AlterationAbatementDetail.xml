@@ -33,7 +33,7 @@
             <name>Payroll_AlterationAbatementLink</name>
             <type>Link</type>
             <typelink>Payroll_AlterationAbatement</typelink>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>DOCID</sqlcolumn>
         </attribute>
     </definition>

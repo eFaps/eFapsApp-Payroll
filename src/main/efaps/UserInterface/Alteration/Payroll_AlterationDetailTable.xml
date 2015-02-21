@@ -31,12 +31,11 @@
         <field name="date">
             <property name="Attribute">Date</property>
             <property name="Label">Payroll_AlterationDetailAbstract/PositionNumber.Label</property>
+            <property name="HRef">TREE</property>
         </field>
         <field name="key">
-            <property name="SelectAlternateOID">linkto[RuleAbstractLink].oid</property>
             <property name="Attribute">Key</property>
             <property name="Label">Payroll_AlterationDetailAbstract/Key.Label</property>
-            <property name="HRef">TREE</property>
         </field>
         <field name="description">
             <property name="Attribute">Description</property>

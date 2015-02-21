@@ -19,18 +19,15 @@
  Last Changed:    $Date: 2010-08-16 11:58:36 -0500 (Mon, 16 Aug 2010) $
  Last Changed By: $Author: miguel.a.aranya $
 
--->
-<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>3acada47-26f3-49cf-9443-df70af08ef20</uuid>
+--><ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>153935e9-4ba2-45cd-b093-c3efad91f67b</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 5319 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AlterationIncrementTree_Detail_Menu_Action</name>
+        <name>Payroll_AlterationIncrementDetailTree_Menu</name>
         <childs>
-            <child>Payroll_AlterationIncrementTree_Detail_Menu_Action_Create</child>
-            <child>Payroll_AlterationIncrementTree_Detail_Menu_Action_Delete</child>
+            <child>Payroll_AlterationIncrementDetailTree_Menu_Action</child>
         </childs>
     </definition>
 </ui-menu>

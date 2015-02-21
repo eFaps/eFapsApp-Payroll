@@ -21,6 +21,7 @@
 package org.efaps.esjp.payroll;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
@@ -28,12 +29,14 @@ import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
+import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.uiform.Create;
 import org.efaps.esjp.common.uiform.Edit;
 import org.efaps.esjp.erp.Currency;
+import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.sales.document.AbstractDocument;
 import org.efaps.util.EFapsException;
 
@@ -73,8 +76,8 @@ public abstract class Abatement_Base
                 _insert.add(CIPayroll.DocumentAbstract.CurrencyId, Currency.getBaseCurrency());
                 _insert.add(CIPayroll.DocumentAbstract.RateCurrencyId, Currency.getBaseCurrency());
                 _insert.add(CIPayroll.DocumentAbstract.EmployeeAbstractLink,
-                                Instance.get(
-                                                _parameter.getParameterValue(CIFormPayroll.Payroll_AlterationAbatementForm.employee.name)));
+                                Instance.get(_parameter.getParameterValue(
+                                                CIFormPayroll.Payroll_AlterationAbatementForm.employee.name)));
             }
         };
         return create.execute(_parameter);
@@ -86,6 +89,66 @@ public abstract class Abatement_Base
         final Edit edit = new Edit()
         {
 
+        };
+        return edit.execute(_parameter);
+    }
+
+    public Return createDetail(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Create create = new Create()
+        {
+
+            @Override
+            protected void add2basicInsert(final Parameter _parameter,
+                                           final Insert _insert)
+                throws EFapsException
+            {
+                super.add2basicInsert(_parameter, _insert);
+                try {
+                    final BigDecimal amount = (BigDecimal) NumberFormatter.get().getFormatter().parse(_parameter
+                                            .getParameterValue(
+                                                CIFormPayroll.Payroll_AlterationAbatementDetailForm.rateAmount.name));
+
+                    _insert.add(CIPayroll.AlterationAbatementDetail.RateAmount, amount);
+                    _insert.add(CIPayroll.AlterationAbatementDetail.Amount, amount);
+                    _insert.add(CIPayroll.AlterationAbatementDetail.Rate, new Object[] { BigDecimal.ZERO,
+                                    BigDecimal.ZERO });
+                    _insert.add(CIPayroll.AlterationAbatementDetail.CurrencyLink, Currency.getBaseCurrency());
+                    _insert.add(CIPayroll.AlterationAbatementDetail.RateCurrencyLink, Currency.getBaseCurrency());
+                } catch (final ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            }
+        };
+        return create.execute(_parameter);
+    }
+
+    public Return editDetail(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Edit edit = new Edit()
+        {
+
+            @Override
+            protected void add2MainUpdate(final Parameter _parameter,
+                                          final Update _update)
+                throws EFapsException
+            {
+                super.add2MainUpdate(_parameter, _update);
+                try {
+                    final BigDecimal amount = (BigDecimal) NumberFormatter.get().getFormatter().parse(_parameter
+                                    .getParameterValue(
+                                    CIFormPayroll.Payroll_AlterationAbatementDetailForm.rateAmount.name));
+                    _update.add(CIPayroll.AlterationAbatementDetail.RateAmount, amount);
+                    _update.add(CIPayroll.AlterationAbatementDetail.Amount, amount);
+                } catch (final ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         };
         return edit.execute(_parameter);
     }
