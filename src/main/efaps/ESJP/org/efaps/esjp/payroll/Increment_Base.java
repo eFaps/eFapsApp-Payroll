@@ -32,6 +32,7 @@ import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.uiform.Create;
+import org.efaps.esjp.common.uiform.Edit;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.sales.document.AbstractDocument;
 import org.efaps.util.EFapsException;
@@ -75,5 +76,15 @@ public abstract class Increment_Base
             }
         };
         return create.execute(_parameter);
+    }
+
+    public Return edit(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Edit edit = new Edit()
+        {
+
+        };
+        return edit.execute(_parameter);
     }
 }

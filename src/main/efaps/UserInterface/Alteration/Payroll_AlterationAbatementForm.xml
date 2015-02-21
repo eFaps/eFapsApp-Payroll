@@ -28,10 +28,6 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_AlterationAbatementForm</name>
-        <field name="type">
-            <property name="Attribute">Type</property>
-            <property name="ModeEdit">NONE</property>
-        </field>
         <field character="Group" name="nameGroup">
             <property name="GroupCount">3</property>
         </field>
@@ -83,6 +79,7 @@
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_AlterationAbatementForm/EmployeeAbstractLink.Label</property>
             <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="employeeData">
             <property name="ModePrint">NONE</property>
