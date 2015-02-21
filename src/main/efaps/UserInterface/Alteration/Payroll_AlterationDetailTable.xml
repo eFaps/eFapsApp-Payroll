@@ -30,7 +30,7 @@
         <name>Payroll_AlterationDetailTable</name>
         <field name="date">
             <property name="Attribute">Date</property>
-            <property name="Label">Payroll_AlterationDetailAbstract/PositionNumber.Label</property>
+            <property name="Label">Payroll_AlterationDetailAbstract/Date.Label</property>
             <property name="HRef">TREE</property>
         </field>
         <field name="key">

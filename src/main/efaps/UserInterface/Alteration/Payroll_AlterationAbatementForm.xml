@@ -57,7 +57,7 @@
         </field>
         <field name="employee">
             <property name="Attribute">EmployeeAbstractLink</property>
-            <property name="Label">Payroll_AlterationAbatementForm/EmployeeAbstractLink.Label</property>
+            <property name="Label">Payroll_AlterationAbatement/EmployeeAbstractLink.Label</property>
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
@@ -77,7 +77,7 @@
         <field name="employee4Read">
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Label">Payroll_AlterationAbatementForm/EmployeeAbstractLink.Label</property>
+            <property name="Label">Payroll_AlterationAbatement/EmployeeAbstractLink.Label</property>
             <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
