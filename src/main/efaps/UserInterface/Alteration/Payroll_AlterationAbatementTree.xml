@@ -33,6 +33,9 @@
             <form>Payroll_AlterationAbatementForm</form>
         </target>
         <type>Payroll_AlterationAbatement</type>
+        <childs>
+            <child>Payroll_AlterationAbatementTree_Detail</child>
+        </childs>
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>

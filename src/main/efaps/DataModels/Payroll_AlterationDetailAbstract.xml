@@ -1,9 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-
-<!--
-
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,94 +15,84 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
+ Revision:        $Rev: 13995 $
+ Last Changed:    $Date: 2014-09-10 21:39:00 -0500 (Wed, 10 Sep 2014) $
+ Last Changed By: $Author: jan@moxter.net $
 
 -->
-
-<datamodel-type  xmlns="http://www.efaps.org/xsd"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>0f928423-ef1a-4ca8-8a3d-e68182a4ffcf</uuid>
+<datamodel-type xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>024e0670-060b-47e6-8a30-3534a69dc50d</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
-
+    <file-revision>$Rev: 13995 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_PositionAbstract</name>
+        <name>Payroll_AlterationDetailAbstract</name>
         <purpose abstract="true"/>
         <attribute>
             <name>Type</name>
             <type>Type</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>TYPEID</sqlcolumn>
         </attribute>
         <attribute>
             <name>OID</name>
             <type>OID</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>TYPEID,ID</sqlcolumn>
         </attribute>
         <attribute>
             <name>ID</name>
             <type>Long</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>ID</sqlcolumn>
         </attribute>
         <attribute>
             <name>DocumentAbstractLink</name>
             <type>Link</type>
             <typelink>Payroll_DocumentAbstract</typelink>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>DOCID</sqlcolumn>
         </attribute>
         <attribute>
-            <name>RuleAbstractLink</name>
-            <type>Link</type>
-            <typelink>Payroll_RuleAbstract</typelink>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
-            <sqlcolumn>RULEID</sqlcolumn>
-        </attribute>
-        <attribute>
-            <name>PositionNumber</name>
-            <type>Integer</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
-            <sqlcolumn>POS</sqlcolumn>
+            <name>Date</name>
+            <type>Date</type>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
+            <sqlcolumn>DATE</sqlcolumn>
         </attribute>
          <attribute>
             <name>Key</name>
             <type>String</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>KEY</sqlcolumn>
         </attribute>
         <attribute>
             <name>Description</name>
             <type>String</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>DESCR</sqlcolumn>
         </attribute>
         <attribute>
             <name>RateAmount</name>
             <type>Decimal</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>RATEAMOUNT</sqlcolumn>
         </attribute>
         <attribute>
             <name>Amount</name>
             <type>Decimal</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>AMOUNT</sqlcolumn>
         </attribute>
         <attribute>
             <name>CurrencyLink</name>
             <type>LinkWithRanges</type>
             <typelink>ERP_Currency</typelink>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>CURRENCYID</sqlcolumn>
-            <trigger program="org.efaps.esjp.admin.datamodel.RangesValue"
-                name="Payroll_PositionAbstract.CurrencyLink.RANGE_VALUE"
-                event="RANGE_VALUE">
+            <trigger event="RANGE_VALUE"
+                name="Payroll_AlterationDetailAbstract.CurrencyLink.RANGE_VALUE"
+                program="org.efaps.esjp.admin.datamodel.RangesValue">
                 <property name="Value">Name</property>
                 <property name="Type">ERP_Currency</property>
             </trigger>
@@ -114,11 +101,11 @@
             <name>RateCurrencyLink</name>
             <type>LinkWithRanges</type>
             <typelink>ERP_Currency</typelink>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>RATECURRENCYID</sqlcolumn>
-            <trigger program="org.efaps.esjp.admin.datamodel.RangesValue"
-                name="Payroll_PositionAbstract.RateCurrencyLink.RANGE_VALUE"
-                event="RANGE_VALUE">
+            <trigger event="RANGE_VALUE"
+                name="Payroll_AlterationDetailAbstract.RateCurrencyLink.RANGE_VALUE"
+                    program="org.efaps.esjp.admin.datamodel.RangesValue">
                 <property name="Value">Name</property>
                 <property name="Type">ERP_Currency</property>
             </trigger>
@@ -126,10 +113,11 @@
          <attribute>
             <name>Rate</name>
             <type>Rate</type>
-            <sqltable>Payroll_PositionSQLTable</sqltable>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
             <sqlcolumn>RATE,RATEDENOM</sqlcolumn>
-            <trigger program="org.efaps.esjp.erp.Currency" method="getRateValue"
-                name="Payroll_PositionAbstract.Rate.RATE_VALUE" event="RATE_VALUE">
+            <trigger event="RATE_VALUE" method="getRateValue"
+                name="Payroll_AlterationDetailAbstract.Rate.RATE_VALUE"
+                program="org.efaps.esjp.erp.Currency">
                 <property name="CurrencyAttribute4Rate">RateCurrencyLink</property>
                 <property name="TargetCurrencyAttribute4Rate">CurrencyLink</property>
             </trigger>

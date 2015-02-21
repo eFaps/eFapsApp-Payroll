@@ -33,6 +33,9 @@
             <form>Payroll_AlterationIncrementForm</form>
         </target>
         <type>Payroll_AlterationIncrement</type>
+        <childs>
+            <child>Payroll_AlterationIncrementTree_Detail</child>
+        </childs>
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>
