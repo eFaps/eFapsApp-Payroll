@@ -37,7 +37,6 @@ import org.efaps.esjp.common.uiform.Create;
 import org.efaps.esjp.common.uiform.Edit;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.NumberFormatter;
-import org.efaps.esjp.sales.document.AbstractDocument;
 import org.efaps.util.EFapsException;
 
 /**
@@ -49,7 +48,7 @@ import org.efaps.util.EFapsException;
 @EFapsUUID("0be695da-f37e-4b84-89d9-e59fcd326a18")
 @EFapsRevision("$Rev: 14839 $")
 public abstract class Increment_Base
-    extends AbstractDocument
+    extends AbstractAlteration
 {
 
     public Return create(final Parameter _parameter)

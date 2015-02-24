@@ -34,6 +34,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.PrintQuery;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.payroll.AbstractAlteration;
 import org.efaps.esjp.payroll.util.Payroll.RuleConfig;
 import org.efaps.esjp.payroll.util.Payroll.RuleType;
 import org.efaps.util.EFapsException;
@@ -42,21 +43,23 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: AbstractRule_Base.java 13971 2014-09-08 21:03:58Z
- *          jan@moxter.net $
+ * @version $Id$
+ * @param <T> extension class
  */
 @EFapsUUID("d31dd0ee-9396-4233-a4fe-bad8780cc931")
 @EFapsRevision("$Rev$")
-public abstract class AbstractRule_Base<T>
+public abstract class AbstractRule_Base<T extends AbstractRule_Base<T>>
 {
 
-    protected static String LISTENERKEY = AbstractRule.class.getName() + ".ListenerKey";
 
     /**
      * Instance of the rule.
      */
     private Instance instance;
 
+    /**
+     * Key of this rule.
+     */
     private String key;
 
     private String expression;
@@ -75,6 +78,11 @@ public abstract class AbstractRule_Base<T>
 
     private final Set<IRuleListener> ruleListeners = new HashSet<>();
 
+    /**
+     * Initialize the rule.
+     *
+     * @throws EFapsException on error
+     */
     protected void init()
         throws EFapsException
     {
@@ -90,6 +98,10 @@ public abstract class AbstractRule_Base<T>
             setDescription(print.<String>getAttribute(CIPayroll.RuleAbstract.Description));
             setRuleType(print.<RuleType>getAttribute(CIPayroll.RuleAbstract.RuleType));
             setConfig(print.<List<RuleConfig>>getAttribute(CIPayroll.RuleAbstract.Config));
+
+            if (getConfig() != null && getConfig().contains(RuleConfig.EVALUATEALTERATION)) {
+                addRuleListener(AbstractAlteration.getAlterationListener(this));
+            }
         }
     }
 
@@ -102,14 +114,16 @@ public abstract class AbstractRule_Base<T>
     protected abstract T getThis();
 
     /**
-     * @param _parameter
+     * @param _parameter Parameter as passed by the eFaps API
+     * @throws EFapsException on error
      */
     public abstract void prepare(final Parameter _parameter)
         throws EFapsException;
 
     /**
-     * @param _parameter
-     * @param _context
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _context JexlContext
+     * @throws EFapsException on error
      */
     public abstract void evaluate(final Parameter _parameter,
                                   final JexlContext _context)
@@ -129,6 +143,7 @@ public abstract class AbstractRule_Base<T>
      * Setter method for instance variable {@link #instance}.
      *
      * @param _instance value for instance variable {@link #instance}
+     * @return this for chaining
      */
     public T setInstance(final Instance _instance)
     {
@@ -160,6 +175,7 @@ public abstract class AbstractRule_Base<T>
      * Getter method for the instance variable {@link #key}.
      *
      * @return value of instance variable {@link #key}
+     * @throws EFapsException on error
      */
     public String getKey()
         throws EFapsException
@@ -172,6 +188,7 @@ public abstract class AbstractRule_Base<T>
      * Getter method for the instance variable {@link #key}.
      *
      * @return value of instance variable {@link #key}
+     * @throws EFapsException on error
      */
     public String getKey4Expression()
         throws EFapsException
@@ -189,6 +206,7 @@ public abstract class AbstractRule_Base<T>
      * Setter method for instance variable {@link #key}.
      *
      * @param _key value for instance variable {@link #key}
+     * @return this for chaining
      */
     public T setKey(final String _key)
     {
@@ -200,6 +218,7 @@ public abstract class AbstractRule_Base<T>
      * Getter method for the instance variable {@link #expression}.
      *
      * @return value of instance variable {@link #expression}
+     * @throws EFapsException on error
      */
     public String getExpression()
         throws EFapsException
@@ -212,6 +231,7 @@ public abstract class AbstractRule_Base<T>
      * Setter method for instance variable {@link #expression}.
      *
      * @param _expression value for instance variable {@link #expression}
+     * @return this for chaining
      */
     public T setExpression(final String _expression)
     {
@@ -223,6 +243,7 @@ public abstract class AbstractRule_Base<T>
      * Getter method for the instance variable {@link #description}.
      *
      * @return value of instance variable {@link #description}
+     * @throws EFapsException on error
      */
     public String getDescription()
         throws EFapsException
@@ -235,6 +256,7 @@ public abstract class AbstractRule_Base<T>
      * Setter method for instance variable {@link #description}.
      *
      * @param _description value for instance variable {@link #description}
+     * @return this for chaining
      */
     public T setDescription(final String _description)
     {
@@ -256,8 +278,12 @@ public abstract class AbstractRule_Base<T>
      * Setter method for instance variable {@link #result}.
      *
      * @param _result value for instance variable {@link #result}
+     * @return this for chaining
+     * @throws EFapsException on error
+     *
      */
     public T setResult(final Object _result)
+        throws EFapsException
     {
         this.result = _result;
         return getThis();
@@ -304,7 +330,7 @@ public abstract class AbstractRule_Base<T>
     }
 
     /**
-     * @return
+     * @return true if the rule should be added as position else false
      */
     public boolean add()
     {
@@ -357,9 +383,9 @@ public abstract class AbstractRule_Base<T>
     }
 
     /**
-     * Getter method for the instance variable {@link #ruleListeners}.
-     *
-     * @return value of instance variable {@link #ruleListeners}
+     * @param _clazz class of listsner wanted
+     * @param <S> Class type
+     * @return RuleListener
      */
     public <S extends IRuleListener> Set<S> getRuleListeners(final Class<S> _clazz)
     {
@@ -372,18 +398,15 @@ public abstract class AbstractRule_Base<T>
         return ret;
     }
 
-    /**
-     * Getter method for the instance variable {@link #ruleListeners}.
-     *
-     * @return value of instance variable {@link #ruleListeners}
+      /**
+     * @param _ruleListener rulelistener to be added
+     * @return this for chaining
      */
     public T addRuleListener(final IRuleListener _ruleListener)
     {
         getRuleListeners().add(_ruleListener);
         return getThis();
     }
-
-
 
     @Override
     public String toString()
@@ -400,6 +423,10 @@ public abstract class AbstractRule_Base<T>
                         .append("result", getResult()).toString();
     }
 
+    /**
+     * @param _ruleInsts instance of rules the rule object is wanetd for
+     * @return lsit of rul objects
+     */
     protected static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
     {
         final List<AbstractRule<?>> ret = new ArrayList<>();

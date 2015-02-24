@@ -36,10 +36,9 @@ import org.efaps.db.Instance;
  */
 @EFapsUUID("0d7ba4f6-d645-4951-9ba2-a6f5e0df4634")
 @EFapsRevision("$Rev$")
-public abstract class AbstractRule<T>
+public abstract class AbstractRule<T extends AbstractRule_Base<T>>
     extends AbstractRule_Base<T>
 {
-    public static String LISTENERKEY = AbstractRule_Base.LISTENERKEY;
 
     public static List<? extends AbstractRule<?>> getRules(final Instance... _ruleInsts)
     {

@@ -50,6 +50,12 @@
             <property name="Select">linkto[CurrencyLink].attribute[Symbol]</property>
             <property name="Label">Payroll_AlterationDetailAbstract/CurrencyLink.Label</property>
         </field>
+         <field name="applyDocumentAbstractLink">
+            <property name="SelectAlternateOID">linkto[ApplyDocumentAbstractLink].oid</property>
+            <property name="Select">linkto[ApplyDocumentAbstractLink].attribute[Name]</property>
+            <property name="Label">Payroll_AlterationDetailAbstract/ApplyDocumentAbstractLink.Label</property>
+            <property name="HRef">TREE</property>
+        </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>

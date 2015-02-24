@@ -36,7 +36,7 @@
             <table>Payroll_AlterationDetailTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
                 <property name="Type">Payroll_AlterationIncrementDetail</property>
-                <property name="LinkFrom">Payroll_AlterationIncrementLink</property>
+                <property name="LinkFrom">AlterationIncrementLink</property>
             </evaluate>
         </target>
         <property name="Target">content</property>

@@ -232,7 +232,10 @@ public abstract class DataFunctions_Base
 
                 if (!instances.isEmpty()) {
                     final ConnectAdvance2Payslip connect = new ConnectAdvance2Payslip(instances);
-                    getContext().set(AbstractRule.LISTENERKEY, connect);
+                    final AbstractRule<?> rule = (AbstractRule<?>) getContext().get(Calculator.PARAKEY4CURRENTRULE);
+                    if (rule != null) {
+                        rule.addRuleListener(connect);
+                    }
                 }
             }
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2014 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,32 @@
  * Last Changed By: $Author$
  */
 
-
 package org.efaps.esjp.payroll.rules;
 
+import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
-
+import org.efaps.util.EFapsException;
 
 /**
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * @version $Id: $
  */
-@EFapsUUID("39c26690-e9b9-4f52-8b2d-a12056be921e")
-@EFapsRevision("$Rev$")
-public interface IRuleListener
+@EFapsUUID("e0c7696e-0cec-45b0-a43e-c578b9d2fea7")
+@EFapsRevision("$Rev: 13971 $")
+public interface IEvaluateListener
+    extends IRuleListener
 {
 
+    /**
+     * @param _jexlContext context of jexl executed
+     * @param _val value object
+     * @return the value
+     * @throws EFapsException on error
+     */
+    Object onEvaluate(final JexlContext _jexlContext,
+                      final Object _val)
+        throws EFapsException;
 }

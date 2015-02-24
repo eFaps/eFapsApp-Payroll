@@ -99,7 +99,6 @@ import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.listener.IOnPayslip;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
-import org.efaps.esjp.payroll.rules.ExpressionRule;
 import org.efaps.esjp.payroll.rules.IDocRuleListener;
 import org.efaps.esjp.payroll.rules.InputRule;
 import org.efaps.esjp.payroll.rules.Result;
@@ -1259,12 +1258,10 @@ public abstract class Payslip_Base
         list.add(map);
 
         for (final AbstractRule<?> rule : rules) {
-            if (rule instanceof ExpressionRule) {
-                final Map<String, Object> map2 = new HashMap<>();
-                list.add(map2);
-                map2.put(EFapsKey.FIELDUPDATE_USEIDX.getKey(), ruleInsts.get(rule.getInstance()));
-                map2.put(CITablePayroll.Payroll_PositionRuleTable.ruleAmount.name, rule.getResult());
-            }
+            final Map<String, Object> map2 = new HashMap<>();
+            list.add(map2);
+            map2.put(EFapsKey.FIELDUPDATE_USEIDX.getKey(), ruleInsts.get(rule.getInstance()));
+            map2.put(CITablePayroll.Payroll_PositionRuleTable.ruleAmount.name, rule.getResult());
         }
 
         ret.put(ReturnValues.VALUES, list);

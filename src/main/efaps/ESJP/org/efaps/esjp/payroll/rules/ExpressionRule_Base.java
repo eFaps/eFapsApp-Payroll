@@ -50,19 +50,18 @@ public abstract class ExpressionRule_Base
 
     @Override
     public void evaluate(final Parameter _parameter,
-                         final JexlContext _context)
+                         final JexlContext _jexlContext)
         throws EFapsException
     {
         try {
             final Expression expr = Calculator.getJexlEngine().createExpression(getExpression());
-            final Object val = expr.evaluate(_context);
+            Object val = expr.evaluate(_jexlContext);
             setMessage(Calculator.getMessageLog().getMessage());
-            _context.set(getKey4Expression(), val);
-            setResult(val);
-
-            if (_context.has(AbstractRule.LISTENERKEY)) {
-                addRuleListener((IRuleListener) _context.get(AbstractRule.LISTENERKEY));
+            for (final IEvaluateListener listener : getRuleListeners(IEvaluateListener.class)) {
+                val = listener.onEvaluate(_jexlContext, val);
             }
+            _jexlContext.set(getKey4Expression(), val);
+            setResult(val);
         } catch (final JexlException e) {
             throw new EFapsException("Catched JexlException", e);
         }

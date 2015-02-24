@@ -41,6 +41,7 @@
             <child>Payroll_PayslipTree_Position</child>
             <child>Payroll_PayslipTree_Doc</child>
             <child>Payroll_PayslipTree_Payment</child>
+            <child>Payroll_PayslipTree_AlterationDetail</child>
         </childs>
         <property name="Target">content</property>
         <property name="TargetMode">view</property>

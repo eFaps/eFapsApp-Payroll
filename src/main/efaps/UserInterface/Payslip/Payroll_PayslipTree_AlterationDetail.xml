@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2013 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,33 +15,28 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev: 13970 $
- Last Changed:    $Date: 2014-09-08 16:02:58 -0500 (Mon, 08 Sep 2014) $
+ Revision:        $Rev: 14789 $
+ Last Changed:    $Date: 2015-01-29 11:40:50 -0500 (Thu, 29 Jan 2015) $
  Last Changed By: $Author: jan@moxter.net $
 
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>d3a19f2a-cbfd-4dec-9284-b928bd5b7347</uuid>
+    <uuid>619fe2a7-43a4-478e-b801-ffaf6693112e</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 13970 $</file-revision>
+    <file-revision>$Rev: 14789 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AlterationAbatementTree_Detail</name>
-        <access>
-            <role>Payroll_Admin</role>
-        </access>
+        <name>Payroll_PayslipTree_AlterationDetail</name>
         <target>
-            <menu>Payroll_AlterationAbatementTree_Detail_Menu</menu>
-            <table>Payroll_AlterationDetailTable</table>
+            <menu>Payroll_PayslipTree_Payment_Menu</menu>
+            <table>Sales_PaymentTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Type">Payroll_AlterationAbatementDetail</property>
-                <property name="LinkFrom">AlterationAbatementLink</property>
+                <property name="Type">Payroll_AlterationDetailAbstract</property>
+                <property name="LinkFrom">ApplyDocumentAbstractLink</property>
             </evaluate>
         </target>
-        <!-- properties -->
         <property name="Target">content</property>
         <property name="TargetShowCheckBoxes">true</property>
-        <property name="TargetMode">view</property>
     </definition>
 </ui-command>

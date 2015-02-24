@@ -56,7 +56,7 @@ public abstract class InputRule_Base
 
     @Override
     public void evaluate(final Parameter _parameter,
-                         final JexlContext _context)
+                         final JexlContext _jexlContext)
         throws EFapsException
     {
         String exprStr = getExpression();
@@ -64,9 +64,13 @@ public abstract class InputRule_Base
             exprStr = "0";
         }
         final Expression expr = Calculator.getJexlEngine().createExpression(exprStr);
-        final Object val = expr.evaluate(_context);
+        Object val = expr.evaluate(_jexlContext);
         setMessage(Calculator.getMessageLog().getMessage());
-        _context.set(getKey4Expression(), val);
+
+        for (final IEvaluateListener listener : getRuleListeners(IEvaluateListener.class)) {
+            val = listener.onEvaluate(_jexlContext, val);
+        }
+        _jexlContext.set(getKey4Expression(), val);
         setResult(val);
     }
 

@@ -70,6 +70,11 @@ public abstract class Calculator_Base
     protected static final String PARAKEY4CONTEXT = "Context";
 
     /**
+     * Key for a parameter containing the current rule.
+     */
+    protected static final String PARAKEY4CURRENTRULE = "CurrentRule";
+
+    /**
      * Logging instance.
      */
     private static MessageLog MSGLOG = new MessageLog();
@@ -134,6 +139,7 @@ public abstract class Calculator_Base
         final JexlContext context = new MapContext(AbstractParameter.getParameters(_parameter, _docInst));
         context.set(Calculator.PARAKEY4CONTEXT, context);
         for (final AbstractRule<?> rule : _rules) {
+            context.set(Calculator.PARAKEY4CURRENTRULE, rule);
             rule.evaluate(_parameter, context);
         }
     }
@@ -296,7 +302,7 @@ public abstract class Calculator_Base
             JexlMethod ret = null;
             if (_obj != null && _method != null) {
                 if (this.classNames.contains(_obj.getClass().getName())
-                                || _obj instanceof Class && this.classNames.contains(((Class<?>)_obj).getName())) {
+                                || _obj instanceof Class && this.classNames.contains(((Class<?>) _obj).getName())) {
                     ret = getMethodExecutor(_obj, _method, _args);
                 }
             }

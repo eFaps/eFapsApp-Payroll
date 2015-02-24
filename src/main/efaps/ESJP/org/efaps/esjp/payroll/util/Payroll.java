@@ -91,7 +91,11 @@ public final class Payroll
         /**
          * INclude it in the report for PLAME.
          */
-        INCLUDEPLAME;
+        INCLUDEPLAME,
+        /**
+         * Evaluate for Alteration.;
+         */
+        EVALUATEALTERATION;
 
         /**
          * {@inheritDoc}

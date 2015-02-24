@@ -37,7 +37,6 @@ import org.efaps.esjp.common.uiform.Create;
 import org.efaps.esjp.common.uiform.Edit;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.NumberFormatter;
-import org.efaps.esjp.sales.document.AbstractDocument;
 import org.efaps.util.EFapsException;
 
 /**
@@ -49,7 +48,7 @@ import org.efaps.util.EFapsException;
 @EFapsUUID("87300c22-90b2-4997-8953-e4b451731751")
 @EFapsRevision("$Rev: 14839 $")
 public abstract class Abatement_Base
-    extends AbstractDocument
+    extends AbstractAlteration
 {
 
     public Return create(final Parameter _parameter)

@@ -123,6 +123,13 @@
             </trigger>
         </attribute>
         <attribute>
+            <name>ApplyDocumentAbstractLink</name>
+            <type>Link</type>
+            <typelink>Payroll_DocumentAbstract</typelink>
+            <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>
+            <sqlcolumn>APPLYID</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>Creator</name>
             <type>CreatorLink</type>
             <sqltable>Payroll_AlterationDetailsSQLTable</sqltable>

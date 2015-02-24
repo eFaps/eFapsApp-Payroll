@@ -77,6 +77,11 @@ public abstract class AbstractParameter_Base<T>
     protected static final String PARAKEY4DATE = "Date";
 
     /**
+     * Key for a parameter containing the date.
+     */
+    protected static final String PARAKEY4DUEDATE = "DueDate";
+
+    /**
      * Key for a parameter containing the Labor Time.
      */
     protected static final String PARAKEY4LT = "LaborTime";
@@ -110,7 +115,6 @@ public abstract class AbstractParameter_Base<T>
      * Key for a parameter containing the Enddate.
      */
     protected static final String PARAKEY4VACATION = "Vacation";
-
 
     /**
      * Logger for this classes.
@@ -380,6 +384,7 @@ public abstract class AbstractParameter_Base<T>
             if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.DueDate,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
@@ -394,6 +399,28 @@ public abstract class AbstractParameter_Base<T>
                 _map.put(AbstractParameter.PARAKEY4DATE, date);
             }
         }
+
+        if (!_map.containsKey(AbstractParameter.PARAKEY4DUEDATE)) {
+            DateTime date = null;
+            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
+                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.DueDate,
+                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
+                                CIPayroll.DocumentAbstract.NightLaborTime);
+                print.executeWithoutAccessCheck();
+                date = print.getAttribute(CIPayroll.DocumentAbstract.DueDate);
+            } else {
+                final String dateStr = _parameter.getParameterValue("dueDate_eFapsDate");
+                if (dateStr != null) {
+                    date = DateUtil.getDateFromParameter(dateStr);
+                }
+            }
+            if (date != null) {
+                _map.put(AbstractParameter.PARAKEY4DUEDATE, date);
+            }
+        }
+
         if (!_map.containsKey(AbstractParameter.PARAKEY4LT)) {
             BigDecimal laborTime = null;
             if (_docInst != null
@@ -402,6 +429,7 @@ public abstract class AbstractParameter_Base<T>
                                             CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.DueDate,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
@@ -432,6 +460,7 @@ public abstract class AbstractParameter_Base<T>
                                             CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.DueDate,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
@@ -462,6 +491,7 @@ public abstract class AbstractParameter_Base<T>
                                             CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.DueDate,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();
@@ -492,6 +522,7 @@ public abstract class AbstractParameter_Base<T>
                                             CIPayroll.Advance))) {
                 final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
                 print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
+                                CIPayroll.DocumentAbstract.DueDate,
                                 CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
                                 CIPayroll.DocumentAbstract.NightLaborTime);
                 print.executeWithoutAccessCheck();

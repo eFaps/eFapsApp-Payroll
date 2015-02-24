@@ -61,6 +61,11 @@ public abstract class AbstractParameter<T>
     /**
      * Key for a parameter containing the date.
      */
+    public static final String PARAKEY4DUEDATE = AbstractParameter_Base.PARAKEY4DUEDATE;
+
+    /**
+     * Key for a parameter containing the date.
+     */
     public static final String PARAKEY4LT = AbstractParameter_Base.PARAKEY4LT;
 
     /**
@@ -81,16 +86,17 @@ public abstract class AbstractParameter<T>
     /**
      * Key for a parameter containing StartDate.
      */
-    public static final String PARAKEY4STARTDATE =  AbstractParameter_Base.PARAKEY4STARTDATE;
+    public static final String PARAKEY4STARTDATE = AbstractParameter_Base.PARAKEY4STARTDATE;
+
     /**
      * Key for a parameter containing the Enddate.
      */
-    public static final String PARAKEY4ENDDATE =  AbstractParameter_Base.PARAKEY4ENDDATE;
+    public static final String PARAKEY4ENDDATE = AbstractParameter_Base.PARAKEY4ENDDATE;
 
     /**
      * Key for a parameter containing the Vacation.
      */
-    public static final String PARAKEY4VACATION =  AbstractParameter_Base.PARAKEY4VACATION;
+    public static final String PARAKEY4VACATION = AbstractParameter_Base.PARAKEY4VACATION;
 
     /**
      * @param _parameter Parameter as passed by the eFaps API

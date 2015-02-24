@@ -47,6 +47,11 @@ public class Calculator
     public static final String PARAKEY4CONTEXT = Calculator_Base.PARAKEY4CONTEXT;
 
     /**
+     * Key for a parameter containing the current rule.
+     */
+    public static final String PARAKEY4CURRENTRULE = Calculator_Base.PARAKEY4CURRENTRULE;
+
+    /**
      * @param _parameter
      * @param _rules
      */
