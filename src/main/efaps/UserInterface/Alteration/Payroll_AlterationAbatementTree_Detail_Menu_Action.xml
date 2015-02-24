@@ -30,6 +30,7 @@
         <name>Payroll_AlterationAbatementTree_Detail_Menu_Action</name>
         <childs>
             <child>Payroll_AlterationAbatementTree_Detail_Menu_Action_Create</child>
+            <child>Payroll_AlterationAbatementTree_Detail_Menu_Action_CreateMultiple</child>
             <child>Payroll_AlterationAbatementTree_Detail_Menu_Action_Delete</child>
         </childs>
     </definition>

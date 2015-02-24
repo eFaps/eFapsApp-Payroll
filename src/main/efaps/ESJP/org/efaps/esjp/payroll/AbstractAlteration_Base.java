@@ -27,13 +27,19 @@ import java.util.Set;
 import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.event.Parameter;
+import org.efaps.admin.event.Return;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.db.Insert;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.Update;
+import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.common.parameter.ParameterUtil;
+import org.efaps.esjp.common.uiform.Create;
+import org.efaps.esjp.common.uiform.Edit;
 import org.efaps.esjp.payroll.rules.AbstractParameter;
 import org.efaps.esjp.payroll.rules.AbstractRule_Base;
 import org.efaps.esjp.payroll.rules.Calculator;
@@ -56,6 +62,142 @@ public abstract class AbstractAlteration_Base
     extends AbstractDocument
 {
 
+    /**
+     * @param _parameter Parametr as passed by the eFaps API
+     * @return Return containing the instance
+     * @throws EFapsException on error
+     */
+    public Return create(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Create create = new Create()
+        {
+
+            @Override
+            protected void add2basicInsert(final Parameter _parameter,
+                                           final Insert _insert)
+                throws EFapsException
+            {
+                super.add2basicInsert(_parameter, _insert);
+                AbstractAlteration_Base.this.add2create(_parameter, _insert);
+            }
+        };
+        return create.execute(_parameter);
+    }
+
+    /**
+     * @param _parameter Parametr as passed by the eFaps API
+     * @param _insert       insert to add to
+     * @throws EFapsException on error
+     */
+    protected abstract void add2create(final Parameter _parameter,
+                                       final Insert _insert)
+        throws EFapsException;
+
+    /**
+     * @param _parameter Parametr as passed by the eFaps API
+     * @return return containing the instance
+     * @throws EFapsException on error
+     */
+    public Return edit(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Edit edit = new Edit();
+        return edit.execute(_parameter);
+    }
+
+    /**
+     * @param _parameter Parametr as passed by the eFaps API
+     * @return return containing the instance
+     * @throws EFapsException on error
+     */
+    public Return createDetail(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Create create = new Create()
+        {
+
+            @Override
+            protected void add2basicInsert(final Parameter _parameter,
+                                           final Insert _insert)
+                throws EFapsException
+            {
+                super.add2basicInsert(_parameter, _insert);
+                AbstractAlteration_Base.this.add2createDetail(_parameter, _insert);
+            }
+        };
+        return create.execute(_parameter);
+    }
+
+    /**
+     * @param _parameter Parametr as passed by the eFaps API
+     * @param _insert       insert to add to
+     * @throws EFapsException on error
+     */
+    protected abstract void add2createDetail(final Parameter _parameter,
+                                             final Insert _insert)
+        throws EFapsException;
+
+    /**
+     * @param _parameter Parametr as passed by the eFaps API
+     * @return Return containing the instance
+     * @throws EFapsException on error
+     */
+    public Return createDetailMultiple(final Parameter _parameter)
+        throws EFapsException
+    {
+
+        DateTime date = new DateTime(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_AlterationCreateMultipleForm.date.name));
+        final Integer repeats = Integer.parseInt(_parameter
+                        .getParameterValue(CIFormPayroll.Payroll_AlterationCreateMultipleForm.repeats.name));
+
+        for (int i = 0; i < repeats; i++) {
+            final Parameter parameter = ParameterUtil.clone(_parameter);
+            ParameterUtil.setParmeterValue(parameter, CIFormPayroll.Payroll_AlterationCreateMultipleForm.date.name,
+                            date.toString());
+            createDetail(parameter);
+            date = date.plusMonths(1);
+        }
+        return new Return();
+    }
+
+    /**
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return return containing the instance
+     * @throws EFapsException on error
+     */
+    public Return editDetail(final Parameter _parameter)
+        throws EFapsException
+    {
+        final Edit edit = new Edit()
+        {
+
+            @Override
+            protected void add2MainUpdate(final Parameter _parameter,
+                                          final Update _update)
+                throws EFapsException
+            {
+                super.add2MainUpdate(_parameter, _update);
+                AbstractAlteration_Base.this.add2editDetail(_parameter, _update);
+            }
+        };
+        return edit.execute(_parameter);
+    }
+
+    /**
+     * @param _parameter Parametr as passed by the eFaps API
+     * @param _update       update to add to
+     * @throws EFapsException on error
+     */
+    protected abstract void add2editDetail(final Parameter _parameter,
+                                             final Update _update)
+        throws EFapsException;
+
+
+    /**
+     * Listener class.
+     */
     public static class AlterationListener
         implements IEvaluateListener
     {

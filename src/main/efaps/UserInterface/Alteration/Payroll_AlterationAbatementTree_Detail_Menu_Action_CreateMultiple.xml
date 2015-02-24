@@ -22,19 +22,19 @@
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>e6841ca4-2b57-435b-ab5d-848a6222cbb4</uuid>
+    <uuid>93795625-d23e-46f0-8363-f35a1f06e469</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <file-revision>$Rev: 14698 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AlterationAbatementTree_Detail_Menu_Action_Create</name>
+        <name>Payroll_AlterationAbatementTree_Detail_Menu_Action_CreateMultiple</name>
         <access>
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
         </access>
         <target>
-            <form>Payroll_AlterationAbatementDetailForm</form>
-            <execute method="createDetail" program="org.efaps.esjp.payroll.Abatement"/>
+            <form>Payroll_AlterationCreateMultipleForm</form>
+            <execute method="createDetailMultiple" program="org.efaps.esjp.payroll.Abatement"/>
         </target>
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_AlterationAbatementDetail</property>

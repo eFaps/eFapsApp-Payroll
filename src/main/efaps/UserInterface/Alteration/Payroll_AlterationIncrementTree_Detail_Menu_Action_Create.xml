@@ -38,7 +38,7 @@
         </target>
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_AlterationIncrementDetail</property>
-        <property name="TargetConnectAttribute">Payroll_AlterationIncrementDetail/Payroll_AlterationIncrementLink</property>
+        <property name="TargetConnectAttribute">Payroll_AlterationIncrementDetail/AlterationIncrementLink</property>
         <property name="TargetMode">create</property>
     </definition>
 </ui-command>

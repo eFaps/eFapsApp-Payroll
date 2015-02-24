@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.event.Return;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Insert;
@@ -33,8 +32,6 @@ import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
-import org.efaps.esjp.common.uiform.Create;
-import org.efaps.esjp.common.uiform.Edit;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.util.EFapsException;
@@ -51,103 +48,61 @@ public abstract class Increment_Base
     extends AbstractAlteration
 {
 
-    public Return create(final Parameter _parameter)
+    @Override
+    protected void add2create(final Parameter _parameter,
+                              final Insert _insert)
         throws EFapsException
     {
-        final Create create = new Create()
-        {
-
-            @Override
-            protected void add2basicInsert(final Parameter _parameter,
-                                           final Insert _insert)
-                throws EFapsException
-            {
-                super.add2basicInsert(_parameter, _insert);
-                _insert.add(CIERP.DocumentAbstract.Name, getDocName4Create(_parameter));
-                _insert.add(CIPayroll.DocumentAbstract.RateCrossTotal, BigDecimal.ZERO);
-                _insert.add(CIPayroll.DocumentAbstract.RateNetTotal, BigDecimal.ZERO);
-                _insert.add(CIPayroll.DocumentAbstract.Rate, new Object[] { BigDecimal.ZERO, BigDecimal.ZERO });
-                _insert.add(CIPayroll.DocumentAbstract.CrossTotal, BigDecimal.ZERO);
-                _insert.add(CIPayroll.DocumentAbstract.NetTotal, BigDecimal.ZERO);
-                _insert.add(CIPayroll.DocumentAbstract.DiscountTotal, 0);
-                _insert.add(CIPayroll.DocumentAbstract.RateDiscountTotal, 0);
-                _insert.add(CIPayroll.DocumentAbstract.CurrencyId, Currency.getBaseCurrency());
-                _insert.add(CIPayroll.DocumentAbstract.RateCurrencyId, Currency.getBaseCurrency());
-                _insert.add(CIPayroll.DocumentAbstract.EmployeeAbstractLink, Instance.get(
-                            _parameter.getParameterValue(CIFormPayroll.Payroll_AlterationIncrementForm.employee.name)));
-            }
-        };
-        return create.execute(_parameter);
+        _insert.add(CIERP.DocumentAbstract.Name, getDocName4Create(_parameter));
+        _insert.add(CIPayroll.DocumentAbstract.RateCrossTotal, BigDecimal.ZERO);
+        _insert.add(CIPayroll.DocumentAbstract.RateNetTotal, BigDecimal.ZERO);
+        _insert.add(CIPayroll.DocumentAbstract.Rate, new Object[] { BigDecimal.ZERO, BigDecimal.ZERO });
+        _insert.add(CIPayroll.DocumentAbstract.CrossTotal, BigDecimal.ZERO);
+        _insert.add(CIPayroll.DocumentAbstract.NetTotal, BigDecimal.ZERO);
+        _insert.add(CIPayroll.DocumentAbstract.DiscountTotal, 0);
+        _insert.add(CIPayroll.DocumentAbstract.RateDiscountTotal, 0);
+        _insert.add(CIPayroll.DocumentAbstract.CurrencyId, Currency.getBaseCurrency());
+        _insert.add(CIPayroll.DocumentAbstract.RateCurrencyId, Currency.getBaseCurrency());
+        _insert.add(CIPayroll.DocumentAbstract.EmployeeAbstractLink, Instance.get(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_AlterationIncrementForm.employee.name)));
     }
 
-    public Return edit(final Parameter _parameter)
+    @Override
+    protected void add2createDetail(final Parameter _parameter,
+                                    final Insert _insert)
         throws EFapsException
     {
-        final Edit edit = new Edit()
-        {
+        try {
+            final BigDecimal amount = (BigDecimal) NumberFormatter.get().getFormatter().parse(_parameter
+                            .getParameterValue(
+                            CIFormPayroll.Payroll_AlterationIncrementDetailForm.rateAmount.name));
 
-        };
-        return edit.execute(_parameter);
+            _insert.add(CIPayroll.AlterationIncrementDetail.RateAmount, amount);
+            _insert.add(CIPayroll.AlterationIncrementDetail.Amount, amount);
+            _insert.add(CIPayroll.AlterationIncrementDetail.Rate, new Object[] { BigDecimal.ZERO,
+                            BigDecimal.ZERO });
+            _insert.add(CIPayroll.AlterationIncrementDetail.CurrencyLink, Currency.getBaseCurrency());
+            _insert.add(CIPayroll.AlterationIncrementDetail.RateCurrencyLink, Currency.getBaseCurrency());
+        } catch (final ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
-    public Return createDetail(final Parameter _parameter)
+    @Override
+    protected void add2editDetail(final Parameter _parameter,
+                                  final Update _update)
         throws EFapsException
     {
-        final Create create = new Create()
-        {
-
-            @Override
-            protected void add2basicInsert(final Parameter _parameter,
-                                           final Insert _insert)
-                throws EFapsException
-            {
-                super.add2basicInsert(_parameter, _insert);
-                try {
-                    final BigDecimal amount = (BigDecimal) NumberFormatter.get().getFormatter().parse(_parameter
-                                    .getParameterValue(
-                                    CIFormPayroll.Payroll_AlterationIncrementDetailForm.rateAmount.name));
-
-                    _insert.add(CIPayroll.AlterationIncrementDetail.RateAmount, amount);
-                    _insert.add(CIPayroll.AlterationIncrementDetail.Amount, amount);
-                    _insert.add(CIPayroll.AlterationIncrementDetail.Rate, new Object[] { BigDecimal.ZERO,
-                                    BigDecimal.ZERO });
-                    _insert.add(CIPayroll.AlterationIncrementDetail.CurrencyLink, Currency.getBaseCurrency());
-                    _insert.add(CIPayroll.AlterationIncrementDetail.RateCurrencyLink, Currency.getBaseCurrency());
-                } catch (final ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-            }
-        };
-        return create.execute(_parameter);
+        try {
+            final BigDecimal amount = (BigDecimal) NumberFormatter.get().getFormatter().parse(_parameter
+                            .getParameterValue(
+                            CIFormPayroll.Payroll_AlterationIncrementDetailForm.rateAmount.name));
+            _update.add(CIPayroll.AlterationIncrementDetail.RateAmount, amount);
+            _update.add(CIPayroll.AlterationIncrementDetail.Amount, amount);
+        } catch (final ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
-
-    public Return editDetail(final Parameter _parameter)
-        throws EFapsException
-    {
-        final Edit edit = new Edit()
-        {
-
-            @Override
-            protected void add2MainUpdate(final Parameter _parameter,
-                                          final Update _update)
-                throws EFapsException
-            {
-                super.add2MainUpdate(_parameter, _update);
-                try {
-                    final BigDecimal amount = (BigDecimal) NumberFormatter.get().getFormatter().parse(_parameter
-                                    .getParameterValue(
-                                    CIFormPayroll.Payroll_AlterationIncrementDetailForm.rateAmount.name));
-                    _update.add(CIPayroll.AlterationIncrementDetail.RateAmount, amount);
-                    _update.add(CIPayroll.AlterationIncrementDetail.Amount, amount);
-                } catch (final ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        };
-        return edit.execute(_parameter);
-    }
-
 }

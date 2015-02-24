@@ -35,7 +35,7 @@ import org.efaps.esjp.payroll.rules.AbstractRule_Base;
  */
 @EFapsUUID("ba2ebd95-2872-4118-a147-a7f938f967fb")
 @EFapsRevision("$Rev: 14839 $")
-public class AbstractAlteration
+public abstract class AbstractAlteration
     extends AbstractAlteration_Base
 {
 
