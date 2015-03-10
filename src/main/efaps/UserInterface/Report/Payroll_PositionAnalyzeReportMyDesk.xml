@@ -28,6 +28,9 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PositionAnalyzeReportMyDesk</name>
+        <access>
+            <role>Payroll_Admin</role>
+        </access>
         <target>
             <menu>Payroll_PositionAnalyzeReportMyDesk_Menu</menu>
             <form>Payroll_PositionAnalyzeReportForm</form>

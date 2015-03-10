@@ -28,6 +28,9 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_RuleReportMyDesk</name>
+        <access>
+            <role>Payroll_Admin</role>
+        </access>
         <target>
             <menu>Payroll_RuleReportMyDesk_Menu</menu>
             <form>Payroll_RuleReportForm</form>
