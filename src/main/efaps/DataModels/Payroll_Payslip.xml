@@ -56,5 +56,8 @@
             method="deletePreTrigger"
             name="Payroll_Payslip.DELETE_PRE"
             event="DELETE_PRE"></trigger>
+        <trigger event="ACCESSCHECK"
+            name="Payroll_Payslip.ACCESSCHECK"
+            program="org.efaps.esjp.admin.access.SimpleAccessCheckOnType" />
     </definition>
 </datamodel-type>

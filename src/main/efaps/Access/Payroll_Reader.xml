@@ -37,6 +37,16 @@
         <access-type>read</access-type>
         <access-type>checkout</access-type>
 
+        <type>Payroll_Payslip</type>
+
+        <status group="Payroll_PayslipStatus">
+            <key>Draft</key>
+            <key>Open</key>
+            <key>Paid</key>
+            <key>Booked</key>
+            <key>Canceled</key>
+        </status>
+
         <role>Payroll_Reader</role>
     </definition>
 </access-set>

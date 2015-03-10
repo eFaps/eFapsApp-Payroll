@@ -40,6 +40,16 @@
         <access-type>checkin</access-type>
         <access-type>create</access-type>
 
+         <type>Payroll_Payslip</type>
+
+        <status group="Payroll_PayslipStatus">
+            <key>Draft</key>
+            <key>Open</key>
+            <key>Paid</key>
+            <key>Booked</key>
+            <key>Canceled</key>
+        </status>
+
         <role>Payroll_Modifier</role>
     </definition>
 </access-set>

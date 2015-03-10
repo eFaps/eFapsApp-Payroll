@@ -32,7 +32,6 @@
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_Admin</name>
-
         <access-type>show</access-type>
         <access-type>read</access-type>
         <access-type>modify</access-type>
@@ -42,6 +41,16 @@
         <access-type>statusBoost</access-type>
         <access-type>statusModify</access-type>
         <access-type>delete</access-type>
+
+        <type>Payroll_Payslip</type>
+
+        <status group="Payroll_PayslipStatus">
+            <key>Draft</key>
+            <key>Open</key>
+            <key>Paid</key>
+            <key>Booked</key>
+            <key>Canceled</key>
+        </status>
 
         <role>Payroll_Admin</role>
     </definition>
