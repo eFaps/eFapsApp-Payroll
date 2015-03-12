@@ -42,7 +42,7 @@
             <column name="RATEAMOUNT"       type="DECIMAL"      not-null="true" length="20" scale="2"/>
             <column name="RATE"             type="DECIMAL"      not-null="true" length="14" scale="6"/>
             <column name="RATEDENOM"        type="DECIMAL"      not-null="true" length="14" scale="6" />
-            <column name="APPLYID"          type="INTEGER"      not-null="true"/>
+            <column name="APPLYID"          type="INTEGER"/>
             <column name="CREATOR"          type="INTEGER"      not-null="true" />
             <column name="CREATED"          type="DATETIME"     not-null="true" />
             <column name="MODIFIER"         type="INTEGER"      not-null="true" />

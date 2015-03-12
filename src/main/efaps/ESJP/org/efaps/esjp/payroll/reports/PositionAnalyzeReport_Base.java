@@ -469,16 +469,17 @@ public abstract class PositionAnalyzeReport_Base
                     }
                 }
                 this.columns = new ArrayList<>(columnMap.values());
-                Collections.sort(this.columns, new Comparator<Column>()
-                {
-
-                    @Override
-                    public int compare(final Column _arg0,
-                                       final Column _arg1)
+                if (!DetailsDisplay.NONE.equals(details)) {
+                    Collections.sort(this.columns, new Comparator<Column>()
                     {
-                        return _arg0.getLabel().compareTo(_arg1.getLabel());
-                    }
-                });
+                        @Override
+                        public int compare(final Column _arg0,
+                                           final Column _arg1)
+                        {
+                            return _arg0.getLabel().compareTo(_arg1.getLabel());
+                        }
+                    });
+                }
             }
             return this.data;
         }
