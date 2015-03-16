@@ -237,7 +237,7 @@ public abstract class LaborTimeReport_Base
             final Object[] holidayLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.HolidayLaborTime);
 
             final UoM laborTimeUom = (UoM) laborTimeOb[1];
-            final BigDecimal laborTime = ((BigDecimal) laborTimeOb[0])
+            final BigDecimal laborTime = laborTimeOb[0] == null ? BigDecimal.ZERO : ((BigDecimal) laborTimeOb[0])
                             .multiply(new BigDecimal(laborTimeUom.getNumerator()))
                             .divide(new BigDecimal(laborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
             final Integer laborTimeHour = laborTime.intValue();
@@ -245,7 +245,8 @@ public abstract class LaborTimeReport_Base
                             .multiply(new BigDecimal(60)).intValue();
 
             final UoM extraLaborTimeUom = (UoM) extraLaborTimeOb[1];
-            final BigDecimal extraLaborTime = ((BigDecimal) extraLaborTimeOb[0])
+            final BigDecimal extraLaborTime = extraLaborTimeOb[0] == null ? BigDecimal.ZERO :
+                        ((BigDecimal) extraLaborTimeOb[0])
                             .multiply(new BigDecimal(extraLaborTimeUom.getNumerator()))
                             .divide(new BigDecimal(extraLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
             final Integer extraLaborTimeHour = extraLaborTime.intValue();
@@ -253,7 +254,7 @@ public abstract class LaborTimeReport_Base
                             .multiply(new BigDecimal(60)).intValue();
 
             final UoM nightLaborTimeUom = (UoM) nightLaborTimeOb[1];
-            final BigDecimal nightLaborTime = ((BigDecimal) nightLaborTimeOb[0])
+            final BigDecimal nightLaborTime = nightLaborTimeOb[0] == null ? BigDecimal.ZERO : ((BigDecimal) nightLaborTimeOb[0])
                             .multiply(new BigDecimal(nightLaborTimeUom.getNumerator()))
                             .divide(new BigDecimal(nightLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
             final Integer nightLaborTimeHour = nightLaborTime.intValue();
@@ -261,7 +262,7 @@ public abstract class LaborTimeReport_Base
                             .multiply(new BigDecimal(60)).intValue();
 
             final UoM holidayLaborTimeUom = (UoM) holidayLaborTimeOb[1];
-            final BigDecimal holidayLaborTime = ((BigDecimal) holidayLaborTimeOb[0])
+            final BigDecimal holidayLaborTime = holidayLaborTimeOb[0] == null ? BigDecimal.ZERO : ((BigDecimal) holidayLaborTimeOb[0])
                             .multiply(new BigDecimal(holidayLaborTimeUom.getNumerator()))
                             .divide(new BigDecimal(holidayLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
             final Integer holidayLaborTimeHour = holidayLaborTime.intValue();
