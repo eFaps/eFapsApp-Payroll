@@ -31,6 +31,8 @@ import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsClassLoader;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.ci.CIAttribute;
+import org.efaps.ci.CIField;
 import org.efaps.db.CachedPrintQuery;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
@@ -363,6 +365,7 @@ public abstract class AbstractParameter_Base<T>
     }
 
     /**
+     * Check first UserInterface then instance.
      * @param _parameter parameter as passed by the eFaps API
      * @param _map map to add to
      * @param _docInst instance of the document to be evaluated for parameters
@@ -380,239 +383,167 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4DATE)) {
-            DateTime date = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
-                                CIPayroll.DocumentAbstract.DueDate,
-                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
-                                CIPayroll.DocumentAbstract.NightLaborTime);
-                print.executeWithoutAccessCheck();
-                date = print.getAttribute(CIPayroll.DocumentAbstract.Date);
-            } else {
-                final String dateStr = _parameter.getParameterValue("date_eFapsDate");
-                if (dateStr != null) {
-                    date = DateUtil.getDateFromParameter(dateStr);
-                }
-            }
+            final DateTime date = getDateTime(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.DocumentAbstract) ? _docInst : null,
+                            CIFormPayroll.Payroll_PayslipForm.date,
+                            CIPayroll.DocumentAbstract.Date);
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4DATE, date);
             }
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4DUEDATE)) {
-            DateTime date = null;
-            if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Payslip)) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
-                                CIPayroll.DocumentAbstract.DueDate,
-                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
-                                CIPayroll.DocumentAbstract.NightLaborTime);
-                print.executeWithoutAccessCheck();
-                date = print.getAttribute(CIPayroll.DocumentAbstract.DueDate);
-            } else {
-                final String dateStr = _parameter.getParameterValue("dueDate_eFapsDate");
-                if (dateStr != null) {
-                    date = DateUtil.getDateFromParameter(dateStr);
-                }
-            }
+            final DateTime date = getDateTime(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Payslip) ? _docInst : null,
+                            CIFormPayroll.Payroll_PayslipForm.dueDate,
+                            CIPayroll.DocumentAbstract.DueDate);
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4DUEDATE, date);
             }
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4LT)) {
-            BigDecimal laborTime = null;
-            if (_docInst != null
-                            && _docInst.isValid()
-                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
-                                            CIPayroll.Advance))) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
-                                CIPayroll.DocumentAbstract.DueDate,
-                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
-                                CIPayroll.DocumentAbstract.NightLaborTime);
-                print.executeWithoutAccessCheck();
-                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.LaborTime);
-                laborTime = obj == null ? null : (BigDecimal) obj[0];
-            } else {
-                try {
-                    final String laborTimeStr = _parameter
-                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
-                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
-                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
-                    } else {
-                        laborTime = BigDecimal.ZERO;
-                    }
-                } catch (final ParseException e) {
-                    LOG.warn("Parsing problems", e);
-                }
-            }
+            final BigDecimal laborTime = getBigDecimal(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+                            CIFormPayroll.Payroll_PayslipForm.laborTime,
+                            CIPayroll.DocumentAbstract.LaborTime);
             if (laborTime != null) {
                 _map.put(AbstractParameter.PARAKEY4LT, laborTime);
             }
         }
+
         if (!_map.containsKey(AbstractParameter.PARAKEY4ELT)) {
-            BigDecimal laborTime = null;
-            if (_docInst != null
-                            && _docInst.isValid()
-                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
-                                            CIPayroll.Advance))) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
-                                CIPayroll.DocumentAbstract.DueDate,
-                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
-                                CIPayroll.DocumentAbstract.NightLaborTime);
-                print.executeWithoutAccessCheck();
-                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.ExtraLaborTime);
-                laborTime = obj == null ? null : (BigDecimal) obj[0];
-            } else {
-                try {
-                    final String laborTimeStr = _parameter
-                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
-                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
-                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
-                    } else {
-                        laborTime = BigDecimal.ZERO;
-                    }
-                } catch (final ParseException e) {
-                    LOG.warn("Parsing problems", e);
-                }
-            }
+            final BigDecimal laborTime = getBigDecimal(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+                            CIFormPayroll.Payroll_PayslipForm.extraLaborTime,
+                            CIPayroll.DocumentAbstract.ExtraLaborTime);
             if (laborTime != null) {
                 _map.put(AbstractParameter.PARAKEY4ELT, laborTime);
             }
         }
+
         if (!_map.containsKey(AbstractParameter.PARAKEY4HLT)) {
-            BigDecimal laborTime = null;
-            if (_docInst != null
-                            && _docInst.isValid()
-                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
-                                            CIPayroll.Advance))) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
-                                CIPayroll.DocumentAbstract.DueDate,
-                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
-                                CIPayroll.DocumentAbstract.NightLaborTime);
-                print.executeWithoutAccessCheck();
-                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.HolidayLaborTime);
-                laborTime = obj == null ? null : (BigDecimal) obj[0];
-            } else {
-                try {
-                    final String laborTimeStr = _parameter
-                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.holidayLaborTime.name);
-                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
-                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
-                    } else {
-                        laborTime = BigDecimal.ZERO;
-                    }
-                } catch (final ParseException e) {
-                    LOG.warn("Parsing problems", e);
-                }
-            }
+            final BigDecimal laborTime = getBigDecimal(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+                            CIFormPayroll.Payroll_PayslipForm.holidayLaborTime,
+                            CIPayroll.DocumentAbstract.HolidayLaborTime);
             if (laborTime != null) {
                 _map.put(AbstractParameter.PARAKEY4HLT, laborTime);
             }
         }
+
         if (!_map.containsKey(AbstractParameter.PARAKEY4NLT)) {
-            BigDecimal laborTime = null;
-            if (_docInst != null
-                            && _docInst.isValid()
-                            && (_docInst.getType().isKindOf(CIPayroll.Payslip) || _docInst.getType().isKindOf(
-                                            CIPayroll.Advance))) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.DocumentAbstract.Date, CIPayroll.DocumentAbstract.LaborTime,
-                                CIPayroll.DocumentAbstract.DueDate,
-                                CIPayroll.DocumentAbstract.ExtraLaborTime, CIPayroll.DocumentAbstract.HolidayLaborTime,
-                                CIPayroll.DocumentAbstract.NightLaborTime);
-                print.executeWithoutAccessCheck();
-                final Object[] obj = print.<Object[]>getAttribute(CIPayroll.DocumentAbstract.NightLaborTime);
-                laborTime = obj == null ? null : (BigDecimal) obj[0];
-            } else {
-                try {
-                    final String laborTimeStr = _parameter
-                                    .getParameterValue(CIFormPayroll.Payroll_PayslipForm.nightLaborTime.name);
-                    if (laborTimeStr != null && !laborTimeStr.isEmpty()) {
-                        laborTime = (BigDecimal) NumberFormatter.get().getFormatter().parse(laborTimeStr);
-                    } else {
-                        laborTime = BigDecimal.ZERO;
-                    }
-                } catch (final ParseException e) {
-                    LOG.warn("Parsing problems", e);
-                }
-            }
+            final BigDecimal laborTime = getBigDecimal(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+                            CIFormPayroll.Payroll_PayslipForm.nightLaborTime,
+                            CIPayroll.DocumentAbstract.NightLaborTime);
             if (laborTime != null) {
                 _map.put(AbstractParameter.PARAKEY4NLT, laborTime);
             }
         }
 
-        // check first UserInterface then instance
         if (!_map.containsKey(AbstractParameter.PARAKEY4STARTDATE)) {
-            DateTime date = null;
-            final String dateStr = _parameter
-                            .getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name);
-            if (dateStr != null && !dateStr.isEmpty()) {
-                date = new DateTime(dateStr);
-            } else if (dateStr == null
-                            && _parameter.getParameters().containsKey(
-                                            CIFormPayroll.Payroll_SettlementForm.startDate.name + "_eFapsDate")) {
-                date = DateUtil.getDateFromParameter(_parameter
-                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name + "_eFapsDate"));
-            } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate,
-                                CIPayroll.Settlement.Vacation);
-                print.executeWithoutAccessCheck();
-                date = print.getAttribute(CIPayroll.Settlement.StartDate);
-            }
-
+            final DateTime date = getDateTime(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Settlement) ? _docInst : null,
+                            CIFormPayroll.Payroll_SettlementForm.startDate,
+                            CIPayroll.Settlement.StartDate);
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4STARTDATE, date);
             }
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4ENDDATE)) {
-            DateTime date = null;
-            final String dateStr = _parameter
-                            .getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name);
-            if (dateStr != null && !dateStr.isEmpty()) {
-                date = new DateTime(dateStr);
-            } else if (dateStr == null
-                            && _parameter.getParameters().containsKey(
-                                            CIFormPayroll.Payroll_SettlementForm.endDate.name + "_eFapsDate")) {
-                date = DateUtil.getDateFromParameter(_parameter
-                                .getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name + "_eFapsDate"));
-            } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate,
-                                CIPayroll.Settlement.Vacation);
-                print.executeWithoutAccessCheck();
-                date = print.getAttribute(CIPayroll.Settlement.EndDate);
-            }
-
+            final DateTime date = getDateTime(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Settlement) ? _docInst : null,
+                            CIFormPayroll.Payroll_SettlementForm.endDate,
+                            CIPayroll.Settlement.EndDate);
             if (date != null) {
                 _map.put(AbstractParameter.PARAKEY4ENDDATE, date);
             }
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4VACATION)) {
-            Integer vacation = null;
-            final String dateStr = _parameter
-                            .getParameterValue(CIFormPayroll.Payroll_SettlementForm.vacation.name);
-            if (dateStr != null && !dateStr.isEmpty()) {
-                vacation = Integer.parseInt(dateStr);
-            } else if (_docInst != null && _docInst.isValid() && _docInst.getType().isKindOf(CIPayroll.Settlement)) {
-                final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
-                print.addAttribute(CIPayroll.Settlement.StartDate, CIPayroll.Settlement.EndDate,
-                                CIPayroll.Settlement.Vacation);
-                print.executeWithoutAccessCheck();
-                vacation = print.getAttribute(CIPayroll.Settlement.Vacation);
-            }
-
+            final Integer vacation = getInteger(_parameter,
+                            _docInst.getType().isKindOf(CIPayroll.Settlement) ? _docInst : null,
+                            CIFormPayroll.Payroll_SettlementForm.vacation,
+                            CIPayroll.Settlement.Vacation);
             if (vacation != null) {
                 _map.put(AbstractParameter.PARAKEY4VACATION, vacation);
             }
         }
-
     }
+
+    protected static BigDecimal getBigDecimal(final Parameter _parameter,
+                                              final Instance _docInst,
+                                              final CIField _field,
+                                              final CIAttribute _attribute)
+        throws EFapsException
+    {
+        BigDecimal ret = null;
+        final String decStr = _parameter.getParameterValue(_field.name);
+        if (decStr != null && !decStr.isEmpty()) {
+            try {
+                ret = (BigDecimal) NumberFormatter.get().getFormatter().parse(decStr);
+            } catch (final ParseException e) {
+                LOG.warn("Parsing problems", e);
+            }
+        } else if (_docInst != null && _docInst.isValid()) {
+            final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+            print.addAttribute(_attribute);
+            print.executeWithoutAccessCheck();
+            final Object retTmp = print.getAttribute(_attribute);
+            if (retTmp != null && retTmp instanceof Object[]) {
+                ret = (BigDecimal) ((Object[]) retTmp)[0];
+            } else if (retTmp != null && retTmp instanceof BigDecimal) {
+                ret = (BigDecimal) retTmp;
+            }
+        }
+        return ret;
+    }
+
+    protected static DateTime getDateTime(final Parameter _parameter,
+                                          final Instance _docInst,
+                                          final CIField _field,
+                                          final CIAttribute _attribute)
+        throws EFapsException
+    {
+        DateTime ret = null;
+        final String dateStr = _parameter.getParameterValue(_field.name);
+        if (dateStr != null && !dateStr.isEmpty()) {
+            ret = new DateTime(dateStr);
+        } else if (dateStr == null  && _parameter.getParameters().containsKey(_field.name + "_eFapsDate")) {
+            ret = DateUtil.getDateFromParameter(_parameter
+                            .getParameterValue(_field.name + "_eFapsDate"));
+        } else if (_docInst != null && _docInst.isValid()) {
+            final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+            print.addAttribute(_attribute);
+            print.executeWithoutAccessCheck();
+            ret = print.getAttribute(_attribute);
+        }
+        return ret;
+    }
+
+    protected static Integer getInteger(final Parameter _parameter,
+                                        final Instance _docInst,
+                                        final CIField _field,
+                                        final CIAttribute _attribute)
+        throws EFapsException
+    {
+        Integer ret = null;
+        final String intStr = _parameter.getParameterValue(_field.name);
+        if (intStr != null && !intStr.isEmpty()) {
+            ret = Integer.parseInt(intStr);
+        } else if (_docInst != null && _docInst.isValid()) {
+            final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
+            print.addAttribute(_attribute);
+            print.executeWithoutAccessCheck();
+            ret = print.getAttribute(_attribute);
+        }
+        return ret;
+    }
+
 }
