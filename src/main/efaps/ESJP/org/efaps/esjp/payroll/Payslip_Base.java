@@ -1280,9 +1280,14 @@ public abstract class Payslip_Base
             if (rule instanceof InputRule) {
                 final String amountStr = amounts[_ruleInsts.get(rule.getInstance())];
                 try {
-                    final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
-                                    .parse(amountStr);
-                    rule.setExpression(Calculator.toJexlBigDecimal(_parameter, amount));
+                    final BigDecimal amount;
+                    if (amountStr.isEmpty()) {
+                        amount = BigDecimal.ZERO;
+                    } else {
+                        amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
+                                        .parse(amountStr);
+                    }
+                    rule.setExpression(Calculator.toJexlBigDecimal(_parameter, amount));;
                 } catch (final ParseException e) {
                     LOG.error("Catched ParserException", e);
                 }
