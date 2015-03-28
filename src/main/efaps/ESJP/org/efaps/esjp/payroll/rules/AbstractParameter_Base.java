@@ -383,7 +383,7 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4DATE)) {
-            final DateTime date = getDateTime(_parameter,
+            final DateTime date = getDateTime(_parameter, _docInst != null && _docInst.isValid() &&
                             _docInst.getType().isKindOf(CIPayroll.DocumentAbstract) ? _docInst : null,
                             CIFormPayroll.Payroll_PayslipForm.date,
                             CIPayroll.DocumentAbstract.Date);
@@ -393,7 +393,7 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4DUEDATE)) {
-            final DateTime date = getDateTime(_parameter,
+            final DateTime date = getDateTime(_parameter, _docInst != null && _docInst.isValid() &&
                             _docInst.getType().isKindOf(CIPayroll.Payslip) ? _docInst : null,
                             CIFormPayroll.Payroll_PayslipForm.dueDate,
                             CIPayroll.DocumentAbstract.DueDate);
@@ -403,9 +403,9 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4LT)) {
-            final BigDecimal laborTime = getBigDecimal(_parameter,
-                            _docInst.getType().isKindOf(CIPayroll.Payslip)
-                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+            final BigDecimal laborTime = getBigDecimal(_parameter, _docInst != null && _docInst.isValid() &&
+                           ( _docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance)) ? _docInst : null,
                             CIFormPayroll.Payroll_PayslipForm.laborTime,
                             CIPayroll.DocumentAbstract.LaborTime);
             if (laborTime != null) {
@@ -414,9 +414,9 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4ELT)) {
-            final BigDecimal laborTime = getBigDecimal(_parameter,
-                            _docInst.getType().isKindOf(CIPayroll.Payslip)
-                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+            final BigDecimal laborTime = getBigDecimal(_parameter, _docInst != null && _docInst.isValid() &&
+                            (_docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance)) ? _docInst : null,
                             CIFormPayroll.Payroll_PayslipForm.extraLaborTime,
                             CIPayroll.DocumentAbstract.ExtraLaborTime);
             if (laborTime != null) {
@@ -425,9 +425,9 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4HLT)) {
-            final BigDecimal laborTime = getBigDecimal(_parameter,
-                            _docInst.getType().isKindOf(CIPayroll.Payslip)
-                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+            final BigDecimal laborTime = getBigDecimal(_parameter, _docInst != null && _docInst.isValid() &&
+                           ( _docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance)) ? _docInst : null,
                             CIFormPayroll.Payroll_PayslipForm.holidayLaborTime,
                             CIPayroll.DocumentAbstract.HolidayLaborTime);
             if (laborTime != null) {
@@ -436,9 +436,9 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4NLT)) {
-            final BigDecimal laborTime = getBigDecimal(_parameter,
-                            _docInst.getType().isKindOf(CIPayroll.Payslip)
-                                            || _docInst.getType().isKindOf(CIPayroll.Advance) ? _docInst : null,
+            final BigDecimal laborTime = getBigDecimal(_parameter, _docInst != null && _docInst.isValid() &&
+                           ( _docInst.getType().isKindOf(CIPayroll.Payslip)
+                                            || _docInst.getType().isKindOf(CIPayroll.Advance)) ? _docInst : null,
                             CIFormPayroll.Payroll_PayslipForm.nightLaborTime,
                             CIPayroll.DocumentAbstract.NightLaborTime);
             if (laborTime != null) {
@@ -447,7 +447,7 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4STARTDATE)) {
-            final DateTime date = getDateTime(_parameter,
+            final DateTime date = getDateTime(_parameter, _docInst != null && _docInst.isValid() &&
                             _docInst.getType().isKindOf(CIPayroll.Settlement) ? _docInst : null,
                             CIFormPayroll.Payroll_SettlementForm.startDate,
                             CIPayroll.Settlement.StartDate);
@@ -457,7 +457,7 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4ENDDATE)) {
-            final DateTime date = getDateTime(_parameter,
+            final DateTime date = getDateTime(_parameter, _docInst != null && _docInst.isValid() &&
                             _docInst.getType().isKindOf(CIPayroll.Settlement) ? _docInst : null,
                             CIFormPayroll.Payroll_SettlementForm.endDate,
                             CIPayroll.Settlement.EndDate);
@@ -467,7 +467,7 @@ public abstract class AbstractParameter_Base<T>
         }
 
         if (!_map.containsKey(AbstractParameter.PARAKEY4VACATION)) {
-            final Integer vacation = getInteger(_parameter,
+            final Integer vacation = getInteger(_parameter, _docInst != null && _docInst.isValid() &&
                             _docInst.getType().isKindOf(CIPayroll.Settlement) ? _docInst : null,
                             CIFormPayroll.Payroll_SettlementForm.vacation,
                             CIPayroll.Settlement.Vacation);
