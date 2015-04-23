@@ -334,7 +334,7 @@ public abstract class PositionAnalyzeReport_Base
                         map.put(CIPayroll.DocumentAbstract.CrossTotal.name, multi.getSelect(selCrossTotal));
                         map.put(CIPayroll.DocumentAbstract.AmountCost.name, multi.getSelect(selAmountCost));
                         final BigDecimal laborTime =  (BigDecimal) multi.<Object[]>getSelect(selDocLT)[0];
-                        if (!DetailsDisplay.NONE.equals(details)) {
+                        if (!DetailsDisplay.NONE.equals(details) || laborTime == null) {
                             map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime);
                         } else {
                             map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime.divide(BigDecimal.valueOf(8),
@@ -448,7 +448,7 @@ public abstract class PositionAnalyzeReport_Base
                                     docMulti.getAttribute(CIPayroll.DocumentAbstract.AmountCost));
                     final BigDecimal laborTime = (BigDecimal) docMulti
                                     .<Object[]>getAttribute(CIPayroll.DocumentAbstract.LaborTime)[0];
-                    if (!DetailsDisplay.NONE.equals(details)) {
+                    if (!DetailsDisplay.NONE.equals(details) || laborTime == null) {
                         map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime);
                     } else {
                         map.put(CIPayroll.DocumentAbstract.LaborTime.name, laborTime.divide(BigDecimal.valueOf(8),
