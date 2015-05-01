@@ -33,6 +33,9 @@
             <form>Payroll_ParameterFixForm</form>
         </target>
         <type>Payroll_ParameterFix</type>
+        <childs>
+            <child>Common_History_ObjectTree_HistoryLog</child>
+        </childs>
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>

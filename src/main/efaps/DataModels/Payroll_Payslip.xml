@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <!--
 
- Copyright 2003 - 2013 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,23 +17,18 @@
  limitations under the License.
 
  Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
 
 -->
 
-<datamodel-type  xmlns="http://www.efaps.org/xsd"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<datamodel-type  xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>a298d361-7530-4a24-b69f-ff3a1186a081</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
-
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_Payslip</name>
         <parent>Payroll_DocumentAbstract</parent>
+        <purpose history="true"/>
         <attribute>
             <name>Status</name>
             <type>Status</type>
@@ -55,9 +49,29 @@
         <trigger program="org.efaps.esjp.payroll.Payslip"
             method="deletePreTrigger"
             name="Payroll_Payslip.DELETE_PRE"
-            event="DELETE_PRE"></trigger>
+            event="DELETE_PRE"/>
         <trigger event="ACCESSCHECK"
             name="Payroll_Payslip.ACCESSCHECK"
             program="org.efaps.esjp.admin.access.SimpleAccessCheckOnType" />
+        <trigger program="org.efaps.esjp.common.history.InsertHistoryTrigger"
+            name="Payroll_Payslip.INSERT_POST"
+            event="INSERT_POST">
+            <property name="SelectAttribute01">RateCurrencyId</property>
+            <property name="Select01">linkto[RateCurrencyId].attribute[ISOCode]</property>
+            <property name="SelectAttribute02">CurrencyId</property>
+            <property name="Select02">linkto[CurrencyId].attribute[ISOCode]</property>
+        </trigger>
+        <trigger program="org.efaps.esjp.common.history.UpdateHistoryTrigger"
+            name="Payroll_Payslip.UPDATE_POST"
+            event="UPDATE_POST">
+            <property name="SelectAttribute01">RateCurrencyId</property>
+            <property name="Select01">linkto[RateCurrencyId].attribute[ISOCode]</property>
+            <property name="SelectAttribute02">CurrencyId</property>
+            <property name="Select02">linkto[CurrencyId].attribute[ISOCode]</property>
+        </trigger>
+        <trigger program="org.efaps.esjp.common.history.DeleteHistoryTrigger"
+            name="Payroll_Payslip.DELETE_PRE.2"
+            index="2"
+            event="DELETE_PRE"/>
     </definition>
 </datamodel-type>
