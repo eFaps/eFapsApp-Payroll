@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-  Copyright 2009 - 2011 moxter.net S.A.C.
+  Copyright 2003 - 2015 The eFaps Team
 
-  All Rights Reserved.
-  This program contains proprietary and trade secret information of
-  moxter.net S.A.C. Copyright notice is precautionary only and does not
-  evidence any actual or intended publication of such program.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-  Author:          moxter.net S.A.C.
-  Revision:        $Rev: 345 $
-  Last Changed:    $Date: 2012-01-19 11:59:37 -0500 (jue, 19 ene 2012) $
-  Last Changed By: $Author: Jorge Cueva $
+  http://www.apache.org/licenses/LICENSE-2.0
 
---><ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
+  Author:          The eFaps Team
+
+-->
+<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>3b6bdcad-139f-48a8-849f-d659005fdd75</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 345 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_ReportMyDesk</name>
