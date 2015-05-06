@@ -34,6 +34,8 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.apache.commons.collections4.comparators.ComparatorChain;
+import org.apache.commons.lang3.BooleanUtils;
+import org.efaps.admin.datamodel.Attribute;
 import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.dbproperty.DBProperties;
@@ -150,7 +152,12 @@ public abstract class LaborTimeReport_Base
                             .attribute(CIHumanResource.EmployeeAbstract.LastName);
             final SelectBuilder selEmplSecondLastName = new SelectBuilder(selEmpl)
                             .attribute(CIHumanResource.EmployeeAbstract.SecondLastName);
-            multi.addSelect(selEmplInst, selEmplNumber, selEmplFirstName, selEmplLastName, selEmplSecondLastName);
+            final SelectBuilder selEmplRemun = new SelectBuilder(selEmpl)
+                        .clazz(CIHumanResource.ClassTR_Labor).attribute(CIHumanResource.ClassTR_Labor.Remuneration);
+            final SelectBuilder selEmplAllowance = new SelectBuilder(selEmpl)
+                    .clazz(CIHumanResource.ClassTR).attribute(CIHumanResource.ClassTR.HouseholdAllowance);
+            multi.addSelect(selEmplInst, selEmplNumber, selEmplFirstName, selEmplLastName, selEmplSecondLastName,
+                            selEmplRemun, selEmplAllowance);
             multi.addAttribute(CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime,
                             CIPayroll.Payslip.NightLaborTime, CIPayroll.Payslip.HolidayLaborTime);
             multi.execute();
@@ -165,7 +172,9 @@ public abstract class LaborTimeReport_Base
                     bean.setNumber(multi.<String>getSelect(selEmplNumber))
                                     .setFirstName(multi.<String>getSelect(selEmplFirstName))
                                     .setLastName(multi.<String>getSelect(selEmplLastName))
-                                    .setSecondLastName(multi.<String>getSelect(selEmplSecondLastName));
+                                    .setSecondLastName(multi.<String>getSelect(selEmplSecondLastName))
+                                    .setRemuneration(multi.<BigDecimal>getSelect(selEmplRemun))
+                                    .setAllowance(multi.<Boolean>getSelect(selEmplAllowance));
                 }
                 bean.addLaborTime(multi.getAttribute(CIPayroll.Payslip.LaborTime))
                                 .addExtraLaborTime(multi.getAttribute(CIPayroll.Payslip.ExtraLaborTime))
@@ -254,6 +263,11 @@ public abstract class LaborTimeReport_Base
             final TextColumnBuilder<String> secondLastNameColumn = DynamicReports.col.column(
                             getLabel("SecondLastName"),
                             "secondLastName", DynamicReports.type.stringType());
+            final TextColumnBuilder<BigDecimal> remunerationColumn = DynamicReports.col.column(
+                            getLabel("Remuneration"),
+                            "remuneration", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<String> allowanceColumn = DynamicReports.col.column(getLabel("Allowance"),
+                            "allowance", DynamicReports.type.stringType());
 
             final TextColumnBuilder<BigDecimal> laborTimeDaysColumn = DynamicReports.col.column(
                             getLabel("LaborTimeDays"),
@@ -290,7 +304,8 @@ public abstract class LaborTimeReport_Base
                             "totalTimeHours", DynamicReports.type.bigDecimalType());
 
             final ColumnTitleGroupBuilder employeeGroup = DynamicReports.grid.titleGroup(getLabel("EmployeeGroup"),
-                            numberColumn, firstNameColumn, lastNameColumn, secondLastNameColumn);
+                            numberColumn, firstNameColumn, lastNameColumn, secondLastNameColumn,
+                            remunerationColumn, allowanceColumn);
 
             final ColumnTitleGroupBuilder laborTimeGroup = DynamicReports.grid.titleGroup(getLabel("LaborTimeGroup"),
                             laborTimeDaysColumn, laborTimeHoursColumn);
@@ -305,6 +320,7 @@ public abstract class LaborTimeReport_Base
             _builder.columnGrid(employeeGroup, laborTimeGroup, extralaborTimeGroup, nightlaborTimeGroup,
                             holidaylaborTimeGroup, totalTimeGroup)
                             .addColumn(numberColumn, firstNameColumn, lastNameColumn, secondLastNameColumn,
+                                            remunerationColumn, allowanceColumn,
                                             laborTimeDaysColumn, laborTimeHoursColumn, extraLaborTimeDaysColumn,
                                             extraLaborTimeHoursColumn, nightLaborTimeDaysColumn,
                                             nightLaborTimeHoursColumn, holidayLaborTimeDaysColumn,
@@ -340,6 +356,7 @@ public abstract class LaborTimeReport_Base
     {
 
         private static BigDecimal DAY = BigDecimal.valueOf(8);
+
         private BigDecimal laborTime = BigDecimal.ZERO;
         private BigDecimal extraLaborTime = BigDecimal.ZERO;
         private BigDecimal nightLaborTime = BigDecimal.ZERO;
@@ -349,6 +366,8 @@ public abstract class LaborTimeReport_Base
         private String firstName;
         private String lastName;
         private String secondLastName;
+        private BigDecimal remuneration;
+        private Boolean allowance;
 
         public BigDecimal getLaborTimeDays()
         {
@@ -588,6 +607,58 @@ public abstract class LaborTimeReport_Base
         public LaborTimeBean setSecondLastName(final String _secondLastName)
         {
             this.secondLastName = _secondLastName;
+            return this;
+        }
+
+
+        /**
+         * Getter method for the instance variable {@link #remuneration}.
+         *
+         * @return value of instance variable {@link #remuneration}
+         */
+        public BigDecimal getRemuneration()
+        {
+            return this.remuneration;
+        }
+
+        /**
+         * Setter method for instance variable {@link #remuneration}.
+         *
+         * @param _remuneration value for instance variable {@link #remuneration}
+         */
+        public LaborTimeBean setRemuneration(final BigDecimal _remuneration)
+        {
+            this.remuneration = _remuneration;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #allowance}.
+         *
+         * @return value of instance variable {@link #allowance}
+         */
+        public String getAllowance()
+        {
+            String ret = BooleanUtils.toStringTrueFalse(this.allowance);
+            final Attribute attr = CIHumanResource.ClassTR.getType().getAttribute(
+                            CIHumanResource.ClassTR.HouseholdAllowance.name);
+
+            if (DBProperties.hasProperty(attr.getKey() + "."
+                            + BooleanUtils.toStringTrueFalse(this.allowance))) {
+                ret = DBProperties.getProperty(attr.getKey() + "."
+                                + BooleanUtils.toStringTrueFalse(this.allowance));
+            }
+            return ret;
+        }
+
+        /**
+         * Setter method for instance variable {@link #allowance}.
+         *
+         * @param _allowance value for instance variable {@link #allowance}
+         */
+        public LaborTimeBean setAllowance(final Boolean _allowance)
+        {
+            this.allowance = _allowance;
             return this;
         }
     }
