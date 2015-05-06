@@ -243,6 +243,14 @@ public abstract class LaborTimeReport_Base
                                     filter.getObject());
                 }
             }
+            if (filterMap.containsKey("settlement")) {
+                final Boolean filter = (Boolean) filterMap.get("settlement");
+                if (filter) {
+                    final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
+                    _queryBldr.addWhereAttrNotInQuery(CIPayroll.DocumentAbstract.ID,
+                                attrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
+                }
+            }
         }
 
         @Override
