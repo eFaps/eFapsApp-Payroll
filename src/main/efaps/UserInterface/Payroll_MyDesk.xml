@@ -39,6 +39,7 @@
             <child>Payroll_ReportMyDesk</child>
             <child>Payroll_PositionAnalyzeReportMyDesk</child>
             <child>Payroll_RuleReportMyDesk</child>
+            <child>Payroll_LaborTimeReportMyDesk</child>
             <child>Payroll_MyDesk_ActionReport</child>
             <child>Payroll_MyDesk_ExportAFPReport</child>
             <child>Payroll_MyDesk_Admin</child>

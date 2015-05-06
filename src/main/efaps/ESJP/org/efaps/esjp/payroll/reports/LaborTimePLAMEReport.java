@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2015 The eFaps Team
+ * Copyright 2003 - 2013 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * Revision:        $Rev: 8514 $
+ * Last Changed:    $Date: 2013-01-15 11:28:07 -0500 (mar, 15 ene 2013) $
+ * Last Changed By: $Author: jan@moxter.net $
  */
 
 
@@ -28,11 +31,12 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * class.
  *
  * @author The eFaps Team
+ * @version $Id: PayslipCalculator.java 8514 2013-01-15 16:28:07Z jan@moxter.net $
  */
-@EFapsUUID("d1a25944-2ce6-431c-8224-15166ce64aa9")
+@EFapsUUID("3749c735-d05c-4abc-a14c-a55af96ba278")
 @EFapsApplication("eFapsApp-Payroll")
-public class LaborTimeReport
-    extends LaborTimeReport_Base
+public class LaborTimePLAMEReport
+    extends LaborTimePLAMEReport_Base
 {
 
 }

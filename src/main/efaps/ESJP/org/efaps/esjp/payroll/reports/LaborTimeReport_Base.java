@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2013 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev: 295 $
- * Last Changed:    $Date: 2011-06-06 15:37:52 -0500 (lun, 06 jun 2011) $
- * Last Changed By: $Author: Jorge Cueva $
  */
+
 package org.efaps.esjp.payroll.reports;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,19 +26,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
+import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.efaps.admin.datamodel.Dimension.UoM;
+import org.efaps.admin.datamodel.Status;
+import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
+import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
-import org.efaps.db.AttributeQuery;
+import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
-import org.efaps.esjp.common.file.FileUtil;
+import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
+import org.efaps.esjp.erp.FilteredReport;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
@@ -50,251 +58,537 @@ import org.joda.time.DateTime;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z Jorge Cueva $
  */
-@EFapsUUID("551faac7-0ac6-4794-bdd7-44839a746ad5")
-@EFapsRevision("$Rev: 295 $")
+@EFapsUUID("925d60d4-b87c-4ed7-a224-f69e820511b2")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class LaborTimeReport_Base
-    extends AbstractReports
+    extends FilteredReport
 {
 
-    private static String format = "0601";
-
     /**
-     * Enum used to define the keys for the map.
+     * @param _parameter Parameter as passed by the eFasp API
+     * @return Return containing html snipplet
+     * @throws EFapsException on error
      */
-    public enum Field implements Column
-    {
-        /**
-         *
-         */
-        ID("", 6, null),
-        /** */
-        DOCTYPE("docType", 2, null),
-        /** */
-        DOCNUM("docNum", 15, null),
-        /** */
-        LABTIMEHOUR("laborTime_Hour", 3, null),
-        /** */
-        LABTIMEMIN("laborTime_Min", 2, null),
-        /** */
-        LABEXTIMEHOUR("laborExtraTime_Hour", 3, null),
-        /** */
-        LABEXTIMEMIN("laborExtraTime_Min", 2, null);
-
-        /**
-         * key.
-         */
-        private final String key;
-
-        /**
-         * length.
-         */
-        private final Integer lenght;
-
-        /**
-         * decimalLength.
-         */
-        private final Integer decimalLength;
-
-        /**
-         * @param _key key
-         */
-        private Field(final String _key,
-                      final Integer _length,
-                      final Integer _decimalLength)
-        {
-            this.key = _key;
-            this.lenght = _length;
-            this.decimalLength = _decimalLength;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #key}.
-         *
-         * @return value of instance variable {@link #key}
-         */
-        @Override
-        public String getKey()
-        {
-            return this.key;
-        }
-
-        @Override
-        public Integer getLength()
-        {
-            return this.lenght;
-        }
-
-        @Override
-        public Integer getDecimalLength()
-        {
-            return this.decimalLength;
-        }
-
-        @Override
-        public boolean isOptional()
-        {
-            return false;
-        }
-
-        @Override
-        public String getDefaultVal()
-        {
-            return null;
-        }
-
-    }
-
-    public Return execute(final Parameter _parameter)
+    public Return generateReport(final Parameter _parameter)
         throws EFapsException
     {
         final Return ret = new Return();
-        final DateTime dateFrom = new DateTime(_parameter.getParameterValue("date"));
-
-        final String name = getName4TextFile(LaborTimeReport_Base.format, dateFrom);
-
-        File file;
-        try {
-            file = new FileUtil().getFile(name == null ? "JOR" : name, "jor");
-            final PrintWriter writer = new PrintWriter(file);
-            writer.print(getReportDataText(_parameter).toString());
-            writer.close();
-            ret.put(ReturnValues.VALUES, file);
-            ret.put(ReturnValues.TRUE, true);
-        } catch (final IOException e) {
-            throw new EFapsException(LaborTimeReport_Base.class, "execute.IOException", e);
-        }
-
+        final AbstractDynamicReport dyRp = getReport(_parameter);
+        final String html = dyRp.getHtmlSnipplet(_parameter);
+        ret.put(ReturnValues.SNIPLETT, html);
         return ret;
     }
 
-    protected String getReportDataText(final Parameter _parameter)
+    /**
+     * @param _parameter Parameter as passed by the eFasp API
+     * @return Return containing the file
+     * @throws EFapsException on error
+     */
+    public Return exportReport(final Parameter _parameter)
         throws EFapsException
     {
-        final DateTime dateFrom = new DateTime(_parameter.getParameterValue("date"));
-        final DateTime dateTo = new DateTime(_parameter.getParameterValue("dateTo"));
-        final StringBuilder rep = new StringBuilder();
-        final List<Map<String, Object>> values = getReportData(dateFrom, dateTo);
-        boolean first = true;
-        for (final Map<String, Object> map : values) {
-            if (first) {
-                first = false;
-            } else {
-                rep.append("\r\n");
-            }
-            rep.append(getCharacterValue(map.get(LaborTimeReport_Base.Field.DOCTYPE.getKey()),
-                            LaborTimeReport_Base.Field.DOCTYPE)).append(getSeparator())
-                .append(getCharacterValue(map.get(LaborTimeReport_Base.Field.DOCNUM.getKey()),
-                                LaborTimeReport_Base.Field.DOCNUM)).append(getSeparator())
-                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABTIMEHOUR.getKey()),
-                                LaborTimeReport_Base.Field.LABTIMEHOUR)).append(getSeparator())
-                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABTIMEMIN.getKey()),
-                                LaborTimeReport_Base.Field.LABTIMEMIN)).append(getSeparator())
-                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABEXTIMEHOUR.getKey()),
-                                LaborTimeReport_Base.Field.LABEXTIMEHOUR)).append(getSeparator())
-                .append(getNumberValue(map.get(LaborTimeReport_Base.Field.LABEXTIMEMIN.getKey()),
-                                            LaborTimeReport_Base.Field.LABEXTIMEMIN)).append(getSeparator());
+        final Return ret = new Return();
+        final Map<?, ?> props = (Map<?, ?>) _parameter.get(ParameterValues.PROPERTIES);
+        final String mime = (String) props.get("Mime");
+        final AbstractDynamicReport dyRp = getReport(_parameter);
+        dyRp.setFileName(DBProperties.getProperty(LaborTimeReport.class.getName() + ".FileName"));
+        File file = null;
+        if ("xls".equalsIgnoreCase(mime)) {
+            file = dyRp.getExcel(_parameter);
+        } else if ("pdf".equalsIgnoreCase(mime)) {
+            file = dyRp.getPDF(_parameter);
         }
-        AbstractReports_Base.LOG.debug(rep.toString());
-        return rep.toString();
+        ret.put(ReturnValues.VALUES, file);
+        ret.put(ReturnValues.TRUE, true);
+        return ret;
     }
 
-    protected List<Map<String, Object>> getReportData(final DateTime _dateFrom,
-                                                      final DateTime _dateTo)
+    /**
+     * @param _parameter Parameter as passed by the eFasp API
+     * @return the report class
+     * @throws EFapsException on error
+     */
+    protected AbstractDynamicReport getReport(final Parameter _parameter)
         throws EFapsException
     {
-        AbstractReports_Base.LOG.debug("dateFrom: '{}' dateTo: '{}'", _dateFrom, _dateTo);
-        final List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+        return new DynLaborTimeReport(this);
+    }
 
-        final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
-        attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date, _dateFrom.minusMinutes(1));
-        attrQueryBldr.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date, _dateTo.plusMinutes(1));
-        final AttributeQuery attrQuery = attrQueryBldr.getAttributeQuery(CIPayroll.DocumentAbstract.ID);
+    /**
+     * Dynamic Report.
+     */
+    public static class DynLaborTimeReport
+        extends AbstractDynamicReport
+    {
 
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
-        queryBldr.addWhereAttrInQuery(CIPayroll.Payslip.ID, attrQuery);
+        private final LaborTimeReport_Base filterReport;
 
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime,
-                        CIPayroll.Payslip.NightLaborTime, CIPayroll.Payslip.HolidayLaborTime);
-        final SelectBuilder selDoc = new SelectBuilder()
-                        .linkto(CIPayroll.Payslip.EmployeeAbstractLink).attribute(CIHumanResource.Employee.Number);
-        final SelectBuilder selDocType = new SelectBuilder()
-                        .linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                        .linkto(CIHumanResource.Employee.NumberTypeLink)
-                        .attribute(CIHumanResource.AttributeDefinitionDOIType.MappingKey);
-        multi.addSelect(selDoc, selDocType);
-        multi.execute();
-        while (multi.next()) {
-            final Map<String, Object> value = new HashMap<String, Object>();
-
-            final String doc = multi.<String>getSelect(selDoc);
-            final String docType = multi.<String>getSelect(selDocType);
-            final Object[] laborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.LaborTime);
-            final Object[] extraLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.ExtraLaborTime);
-            final Object[] nightLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.NightLaborTime);
-            final Object[] holidayLaborTimeOb = multi.<Object[]>getAttribute(CIPayroll.Payslip.HolidayLaborTime);
-
-            final UoM laborTimeUom = (UoM) laborTimeOb[1];
-            final BigDecimal laborTime = laborTimeOb[0] == null ? BigDecimal.ZERO : ((BigDecimal) laborTimeOb[0])
-                            .multiply(new BigDecimal(laborTimeUom.getNumerator()))
-                            .divide(new BigDecimal(laborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
-            final Integer laborTimeHour = laborTime.intValue();
-            final Integer laborTimeMin = laborTime.subtract(new BigDecimal(laborTime.intValue()))
-                            .multiply(new BigDecimal(60)).intValue();
-
-            final UoM extraLaborTimeUom = (UoM) extraLaborTimeOb[1];
-            final BigDecimal extraLaborTime = extraLaborTimeOb[0] == null ? BigDecimal.ZERO :
-                        ((BigDecimal) extraLaborTimeOb[0])
-                            .multiply(new BigDecimal(extraLaborTimeUom.getNumerator()))
-                            .divide(new BigDecimal(extraLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
-            final Integer extraLaborTimeHour = extraLaborTime.intValue();
-            final Integer extraLaborTimeMin = extraLaborTime.subtract(new BigDecimal(extraLaborTime.intValue()))
-                            .multiply(new BigDecimal(60)).intValue();
-
-            final UoM nightLaborTimeUom = (UoM) nightLaborTimeOb[1];
-            final BigDecimal nightLaborTime = nightLaborTimeOb[0] == null ? BigDecimal.ZERO : ((BigDecimal) nightLaborTimeOb[0])
-                            .multiply(new BigDecimal(nightLaborTimeUom.getNumerator()))
-                            .divide(new BigDecimal(nightLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
-            final Integer nightLaborTimeHour = nightLaborTime.intValue();
-            final Integer nightLaborTimeMin = nightLaborTime.subtract(new BigDecimal(nightLaborTime.intValue()))
-                            .multiply(new BigDecimal(60)).intValue();
-
-            final UoM holidayLaborTimeUom = (UoM) holidayLaborTimeOb[1];
-            final BigDecimal holidayLaborTime = holidayLaborTimeOb[0] == null ? BigDecimal.ZERO : ((BigDecimal) holidayLaborTimeOb[0])
-                            .multiply(new BigDecimal(holidayLaborTimeUom.getNumerator()))
-                            .divide(new BigDecimal(holidayLaborTimeUom.getDenominator()), BigDecimal.ROUND_HALF_UP);
-            final Integer holidayLaborTimeHour = holidayLaborTime.intValue();
-            final Integer holidayLaborTimeMin = holidayLaborTime.subtract(new BigDecimal(holidayLaborTime.intValue()))
-                            .multiply(new BigDecimal(60)).intValue();
-
-            value.put(LaborTimeReport_Base.Field.DOCNUM.getKey(), doc);
-            value.put(LaborTimeReport_Base.Field.DOCTYPE.getKey(), docType);
-            value.put(LaborTimeReport_Base.Field.LABTIMEHOUR.getKey(), laborTimeHour);
-            value.put(LaborTimeReport_Base.Field.LABTIMEMIN.getKey(), laborTimeMin);
-            value.put(LaborTimeReport_Base.Field.LABEXTIMEHOUR.getKey(), extraLaborTimeHour + nightLaborTimeHour
-                            + holidayLaborTimeHour);
-            value.put(LaborTimeReport_Base.Field.LABEXTIMEMIN.getKey(), extraLaborTimeMin + nightLaborTimeMin
-                            + holidayLaborTimeMin);
-            values.add(value);
-
+        /**
+         * @param _ruleReport_Base
+         */
+        public DynLaborTimeReport(final LaborTimeReport_Base _ruleReport_Base)
+        {
+            this.filterReport = _ruleReport_Base;
         }
 
-        Collections.sort(values, new Comparator<Map<String, Object>>()
+        @Override
+        protected JRDataSource createDataSource(final Parameter _parameter)
+            throws EFapsException
+        {
+            final Map<Instance, LaborTimeBean> values = new HashMap<>();
+            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
+            add2QueryBuilder(_parameter, queryBldr);
+            final MultiPrintQuery multi = queryBldr.getPrint();
+            final SelectBuilder selEmpl = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink);
+            final SelectBuilder selEmplInst = new SelectBuilder(selEmpl).instance();
+            final SelectBuilder selEmplNumber = new SelectBuilder(selEmpl)
+                            .attribute(CIHumanResource.EmployeeAbstract.Number);
+            final SelectBuilder selEmplFirstName = new SelectBuilder(selEmpl)
+                            .attribute(CIHumanResource.EmployeeAbstract.FirstName);
+            final SelectBuilder selEmplLastName = new SelectBuilder(selEmpl)
+                            .attribute(CIHumanResource.EmployeeAbstract.LastName);
+            final SelectBuilder selEmplSecondLastName = new SelectBuilder(selEmpl)
+                            .attribute(CIHumanResource.EmployeeAbstract.SecondLastName);
+            multi.addSelect(selEmplInst, selEmplNumber, selEmplFirstName, selEmplLastName, selEmplSecondLastName);
+            multi.addAttribute(CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime,
+                            CIPayroll.Payslip.NightLaborTime, CIPayroll.Payslip.HolidayLaborTime);
+            multi.execute();
+            while (multi.next()) {
+                final Instance emplInst = multi.getSelect(selEmplInst);
+                LaborTimeBean bean;
+                if (values.containsKey(emplInst)) {
+                    bean = values.get(emplInst);
+                } else {
+                    bean = getBean();
+                    values.put(emplInst, bean);
+                    bean.setNumber(multi.<String>getSelect(selEmplNumber))
+                                    .setFirstName(multi.<String>getSelect(selEmplFirstName))
+                                    .setLastName(multi.<String>getSelect(selEmplLastName))
+                                    .setSecondLastName(multi.<String>getSelect(selEmplSecondLastName));
+                }
+                bean.addLaborTime(multi.getAttribute(CIPayroll.Payslip.LaborTime))
+                                .addExtraLaborTime(multi.getAttribute(CIPayroll.Payslip.ExtraLaborTime))
+                                .addNightLaborTime(multi.getAttribute(CIPayroll.Payslip.NightLaborTime))
+                                .addHolidayLaborTime(multi.getAttribute(CIPayroll.Payslip.HolidayLaborTime));
+            }
+            final ComparatorChain<LaborTimeBean> chain = new ComparatorChain<>();
+            chain.addComparator(new Comparator<LaborTimeBean>()
+            {
+                @Override
+                public int compare(final LaborTimeBean _bean0,
+                                   final LaborTimeBean _bean1)
+                {
+                    return _bean0.getLastName().compareTo(_bean1.getLastName());
+                }
+            });
+
+            chain.addComparator(new Comparator<LaborTimeBean>()
+            {
+
+                @Override
+                public int compare(final LaborTimeBean _bean0,
+                                   final LaborTimeBean _bean1)
+                {
+                    return _bean0.getSecondLastName().compareTo(_bean1.getSecondLastName());
+                }
+            });
+
+            chain.addComparator(new Comparator<LaborTimeBean>()
+            {
+
+                @Override
+                public int compare(final LaborTimeBean _bean0,
+                                   final LaborTimeBean _bean1)
+                {
+                    return _bean0.getFirstName().compareTo(_bean1.getFirstName());
+                }
+            });
+
+            final List<LaborTimeBean> temp = new ArrayList<>(values.values());
+            Collections.sort(temp, chain);
+            return new JRBeanCollectionDataSource(temp);
+        }
+
+        protected void add2QueryBuilder(final Parameter _parameter,
+                                        final QueryBuilder _queryBldr)
+            throws EFapsException
+        {
+            _queryBldr.addWhereAttrNotEqValue(CIPayroll.DocumentAbstract.StatusAbstract,
+                            Status.find(CIPayroll.PayslipStatus.Canceled));
+            final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+            if (filterMap.containsKey("dateFrom")) {
+                final DateTime date = (DateTime) filterMap.get("dateFrom");
+                _queryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date,
+                                date.withTimeAtStartOfDay().minusSeconds(1));
+            }
+            if (filterMap.containsKey("dateTo")) {
+                final DateTime date = (DateTime) filterMap.get("dateTo");
+                _queryBldr.addWhereAttrLessValue(CIPayroll.DocumentAbstract.Date,
+                                date.withTimeAtStartOfDay().plusDays(1));
+            }
+            if (filterMap.containsKey("employee")) {
+                final InstanceFilterValue filter = (InstanceFilterValue) filterMap.get("employee");
+                if (filter.getObject() != null && filter.getObject().isValid()) {
+                    _queryBldr.addWhereAttrEqValue(CIPayroll.DocumentAbstract.EmployeeAbstractLink,
+                                    filter.getObject());
+                }
+            }
+        }
+
+        @Override
+        protected void addColumnDefintion(final Parameter _parameter,
+                                          final JasperReportBuilder _builder)
+            throws EFapsException
         {
 
-            @Override
-            public int compare(final Map<String, Object> _o1,
-                               final Map<String, Object> _o2)
-            {
-                final String name1 = (String) _o1.get(LaborTimeReport_Base.Field.DOCNUM.getKey());
-                final String name2 = (String) _o2.get(LaborTimeReport_Base.Field.DOCNUM.getKey());
-                final int ret = name1.compareTo(name2);
-                return ret;
-            }
-        });
-        return values;
+            final TextColumnBuilder<String> numberColumn = DynamicReports.col.column(
+                            getLabel("Number"),
+                            "number", DynamicReports.type.stringType());
+            final TextColumnBuilder<String> firstNameColumn = DynamicReports.col.column(
+                            getLabel("FirstName"),
+                            "firstName", DynamicReports.type.stringType());
+            final TextColumnBuilder<String> lastNameColumn = DynamicReports.col.column(
+                            getLabel("LastName"),
+                            "lastName", DynamicReports.type.stringType());
+            final TextColumnBuilder<String> secondLastNameColumn = DynamicReports.col.column(
+                            getLabel("SecondLastName"),
+                            "secondLastName", DynamicReports.type.stringType());
+
+            final TextColumnBuilder<BigDecimal> laborTimeDaysColumn = DynamicReports.col.column(
+                            getLabel("LaborTimeDays"),
+                            "laborTimeDays", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> laborTimeHoursColumn = DynamicReports.col.column(
+                            getLabel("LaborTimeHours"),
+                            "laborTimeHours", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> extraLaborTimeDaysColumn = DynamicReports.col.column(
+                            getLabel("ExtraLaborTimeDays"),
+                            "extraLaborTimeDays", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> extraLaborTimeHoursColumn = DynamicReports.col.column(
+                            getLabel("ExtraLaborTimeHours"),
+                            "extraLaborTimeHours", DynamicReports.type.bigDecimalType());
+
+            final TextColumnBuilder<BigDecimal> nightLaborTimeDaysColumn = DynamicReports.col.column(
+                            getLabel("NightLaborTimeDays"),
+                            "nightLaborTimeDays", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> nightLaborTimeHoursColumn = DynamicReports.col.column(
+                            getLabel("NightLaborTimeHours"),
+                            "nightLaborTimeHours", DynamicReports.type.bigDecimalType());
+
+            final TextColumnBuilder<BigDecimal> holidayLaborTimeDaysColumn = DynamicReports.col.column(
+                            getLabel("HolidayLaborTimeDays"),
+                            "holidayLaborTimeDays", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> holidayLaborTimeHoursColumn = DynamicReports.col.column(
+                            getLabel("HolidayLaborTimeHours"),
+                            "holidayLaborTimeHours", DynamicReports.type.bigDecimalType());
+
+            final TextColumnBuilder<BigDecimal> totalTimeDaysColumn = DynamicReports.col.column(
+                            getLabel("TotalTimeDays"),
+                            "totalTimeDays", DynamicReports.type.bigDecimalType());
+            final TextColumnBuilder<BigDecimal> totalTimeHoursColumn = DynamicReports.col.column(
+                            getLabel("TotalTimeHours"),
+                            "totalTimeHours", DynamicReports.type.bigDecimalType());
+
+            final ColumnTitleGroupBuilder employeeGroup = DynamicReports.grid.titleGroup(getLabel("EmployeeGroup"),
+                            numberColumn, firstNameColumn, lastNameColumn, secondLastNameColumn);
+
+            final ColumnTitleGroupBuilder laborTimeGroup = DynamicReports.grid.titleGroup(getLabel("LaborTimeGroup"),
+                            laborTimeDaysColumn, laborTimeHoursColumn);
+            final ColumnTitleGroupBuilder extralaborTimeGroup = DynamicReports.grid.titleGroup(
+                            getLabel("ExtraLaborTimeGroup"), extraLaborTimeDaysColumn, extraLaborTimeHoursColumn);
+            final ColumnTitleGroupBuilder nightlaborTimeGroup = DynamicReports.grid.titleGroup(
+                            getLabel("NightLaborTimeGroup"), nightLaborTimeDaysColumn, nightLaborTimeHoursColumn);
+            final ColumnTitleGroupBuilder holidaylaborTimeGroup = DynamicReports.grid.titleGroup(
+                            getLabel("HolidayLaborTimeGroup"), holidayLaborTimeDaysColumn, holidayLaborTimeHoursColumn);
+            final ColumnTitleGroupBuilder totalTimeGroup = DynamicReports.grid.titleGroup(
+                            getLabel("TotalTimeGroup"), totalTimeDaysColumn, totalTimeHoursColumn);
+            _builder.columnGrid(employeeGroup, laborTimeGroup, extralaborTimeGroup, nightlaborTimeGroup,
+                            holidaylaborTimeGroup, totalTimeGroup)
+                            .addColumn(numberColumn, firstNameColumn, lastNameColumn, secondLastNameColumn,
+                                            laborTimeDaysColumn, laborTimeHoursColumn, extraLaborTimeDaysColumn,
+                                            extraLaborTimeHoursColumn, nightLaborTimeDaysColumn,
+                                            nightLaborTimeHoursColumn, holidayLaborTimeDaysColumn,
+                                            holidayLaborTimeHoursColumn, totalTimeDaysColumn, totalTimeHoursColumn);
+        }
+
+        /**
+         * @param _key key the label is wanted for
+         * @return label
+         */
+        protected String getLabel(final String _key)
+        {
+            return DBProperties.getProperty(LaborTimeReport.class.getName() + "." + _key);
+        }
+
+        /**
+         * Getter method for the instance variable {@link #filterReport}.
+         *
+         * @return value of instance variable {@link #filterReport}
+         */
+        public LaborTimeReport_Base getFilterReport()
+        {
+            return this.filterReport;
+        }
+
+        protected LaborTimeBean getBean()
+        {
+            return new LaborTimeBean();
+        }
     }
 
+    public static class LaborTimeBean
+    {
+
+        private static BigDecimal DAY = BigDecimal.valueOf(8);
+        private BigDecimal laborTime = BigDecimal.ZERO;
+        private BigDecimal extraLaborTime = BigDecimal.ZERO;
+        private BigDecimal nightLaborTime = BigDecimal.ZERO;
+        private BigDecimal holidayLaborTime = BigDecimal.ZERO;
+        private String number;
+
+        private String firstName;
+        private String lastName;
+        private String secondLastName;
+
+        public BigDecimal getLaborTimeDays()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.laborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.laborTime.divideToIntegralValue(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getLaborTimeHours()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.laborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.laborTime.remainder(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getExtraLaborTimeDays()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.extraLaborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.extraLaborTime.divideToIntegralValue(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getExtraLaborTimeHours()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.extraLaborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.extraLaborTime.remainder(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getNightLaborTimeDays()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.nightLaborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.nightLaborTime.divideToIntegralValue(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getNightLaborTimeHours()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.nightLaborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.nightLaborTime.remainder(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getHolidayLaborTimeDays()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.holidayLaborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.holidayLaborTime.divideToIntegralValue(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getHolidayLaborTimeHours()
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (this.holidayLaborTime.compareTo(BigDecimal.ZERO) != 0) {
+                ret = this.holidayLaborTime.remainder(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getTotalTimeDays()
+        {
+            BigDecimal ret = this.laborTime.add(this.extraLaborTime).add(this.nightLaborTime)
+                            .add(this.holidayLaborTime);
+            if (ret.compareTo(BigDecimal.ZERO) != 0) {
+                ret = ret.divideToIntegralValue(DAY);
+            }
+            return ret;
+        }
+
+        public BigDecimal getTotalTimeHours()
+        {
+            BigDecimal ret = this.laborTime.add(this.extraLaborTime).add(this.nightLaborTime)
+                            .add(this.holidayLaborTime);
+            if (ret.compareTo(BigDecimal.ZERO) != 0) {
+                ret = ret.remainder(DAY);
+            }
+            return ret;
+        }
+
+        /**
+         * @param _attribute
+         */
+        public LaborTimeBean addLaborTime(final Object _attribute)
+        {
+            if (_attribute != null) {
+                this.laborTime = this.laborTime.add(evalTime(_attribute));
+            }
+            return this;
+        }
+
+        /**
+         * @param _attribute
+         */
+        public LaborTimeBean addExtraLaborTime(final Object _attribute)
+        {
+            if (_attribute != null) {
+                this.extraLaborTime = this.extraLaborTime.add(evalTime(_attribute));
+            }
+            return this;
+        }
+
+        /**
+         * @param _attribute
+         */
+        public LaborTimeBean addNightLaborTime(final Object _attribute)
+        {
+            if (_attribute != null) {
+                this.nightLaborTime = this.nightLaborTime.add(evalTime(_attribute));
+            }
+            return this;
+        }
+
+        /**
+         * @param _attribute
+         */
+        public LaborTimeBean addHolidayLaborTime(final Object _attribute)
+        {
+            if (_attribute != null) {
+                this.holidayLaborTime = this.holidayLaborTime.add(evalTime(_attribute));
+            }
+            return this;
+        }
+
+        protected BigDecimal evalTime(final Object _attribute)
+        {
+            BigDecimal ret = BigDecimal.ZERO;
+            if (_attribute != null) {
+                BigDecimal amount = (BigDecimal) ((Object[]) _attribute)[0];
+                final UoM uoM = (UoM) ((Object[]) _attribute)[1];
+                if (amount == null) {
+                    amount = BigDecimal.ZERO;
+                }
+                if (uoM.getDimension().getBaseUoM().equals(uoM)) {
+                    ret = amount;
+                } else if (amount.compareTo(BigDecimal.ZERO) != 0) {
+                    ret = amount.multiply(BigDecimal.valueOf(uoM.getNumerator()))
+                                    .setScale(8, BigDecimal.ROUND_HALF_UP)
+                                    .divide(BigDecimal.valueOf(uoM.getDenominator()), BigDecimal.ROUND_HALF_UP);
+                }
+            }
+            return ret;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #number}.
+         *
+         * @return value of instance variable {@link #number}
+         */
+        public String getNumber()
+        {
+            return this.number;
+        }
+
+        /**
+         * Setter method for instance variable {@link #number}.
+         *
+         * @param _number value for instance variable {@link #number}
+         */
+        public LaborTimeBean setNumber(final String _number)
+        {
+            this.number = _number;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #firstName}.
+         *
+         * @return value of instance variable {@link #firstName}
+         */
+        public String getFirstName()
+        {
+            return this.firstName;
+        }
+
+        /**
+         * Setter method for instance variable {@link #firstName}.
+         *
+         * @param _firstName value for instance variable {@link #firstName}
+         */
+        public LaborTimeBean setFirstName(final String _firstName)
+        {
+            this.firstName = _firstName;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #lastName}.
+         *
+         * @return value of instance variable {@link #lastName}
+         */
+        public String getLastName()
+        {
+            return this.lastName == null ? "" : this.lastName;
+        }
+
+        /**
+         * Setter method for instance variable {@link #lastName}.
+         *
+         * @param _lastName value for instance variable {@link #lastName}
+         */
+        public LaborTimeBean setLastName(final String _lastName)
+        {
+            this.lastName = _lastName;
+            return this;
+        }
+
+        /**
+         * Getter method for the instance variable {@link #secondLastName}.
+         *
+         * @return value of instance variable {@link #secondLastName}
+         */
+        public String getSecondLastName()
+        {
+            return this.secondLastName == null ? "" : this.secondLastName;
+        }
+
+        /**
+         * Setter method for instance variable {@link #secondLastName}.
+         *
+         * @param _secondLastName value for instance variable
+         *            {@link #secondLastName}
+         */
+        public LaborTimeBean setSecondLastName(final String _secondLastName)
+        {
+            this.secondLastName = _secondLastName;
+            return this;
+        }
+    }
 }

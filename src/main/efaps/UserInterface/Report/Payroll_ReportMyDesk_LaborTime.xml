@@ -31,7 +31,7 @@
         </access>
         <target>
             <form>Payroll_ReportPrintForm</form>
-            <execute program="org.efaps.esjp.payroll.reports.LaborTimeReport">
+            <execute program="org.efaps.esjp.payroll.reports.LaborTimePLAMEReport">
             </execute>
         </target>
         <property name="Target">modal</property>
