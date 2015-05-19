@@ -41,6 +41,7 @@ import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.expression.Expressions;
 import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder;
 import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
 import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
@@ -82,8 +83,6 @@ import org.slf4j.LoggerFactory;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: PositionAnalyzeReport_Base.java 14584 2014-12-04 03:55:22Z
- *          jan@moxter.net $
  */
 public abstract class PositionAnalyzeReport_Base
     extends FilteredReport
@@ -682,7 +681,15 @@ public abstract class PositionAnalyzeReport_Base
             if (filterMap.containsKey("details")) {
                 details = FilteredReport.getEnumValue(filterMap.get("details"));
             }
-
+            final TextColumnBuilder<Integer> numberCol;
+            if (projectGroup != null) {
+                numberCol = DynamicReports.col.column(Expressions.groupRowNumber(projectGroup));
+            } else if (departmentGroup != null) {
+                numberCol = DynamicReports.col.column(Expressions.groupRowNumber(departmentGroup));
+            } else {
+                numberCol = DynamicReports.col.columnRowNumberColumn();
+            }
+            numberCol.setWidth(15).setTitle(getLabel("RowNumber"));
             final TextColumnBuilder<String> nameCol = DynamicReports.col.column(getLabel("Name"),
                             CIPayroll.DocumentAbstract.Name.name, DynamicReports.type.stringType());
             final TextColumnBuilder<String> employeeCol = DynamicReports.col.column(getLabel("Employee"),
@@ -690,7 +697,8 @@ public abstract class PositionAnalyzeReport_Base
                             .setWidth(200);
             final TextColumnBuilder<String> employeeNumCol = DynamicReports.col.column(getLabel("EmployeeNumber"),
                             "EmployeeNumber", DynamicReports.type.stringType());
-            _builder.addColumn(nameCol, employeeCol, employeeNumCol);
+            _builder.addColumn(numberCol, nameCol, employeeCol, employeeNumCol);
+            groups.add(numberCol);
             groups.add(nameCol);
             groups.add(employeeCol);
             groups.add(employeeNumCol);
