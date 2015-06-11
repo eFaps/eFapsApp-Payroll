@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+
+  Copyright 2003 - 2015 The eFaps Team
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+<ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>5f28eb51-1d4a-489b-acdd-cbca1adee31d</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_CashOutReportFilterForm</name>
+        <field name="dateFrom">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <property name="Label">ERP_ReportFilterForm4DateFromTo.dateFrom.Label</property>
+            <trigger event="UI_FIELD_VALUE" method="getDateFromFieldValue"
+                name="Payroll_CashOutReportFilterForm.dateFrom.UI_FIELD_VALUE"
+                program="org.efaps.esjp.payroll.reports.CashOutReport"/>
+        </field>
+        <field name="dateTo">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <property name="Label">ERP_ReportFilterForm4DateFromTo.dateTo.Label</property>
+            <trigger event="UI_FIELD_VALUE" method="getDateToFieldValue"
+                name="Payroll_CashOutReportFilterForm.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.payroll.reports.CashOutReport"/>
+        </field>
+        <field name="type">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.CashOutReport.type</property>
+            <trigger event="UI_FIELD_VALUE" method="getTypeFieldValue"
+                name="Payroll_PositionAnalyzeReportFilterForm.type.UI_FIELD_VALUE"
+                program="org.efaps.esjp.payroll.reports.CashOutReport" >
+                <property name="ListType">CHECKBOX</property>
+                <property name="Type01">Payroll_Advance</property>
+                <property name="Type02">Payroll_Payslip</property>
+                <property name="Type03">Payroll_Settlement</property>
+            </trigger>
+        </field>
+        <field name="status">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.CashOutReport.status</property>
+            <trigger event="UI_FIELD_VALUE" method="getStatusFieldValue"
+                name="Payroll_PositionAnalyzeReportFilterForm.dateTo.UI_FIELD_VALUE"
+                program="org.efaps.esjp.payroll.reports.CashOutReport" >
+                <property name="StatusGroup">Payroll_PayslipStatus</property>
+                <property name="Status01">Draft</property>
+                <property name="Status02">Open</property>
+                <property name="Status03">Paid</property>
+                <property name="Status04">Booked</property>
+                <property name="Status05">Canceled</property>
+            </trigger>
+        </field>
+        <field name="finType">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIType">DROPDOWN</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.CashOutReport.status</property>
+            <trigger event="UI_FIELD_VALUE" method="getOptionListFieldValue"
+                name="Payroll_PositionAnalyzeReportFilterForm.finType.UI_FIELD_VALUE"
+                program="org.efaps.esjp.payroll.reports.CashOutReport" >
+                <property name="Type">HumanResource_AttributeDefinitionFinancialInformationType</property>
+                <property name="Select">attribute[Value]</property>
+                <property name="ValueSelect">oid</property>
+                <property name="SetSelected">true</property>
+            </trigger>
+        </field>
+    </definition>
+</ui-form>

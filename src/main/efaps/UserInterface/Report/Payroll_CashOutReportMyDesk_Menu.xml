@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
  Copyright 2003 - 2015 The eFaps Team
 
@@ -17,26 +15,17 @@
  limitations under the License.
 
 -->
-
 <ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>cf354312-fb84-4cf7-9d57-81a8426420e1</uuid>
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>cba63b8a-c743-48ad-a0c2-c888f273dd33</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_MyDesk</name>
+        <name>Payroll_CashOutReportMyDesk_Menu</name>
         <childs>
-            <child>Payroll_PayslipMyDesk</child>
-            <child>Payroll_AdvanceMyDesk</child>
-            <child>Payroll_SettlementMyDesk</child>
-            <child>Payroll_AlterationMyDesk</child>
-            <child>Payroll_ReportMyDesk</child>
-            <child>Payroll_PositionAnalyzeReportMyDesk</child>
-            <child>Payroll_RuleReportMyDesk</child>
-            <child>Payroll_LaborTimeReportMyDesk</child>
-            <child>Payroll_CashOutReportMyDesk</child>
-            <child>Payroll_MyDesk_ExportAFPReport</child>
-            <child>Payroll_MyDesk_Admin</child>
+            <child>Payroll_CashOutReportMyDesk_Menu_DownloadExcel</child>
+            <child>Payroll_CashOutReportMyDesk_Menu_DownloadPDF</child>
+            <child>Payroll_CashOutReportMyDesk_Menu_Filter</child>
         </childs>
     </definition>
 </ui-menu>
