@@ -125,35 +125,25 @@ public abstract class DataFunctions_Base
     }
 
     /**
-     * @param _keys keys to be analized.
-     * @return the amount for anual
+     * Get the amount for a list of keys during a period, that have a minimum occurrence.
+     * e.g. the amount of extra time only if more than tree times received
+     * @param _startDate    start of the period
+     * @param _endDate      end of the period
+     * @param _minOccurrence minimum occurrence to be evaluated
+     * @param _keys keys to be analyzed.
+     * @return the amount for the period
      * @throws EFapsException on error
      */
-    public BigDecimal getAnualAverage(final String... _keys)
-        throws EFapsException
-    {
-        return getAnualAverage(0, _keys);
-    }
-
-    /**
-     * @param _minMonths month to be used as filter
-     * @param _keys keys to be analized.
-     * @return the amount for anual
-     * @throws EFapsException on error
-     */
-    public BigDecimal getAnualAverage(final Integer _minMonths,
-                                      final String... _keys)
+    public BigDecimal getAmount4Period(final DateTime _startDate,
+                                       final DateTime _endDate,
+                                       final Integer _minOccurrence,
+                                       final String... _keys)
         throws EFapsException
     {
         BigDecimal ret = BigDecimal.ZERO;
         final Instance employeeInst = (Instance) getContext().get(AbstractParameter.PARAKEY4EMPLOYINST);
         if (employeeInst != null && employeeInst.isValid()) {
             final Set<Integer> months = new HashSet<>();
-            final DateTime date = (DateTime) getContext().get(AbstractParameter.PARAKEY4DATE);
-            final DateTime startDate = date.dayOfYear().withMinimumValue().minusMinutes(1);
-            final DateTime endDate = date.monthOfYear().setCopy(12).dayOfMonth().withMaximumValue()
-                            .plusMinutes(1);
-
             final QueryBuilder relAttrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
             final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
             attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
@@ -161,8 +151,8 @@ public abstract class DataFunctions_Base
             attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
             attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status,
                             Status.find(CIPayroll.PayslipStatus.Canceled));
-            attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, startDate);
-            attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, endDate);
+            attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, _startDate.minusMinutes(1));
+            attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, _endDate.plusMinutes(1));
 
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
             queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key, (Object[]) _keys);
@@ -179,7 +169,7 @@ public abstract class DataFunctions_Base
                 final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
                 ret = ret.add(amount);
             }
-            if (_minMonths < months.size()) {
+            if (months.size() < _minOccurrence) {
                 ret = BigDecimal.ZERO;
             }
         }
