@@ -21,11 +21,9 @@ package org.efaps.esjp.payroll.reports;
 
 import java.math.BigDecimal;
 
-import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.esjp.erp.util.ERP;
-import org.efaps.esjp.erp.util.ERPSettings;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -83,8 +81,7 @@ public abstract class AbstractReports_Base
         final String month = _date.getMonthOfYear() < 10
                         ? "0" + _date.getMonthOfYear() : "" + _date.getMonthOfYear();
 
-        final SystemConfiguration config = ERP.getSysConfig();
-        final String ruc = config.getAttributeValue(ERPSettings.COMPANYTAX);
+        final String ruc = ERP.COMPANYTAX.get();
         final String name = _format.concat(year).concat(month).concat(ruc);
         return name;
     }
