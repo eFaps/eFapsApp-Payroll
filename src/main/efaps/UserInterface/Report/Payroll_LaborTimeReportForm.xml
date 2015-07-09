@@ -36,14 +36,17 @@
                 <property name="Field02">dateTo</property>
                 <property name="Field03">employee</property>
                 <property name="Field04">settlement</property>
+                <property name="Field05">monthly</property>
                 <property name="FilterType01">DateTime</property>
                 <property name="FilterType02">DateTime</property>
                 <property name="FilterType03">Instance</property>
                 <property name="FilterType04">Boolean</property>
+                <property name="FilterType05">Boolean</property>
                 <property name="FilterDefault01">MONTH:-1</property>
                 <property name="FilterDefault02">TODAY</property>
                 <property name="FilterDefault03">-</property>
-                <property name="FilterDefault03">false</property>
+                <property name="FilterDefault04">false</property>
+                <property name="FilterDefault05">false</property>
             </trigger>
             <trigger event="UI_FIELD_VALUE" index="2" method="getFilterFieldValue"
                 name="Payroll_LaborTimeReportForm.filter.UI_FIELD_VALUE.2"
@@ -53,10 +56,12 @@
                 <property name="Field02">dateTo</property>
                 <property name="Field03">employee</property>
                 <property name="Field04">settlement</property>
+                <property name="Field05">monthly</property>
                 <property name="DBProperty01">org.efaps.esjp.payroll.reports.LaborTimeReport.dateFrom</property>
                 <property name="DBProperty02">org.efaps.esjp.payroll.reports.LaborTimeReport.dateTo</property>
                 <property name="DBProperty03">org.efaps.esjp.payroll.reports.LaborTimeReport.employee</property>
                 <property name="DBProperty04">org.efaps.esjp.payroll.reports.LaborTimeReport.settlement</property>
+                <property name="DBProperty05">org.efaps.esjp.payroll.reports.LaborTimeReport.monthly</property>
                 <property name="HumanResource_Employee_MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
             </trigger>
         </field>

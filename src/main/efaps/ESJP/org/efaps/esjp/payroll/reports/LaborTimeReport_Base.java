@@ -26,13 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
-import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
 import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.commons.lang3.BooleanUtils;
 import org.efaps.admin.datamodel.Attribute;
@@ -52,9 +45,23 @@ import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
+import org.efaps.esjp.erp.AbstractGroupedByDate;
+import org.efaps.esjp.erp.AbstractGroupedByDate_Base.DateGroup;
 import org.efaps.esjp.erp.FilteredReport;
+import org.efaps.esjp.payroll.reports.RuleReport_Base.RuleGroupedByDate;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
+import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRRewindableDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 /**
  * TODO comment!
@@ -138,85 +145,134 @@ public abstract class LaborTimeReport_Base
         protected JRDataSource createDataSource(final Parameter _parameter)
             throws EFapsException
         {
-            final Map<Instance, LaborTimeBean> values = new HashMap<>();
-            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
-            add2QueryBuilder(_parameter, queryBldr);
-            final MultiPrintQuery multi = queryBldr.getPrint();
-            final SelectBuilder selEmpl = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink);
-            final SelectBuilder selEmplInst = new SelectBuilder(selEmpl).instance();
-            final SelectBuilder selEmplNumber = new SelectBuilder(selEmpl)
-                            .attribute(CIHumanResource.EmployeeAbstract.Number);
-            final SelectBuilder selEmplFirstName = new SelectBuilder(selEmpl)
-                            .attribute(CIHumanResource.EmployeeAbstract.FirstName);
-            final SelectBuilder selEmplLastName = new SelectBuilder(selEmpl)
-                            .attribute(CIHumanResource.EmployeeAbstract.LastName);
-            final SelectBuilder selEmplSecondLastName = new SelectBuilder(selEmpl)
-                            .attribute(CIHumanResource.EmployeeAbstract.SecondLastName);
-            final SelectBuilder selEmplRemun = new SelectBuilder(selEmpl)
-                        .clazz(CIHumanResource.ClassTR_Labor).attribute(CIHumanResource.ClassTR_Labor.Remuneration);
-            final SelectBuilder selEmplAllowance = new SelectBuilder(selEmpl)
-                    .clazz(CIHumanResource.ClassTR).attribute(CIHumanResource.ClassTR.HouseholdAllowance);
-            multi.addSelect(selEmplInst, selEmplNumber, selEmplFirstName, selEmplLastName, selEmplSecondLastName,
-                            selEmplRemun, selEmplAllowance);
-            multi.addAttribute(CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime,
-                            CIPayroll.Payslip.NightLaborTime, CIPayroll.Payslip.HolidayLaborTime);
-            multi.execute();
-            while (multi.next()) {
-                final Instance emplInst = multi.getSelect(selEmplInst);
-                LaborTimeBean bean;
-                if (values.containsKey(emplInst)) {
-                    bean = values.get(emplInst);
-                } else {
-                    bean = getBean();
-                    values.put(emplInst, bean);
-                    bean.setNumber(multi.<String>getSelect(selEmplNumber))
-                                    .setFirstName(multi.<String>getSelect(selEmplFirstName))
-                                    .setLastName(multi.<String>getSelect(selEmplLastName))
-                                    .setSecondLastName(multi.<String>getSelect(selEmplSecondLastName))
-                                    .setRemuneration(multi.<BigDecimal>getSelect(selEmplRemun))
-                                    .setAllowance(multi.<Boolean>getSelect(selEmplAllowance));
+            JRRewindableDataSource ret;
+            if (getFilterReport().isCached(_parameter)) {
+                ret = getFilterReport().getDataSourceFromCache(_parameter);
+                try {
+                    ret.moveFirst();
+                } catch (final JRException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-                bean.addLaborTime(multi.getAttribute(CIPayroll.Payslip.LaborTime))
-                                .addExtraLaborTime(multi.getAttribute(CIPayroll.Payslip.ExtraLaborTime))
-                                .addNightLaborTime(multi.getAttribute(CIPayroll.Payslip.NightLaborTime))
-                                .addHolidayLaborTime(multi.getAttribute(CIPayroll.Payslip.HolidayLaborTime));
+            } else {
+                final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+                boolean monthly = false;
+                if (filterMap.containsKey("monthly")) {
+                    monthly = (Boolean) filterMap.get("monthly");
+                }
+
+                final RuleGroupedByDate group = new RuleGroupedByDate();
+                final DateTimeFormatter dateTimeFormatter = group.getDateTimeFormatter(DateGroup.MONTH);
+
+                final Map<Instance, Map<String, LaborTimeBean>> values = new HashMap<>();
+                final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Payslip);
+                add2QueryBuilder(_parameter, queryBldr);
+                final MultiPrintQuery multi = queryBldr.getPrint();
+                final SelectBuilder selEmpl = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink);
+                final SelectBuilder selEmplInst = new SelectBuilder(selEmpl).instance();
+                final SelectBuilder selEmplNumber = new SelectBuilder(selEmpl)
+                                .attribute(CIHumanResource.EmployeeAbstract.Number);
+                final SelectBuilder selEmplFirstName = new SelectBuilder(selEmpl)
+                                .attribute(CIHumanResource.EmployeeAbstract.FirstName);
+                final SelectBuilder selEmplLastName = new SelectBuilder(selEmpl)
+                                .attribute(CIHumanResource.EmployeeAbstract.LastName);
+                final SelectBuilder selEmplSecondLastName = new SelectBuilder(selEmpl)
+                                .attribute(CIHumanResource.EmployeeAbstract.SecondLastName);
+                final SelectBuilder selEmplRemun = new SelectBuilder(selEmpl)
+                            .clazz(CIHumanResource.ClassTR_Labor).attribute(CIHumanResource.ClassTR_Labor.Remuneration);
+                final SelectBuilder selEmplAllowance = new SelectBuilder(selEmpl)
+                        .clazz(CIHumanResource.ClassTR).attribute(CIHumanResource.ClassTR.HouseholdAllowance);
+                multi.addSelect(selEmplInst, selEmplNumber, selEmplFirstName, selEmplLastName, selEmplSecondLastName,
+                                selEmplRemun, selEmplAllowance);
+                multi.addAttribute(CIPayroll.Payslip.Date, CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.ExtraLaborTime,
+                                CIPayroll.Payslip.NightLaborTime, CIPayroll.Payslip.HolidayLaborTime);
+                multi.execute();
+                while (multi.next()) {
+                    final String partial;
+                    if (monthly) {
+                        partial = group.getPartial(multi.<DateTime>getAttribute(CIPayroll.Payslip.Date),
+                                    DateGroup.MONTH).toString(dateTimeFormatter);
+                    } else {
+                        partial = "";
+                    }
+                    final Instance emplInst = multi.getSelect(selEmplInst);
+                    Map<String, LaborTimeBean> map;
+                    if (values.containsKey(emplInst)) {
+                        map = values.get(emplInst);
+                    } else {
+                        map = new HashMap<>();
+                        values.put(emplInst, map);
+                    }
+                    LaborTimeBean bean;
+                    if (map.containsKey(partial)) {
+                        bean = map.get(partial);
+                    } else {
+                        bean = getBean();
+                        map.put(partial, bean);
+                        bean.setPartial(partial)
+                                        .setNumber(multi.<String>getSelect(selEmplNumber))
+                                        .setFirstName(multi.<String>getSelect(selEmplFirstName))
+                                        .setLastName(multi.<String>getSelect(selEmplLastName))
+                                        .setSecondLastName(multi.<String>getSelect(selEmplSecondLastName))
+                                        .setRemuneration(multi.<BigDecimal>getSelect(selEmplRemun))
+                                        .setAllowance(multi.<Boolean>getSelect(selEmplAllowance));
+                    }
+                    bean.addLaborTime(multi.getAttribute(CIPayroll.Payslip.LaborTime))
+                                    .addExtraLaborTime(multi.getAttribute(CIPayroll.Payslip.ExtraLaborTime))
+                                    .addNightLaborTime(multi.getAttribute(CIPayroll.Payslip.NightLaborTime))
+                                    .addHolidayLaborTime(multi.getAttribute(CIPayroll.Payslip.HolidayLaborTime));
+                }
+                final ComparatorChain<LaborTimeBean> chain = new ComparatorChain<>();
+                chain.addComparator(new Comparator<LaborTimeBean>()
+                {
+                    @Override
+                    public int compare(final LaborTimeBean _bean0,
+                                       final LaborTimeBean _bean1)
+                    {
+                        return _bean0.getPartial().compareTo(_bean1.getPartial());
+                    }
+                });
+
+                chain.addComparator(new Comparator<LaborTimeBean>()
+                {
+                    @Override
+                    public int compare(final LaborTimeBean _bean0,
+                                       final LaborTimeBean _bean1)
+                    {
+                        return _bean0.getLastName().compareTo(_bean1.getLastName());
+                    }
+                });
+
+                chain.addComparator(new Comparator<LaborTimeBean>()
+                {
+
+                    @Override
+                    public int compare(final LaborTimeBean _bean0,
+                                       final LaborTimeBean _bean1)
+                    {
+                        return _bean0.getSecondLastName().compareTo(_bean1.getSecondLastName());
+                    }
+                });
+
+                chain.addComparator(new Comparator<LaborTimeBean>()
+                {
+
+                    @Override
+                    public int compare(final LaborTimeBean _bean0,
+                                       final LaborTimeBean _bean1)
+                    {
+                        return _bean0.getFirstName().compareTo(_bean1.getFirstName());
+                    }
+                });
+                final List<LaborTimeBean> temp = new ArrayList<>();
+                for (final Map<String, LaborTimeBean> map : values.values()) {
+                    temp.addAll(map.values());
+                }
+                Collections.sort(temp, chain);
+                ret = new JRBeanCollectionDataSource(temp);
+                getFilterReport().cache(_parameter, ret);
             }
-            final ComparatorChain<LaborTimeBean> chain = new ComparatorChain<>();
-            chain.addComparator(new Comparator<LaborTimeBean>()
-            {
-                @Override
-                public int compare(final LaborTimeBean _bean0,
-                                   final LaborTimeBean _bean1)
-                {
-                    return _bean0.getLastName().compareTo(_bean1.getLastName());
-                }
-            });
-
-            chain.addComparator(new Comparator<LaborTimeBean>()
-            {
-
-                @Override
-                public int compare(final LaborTimeBean _bean0,
-                                   final LaborTimeBean _bean1)
-                {
-                    return _bean0.getSecondLastName().compareTo(_bean1.getSecondLastName());
-                }
-            });
-
-            chain.addComparator(new Comparator<LaborTimeBean>()
-            {
-
-                @Override
-                public int compare(final LaborTimeBean _bean0,
-                                   final LaborTimeBean _bean1)
-                {
-                    return _bean0.getFirstName().compareTo(_bean1.getFirstName());
-                }
-            });
-
-            final List<LaborTimeBean> temp = new ArrayList<>(values.values());
-            Collections.sort(temp, chain);
-            return new JRBeanCollectionDataSource(temp);
+            return ret;
         }
 
         protected void add2QueryBuilder(final Parameter _parameter,
@@ -258,6 +314,17 @@ public abstract class LaborTimeReport_Base
                                           final JasperReportBuilder _builder)
             throws EFapsException
         {
+            final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+            if (filterMap.containsKey("monthly")) {
+                final Boolean monthly = (Boolean) filterMap.get("monthly");
+                if (monthly) {
+                    final TextColumnBuilder<String> partialColumn = DynamicReports.col.column(
+                                    getLabel("partial"),
+                                    "partial", DynamicReports.type.stringType());
+                    final ColumnGroupBuilder prtialGrp = DynamicReports.grp.group(partialColumn);
+                    _builder.addColumn(partialColumn).groupBy(prtialGrp);
+                }
+            }
 
             final TextColumnBuilder<String> numberColumn = DynamicReports.col.column(
                             getLabel("Number"),
@@ -376,6 +443,18 @@ public abstract class LaborTimeReport_Base
         private String secondLastName;
         private BigDecimal remuneration;
         private Boolean allowance;
+        private String partial;
+
+        public String getPartial()
+        {
+            return this.partial;
+        }
+
+        public LaborTimeBean setPartial(final String partial)
+        {
+            this.partial = partial;
+            return this;
+        }
 
         public BigDecimal getLaborTimeDays()
         {
@@ -669,5 +748,11 @@ public abstract class LaborTimeReport_Base
             this.allowance = _allowance;
             return this;
         }
+    }
+
+    public static class LaborTimeGroupedByDate
+        extends AbstractGroupedByDate
+    {
+
     }
 }
