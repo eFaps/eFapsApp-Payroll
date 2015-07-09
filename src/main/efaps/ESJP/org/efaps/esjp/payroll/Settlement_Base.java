@@ -97,7 +97,7 @@ public abstract class Settlement_Base
         throws EFapsException
     {
         final PrintQuery print = new PrintQuery(_createdDoc.getInstance());
-        print.addAttribute(CIPayroll.DocumentAbstract.EmployeeAbstractLink);
+        print.addAttribute(CIPayroll.DocumentAbstract.EmployeeAbstractLink, CIPayroll.Settlement.EndDate);
         print.execute();
 
         final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
@@ -107,7 +107,7 @@ public abstract class Settlement_Base
                         attrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
         queryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink,
                         print.getAttribute(CIPayroll.DocumentAbstract.EmployeeAbstractLink));
-
+        queryBldr.addWhereAttrLessValue(CIPayroll.Payslip.Date, print.getAttribute(CIPayroll.Settlement.EndDate));
         final InstanceQuery query = queryBldr.getQuery();
         query.execute();
         while (query.next()) {
