@@ -2,775 +2,777 @@
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
 <!-- 2015-02-03T22:40:22 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_Payslip" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b4600af4-1a3e-4e27-a0ff-d684d61d9779">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
-	<style name="heading1" mode="Opaque" backcolor="#CCCCCC" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
-		<pen lineWidth="1.0"/>
-		<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
-			<topPen lineWidth="1.0"/>
-			<leftPen lineWidth="1.0"/>
-			<bottomPen lineWidth="1.0"/>
-			<rightPen lineWidth="1.0"/>
-		</box>
-	</style>
-	<style name="heading2" mode="Opaque" backcolor="#CCCCCC" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-	<parameter name="INSTANCE" class="java.lang.Object">
-		<defaultValueExpression><![CDATA[14106.889]]></defaultValueExpression>
-	</parameter>
-	<parameter name="sumDeduction" class="java.math.BigDecimal" isForPrompting="false"/>
-	<parameter name="sumPayment" class="java.math.BigDecimal" isForPrompting="false"/>
-	<parameter name="sumNeutral" class="java.math.BigDecimal" isForPrompting="false"/>
-	<parameter name="sumTotal" class="java.math.BigDecimal" isForPrompting="false"/>
-	<parameter name="CompanyName" class="java.lang.String">
-		<defaultValueExpression><![CDATA["Compania"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="CompanyTaxNum" class="java.lang.String">
-		<defaultValueExpression><![CDATA["12345678901"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="CompanyActivity" class="java.lang.String">
-		<defaultValueExpression><![CDATA["Actividades varios"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="CompanyStreet" class="java.lang.String">
-		<defaultValueExpression><![CDATA["Calle Azul 567"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="CompanyRegion" class="java.lang.String">
-		<defaultValueExpression><![CDATA["Lima"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="CompanyCity" class="java.lang.String">
-		<defaultValueExpression><![CDATA["Lima"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="CompanyDistrict" class="java.lang.String">
-		<defaultValueExpression><![CDATA["Miraflores"]]></defaultValueExpression>
-	</parameter>
-	<queryString language="eFaps">
-		<![CDATA[print $P!{INSTANCE} select attribute[Name] as name, 
-	linkto[EmployeeAbstractLink].attribute[FirstName] as firstName, 
-	linkto[EmployeeAbstractLink].attribute[LastName] as lastName, 
-	linkto[EmployeeAbstractLink].attribute[SecondLastName] as secondLastName,
-	linkto[EmployeeAbstractLink].attribute[Number] as number,
-	linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Labor].attribute[Remuneration] as remuneration,
-	linkto[EmployeeAbstractLink].linkto[EmployLink].attribute[Value] as position,
-	linkto[EmployeeAbstractLink].class[HumanResource_ClassTR].attribute[StartDate] as startDate,
-	linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Labor].linkto[RegimeLink].attribute[Value] as laborSystem,
-	linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].linkto[PensionRegimeLink].attribute[Value] as afp,
-	linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].attribute[CUSPP] as cuspp,
-	attribute[LaborTime].value as laborTimeValue,
-	attribute[LaborTime].label as laborTimeUoM,
-	attribute[ExtraLaborTime].value as extraLaborTimeValue,
-	attribute[ExtraLaborTime].label as extraLaborTimeUoM,
-	attribute[NightLaborTime].value as nightLaborTimeValue,
-	attribute[NightLaborTime].label as nightLaborTimeUoM,
-	attribute[HolidayLaborTime].value as holidayLaborTimeValue,
-	attribute[HolidayLaborTime].label as holidayLaborTimeUoM,
-	linkto[RateCurrencyId].attribute[Name] as currency,
-	linkto[RateCurrencyId].attribute[Symbol] as currencySymbol,
-	attribute[Date] as date, attribute[DueDate] as duedate]]>
-	</queryString>
-	<field name="name" class="java.lang.String"/>
-	<field name="firstName" class="java.lang.String"/>
-	<field name="lastName" class="java.lang.String"/>
-	<field name="number" class="java.lang.String"/>
-	<field name="startDate" class="org.joda.time.DateTime"/>
-	<field name="laborSystem" class="java.lang.String"/>
-	<field name="afp" class="java.lang.String"/>
-	<field name="cuspp" class="java.lang.String"/>
-	<field name="laborTimeValue" class="java.lang.Object"/>
-	<field name="laborTimeUoM" class="java.lang.Object"/>
-	<field name="extraLaborTimeValue" class="java.lang.Object"/>
-	<field name="extraLaborTimeUoM" class="java.lang.Object"/>
-	<field name="nightLaborTimeValue" class="java.lang.Object"/>
-	<field name="nightLaborTimeUoM" class="java.lang.Object"/>
-	<field name="holidayLaborTimeValue" class="java.lang.Object"/>
-	<field name="holidayLaborTimeUoM" class="java.lang.Object"/>
-	<field name="currency" class="java.lang.String"/>
-	<field name="currencySymbol" class="java.lang.String"/>
-	<field name="date" class="org.joda.time.DateTime"/>
-	<field name="duedate" class="org.joda.time.DateTime"/>
-	<field name="secondLastName" class="java.lang.String"/>
-	<field name="remuneration" class="java.math.BigDecimal"/>
-	<field name="position" class="java.lang.String"/>
-	<variable name="paymentTotal" class="java.math.BigDecimal"/>
-	<variable name="deductionTotal" class="java.math.BigDecimal"/>
-	<pageHeader>
-		<band height="92" splitType="Stretch">
-			<staticText>
-				<reportElement x="0" y="0" width="555" height="14" uuid="ae8ec065-15af-466a-b9e1-8266ff44525c">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Boleta de Pago]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="14" width="555" height="10" uuid="6cd7a6b6-ba03-48a8-8142-00b98e93e37e">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[Art. 19 del decreto supremo Nº 001-98-TR del 22-01-98]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="115" y="53" width="440" height="12" uuid="9d803671-c6b3-435f-a3be-82eeec26a994">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement>
-					<font isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{CompanyName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="115" y="41" width="440" height="12" uuid="25857cd7-b901-4710-b108-3f81563a816f">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement>
-					<font isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{CompanyTaxNum}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="0" y="41" width="115" height="12" uuid="98445cb8-79d3-4c88-974c-6a6389ce583f">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unitx" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="local_mesure_unitwidth" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<text><![CDATA[RUC:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="53" width="115" height="12" uuid="78f10ebd-3cd2-450d-ab95-142b7f8d486b">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unitx" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="local_mesure_unitwidth" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<text><![CDATA[Razon social:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="65" width="115" height="12" uuid="c7d26b98-1b74-4af8-aaba-7f4a76ae096d">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unitwidth" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="local_mesure_unitx" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<text><![CDATA[Rubro de la empresa:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="77" width="115" height="12" uuid="cde9215d-dfc2-4abd-b352-e21cc20bffff">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unitx" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="local_mesure_unitwidth" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<text><![CDATA[Dirección:]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="115" y="65" width="440" height="12" uuid="a667a360-49fd-48ae-8b6b-4368b5f57599">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement>
-					<font isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{CompanyActivity}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="115" y="77" width="440" height="12" uuid="66131cb8-1548-4674-8d0f-0d8479f27639">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement>
-					<font isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{CompanyStreet}
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
+    <style name="heading1" mode="Opaque" backcolor="#CCCCCC" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+        <pen lineWidth="1.0"/>
+        <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+            <topPen lineWidth="1.0"/>
+            <leftPen lineWidth="1.0"/>
+            <bottomPen lineWidth="1.0"/>
+            <rightPen lineWidth="1.0"/>
+        </box>
+    </style>
+    <style name="heading2" mode="Opaque" backcolor="#CCCCCC" hAlign="Left" vAlign="Middle" fontSize="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+    <parameter name="INSTANCE" class="java.lang.Object">
+        <defaultValueExpression><![CDATA[14106.889]]></defaultValueExpression>
+    </parameter>
+    <parameter name="sumDeduction" class="java.math.BigDecimal" isForPrompting="false"/>
+    <parameter name="sumPayment" class="java.math.BigDecimal" isForPrompting="false"/>
+    <parameter name="sumNeutral" class="java.math.BigDecimal" isForPrompting="false"/>
+    <parameter name="sumTotal" class="java.math.BigDecimal" isForPrompting="false"/>
+    <parameter name="CompanyName" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Compania"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CompanyTaxNum" class="java.lang.String">
+        <defaultValueExpression><![CDATA["12345678901"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CompanyActivity" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Actividades varios"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CompanyStreet" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Calle Azul 567"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CompanyRegion" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Lima"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CompanyCity" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Lima"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="CompanyDistrict" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Miraflores"]]></defaultValueExpression>
+    </parameter>
+    <queryString language="eFaps">
+        <![CDATA[print $P!{INSTANCE} select attribute[Name] as name,
+    linkto[EmployeeAbstractLink].attribute[FirstName] as firstName,
+    linkto[EmployeeAbstractLink].attribute[LastName] as lastName,
+    linkto[EmployeeAbstractLink].attribute[SecondLastName] as secondLastName,
+    linkto[EmployeeAbstractLink].attribute[Number] as number,
+    linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Labor].attribute[Remuneration] as remuneration,
+    linkto[EmployeeAbstractLink].linkto[EmployLink].attribute[Value] as position,
+    linkto[EmployeeAbstractLink].class[HumanResource_ClassTR].attribute[StartDate] as startDate,
+    linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Labor].linkto[RegimeLink].attribute[Value] as laborSystem,
+    linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].linkto[PensionRegimeLink].attribute[Value] as afp,
+    linkto[EmployeeAbstractLink].class[HumanResource_ClassTR_Health].attribute[CUSPP] as cuspp,
+    attribute[LaborTime].value as laborTimeValue,
+    attribute[LaborTime].label as laborTimeUoM,
+    attribute[ExtraLaborTime].value as extraLaborTimeValue,
+    attribute[ExtraLaborTime].label as extraLaborTimeUoM,
+    attribute[NightLaborTime].value as nightLaborTimeValue,
+    attribute[NightLaborTime].label as nightLaborTimeUoM,
+    attribute[HolidayLaborTime].value as holidayLaborTimeValue,
+    attribute[HolidayLaborTime].label as holidayLaborTimeUoM,
+    linkto[RateCurrencyId].attribute[Name] as currency,
+    linkto[RateCurrencyId].attribute[Symbol] as currencySymbol,
+    attribute[Date] as date, attribute[DueDate] as duedate]]>
+    </queryString>
+    <field name="name" class="java.lang.String"/>
+    <field name="firstName" class="java.lang.String"/>
+    <field name="lastName" class="java.lang.String"/>
+    <field name="number" class="java.lang.String"/>
+    <field name="startDate" class="org.joda.time.DateTime"/>
+    <field name="laborSystem" class="java.lang.String"/>
+    <field name="afp" class="java.lang.String"/>
+    <field name="cuspp" class="java.lang.String"/>
+    <field name="laborTimeValue" class="java.lang.Object"/>
+    <field name="laborTimeUoM" class="java.lang.Object"/>
+    <field name="extraLaborTimeValue" class="java.lang.Object"/>
+    <field name="extraLaborTimeUoM" class="java.lang.Object"/>
+    <field name="nightLaborTimeValue" class="java.lang.Object"/>
+    <field name="nightLaborTimeUoM" class="java.lang.Object"/>
+    <field name="holidayLaborTimeValue" class="java.lang.Object"/>
+    <field name="holidayLaborTimeUoM" class="java.lang.Object"/>
+    <field name="currency" class="java.lang.String"/>
+    <field name="currencySymbol" class="java.lang.String"/>
+    <field name="date" class="org.joda.time.DateTime"/>
+    <field name="duedate" class="org.joda.time.DateTime"/>
+    <field name="secondLastName" class="java.lang.String"/>
+    <field name="remuneration" class="java.math.BigDecimal"/>
+    <field name="position" class="java.lang.String"/>
+    <variable name="paymentTotal" class="java.math.BigDecimal"/>
+    <variable name="deductionTotal" class="java.math.BigDecimal"/>
+    <pageHeader>
+        <band height="92" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="14" uuid="ae8ec065-15af-466a-b9e1-8266ff44525c">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement textAlignment="Center">
+                    <font size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Boleta de Pago]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="14" width="555" height="10" uuid="6cd7a6b6-ba03-48a8-8142-00b98e93e37e">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <text><![CDATA[Art. 19 del decreto supremo Nº 001-98-TR del 22-01-98]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="115" y="53" width="440" height="12" uuid="9d803671-c6b3-435f-a3be-82eeec26a994">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement>
+                    <font isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{CompanyName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="115" y="41" width="440" height="12" uuid="25857cd7-b901-4710-b108-3f81563a816f">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement>
+                    <font isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{CompanyTaxNum}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="41" width="115" height="12" uuid="98445cb8-79d3-4c88-974c-6a6389ce583f">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unitx" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                    <property name="local_mesure_unitwidth" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <text><![CDATA[RUC:]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="53" width="115" height="12" uuid="78f10ebd-3cd2-450d-ab95-142b7f8d486b">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unitx" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                    <property name="local_mesure_unitwidth" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <text><![CDATA[Razon social:]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="65" width="115" height="12" uuid="c7d26b98-1b74-4af8-aaba-7f4a76ae096d">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unitwidth" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="local_mesure_unitx" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <text><![CDATA[Rubro de la empresa:]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="77" width="115" height="12" uuid="cde9215d-dfc2-4abd-b352-e21cc20bffff">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unitx" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                    <property name="local_mesure_unitwidth" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <text><![CDATA[Dirección:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="115" y="65" width="440" height="12" uuid="a667a360-49fd-48ae-8b6b-4368b5f57599">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement>
+                    <font isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{CompanyActivity}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="115" y="77" width="440" height="12" uuid="66131cb8-1548-4674-8d0f-0d8479f27639">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement>
+                    <font isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{CompanyStreet}
 + ( $P{CompanyRegion} != null && !$P{CompanyRegion}.isEmpty() ? " - " + $P{CompanyRegion} : "")
 + ( $P{CompanyCity} != null && !$P{CompanyCity}.isEmpty() ? " - " + $P{CompanyCity} : "")
 + ( $P{CompanyDistrict} != null && !$P{CompanyDistrict}.isEmpty() ? " - " + $P{CompanyDistrict} : "")]]></textFieldExpression>
-			</textField>
-			<textField pattern="" isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="0" y="24" width="555" height="16" uuid="410a9861-9e28-4bfd-a17e-d614313a3746"/>
-				<box leftPadding="2"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[new StringBuilder(new SimpleDateFormat("MMMMM yyyy", $P{REPORT_LOCALE}).format($F{date}.toDate()).toUpperCase())]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="462" y="1" width="93" height="13" uuid="e4161387-b764-45c1-b987-bba99b62eac6"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
-			</textField>
-		</band>
-	</pageHeader>
-	<columnHeader>
-		<band height="116" splitType="Stretch">
-			<staticText>
-				<reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="169afffc-43e8-49f3-bad5-662ce5931c0c"/>
-				<box leftPadding="2"/>
-				<text><![CDATA[INFORMACIÓN GENERAL]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="0" y="79" width="160" height="12" uuid="a7900ec7-8f16-4e97-aa19-1b0a5aecde1d">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Horas extras > 3h:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Transparent" x="280" y="31" width="120" height="12" uuid="9c5228f2-f7fe-4850-bf27-8a99bbecb280">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Régimen Laboral:]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="160" y="79" width="120" height="12" uuid="0bdeb722-d86e-4daa-8178-b416afdd435e">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{nightLaborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{nightLaborTimeUoM}]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="400" y="91" width="155" height="12" uuid="793c2fa1-80d4-4107-a560-058792db7b58">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{duedate}.toDate()]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement mode="Transparent" x="280" y="43" width="120" height="12" uuid="382bcf30-47be-4cd9-86e7-6bcb99f05e32">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Cargo:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="0" y="67" width="160" height="12" uuid="63307a5b-8f72-4153-a53e-0831e890caec">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Horas Laboradas:]]></text>
-			</staticText>
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="160" y="31" width="120" height="12" uuid="6324d1b3-dea5-4a78-b3b8-780772fbc1bb">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{startDate}.toDate()]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement mode="Transparent" x="0" y="43" width="160" height="12" uuid="d5b205d8-2906-4e2b-b5f8-673101890a50">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Remuneración Básica:]]></text>
-			</staticText>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="160" y="43" width="120" height="12" uuid="b32ed266-7a1e-4aa7-9cda-4a8f3ff0134e">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{remuneration}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="0" y="91" width="160" height="12" uuid="af527db6-ca16-45bc-94f7-ebd9b4b289b7">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Desde:]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="400" y="31" width="155" height="12" uuid="b7216c44-15fc-4457-8b40-88ed0f50d249">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{laborSystem}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="280" y="67" width="120" height="12" uuid="5943ef7e-fa82-4a78-aff6-f6e424e4328f">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Horas en Sobretiempo:]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="400" y="79" width="155" height="12" uuid="5f1def21-899d-4161-8765-d26e0fd7448d">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{holidayLaborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{holidayLaborTimeUoM}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="160" y="103" width="395" height="12" uuid="07a4a1a0-2741-46fe-bbd2-da5b3321c3a8">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{currency}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement mode="Transparent" x="0" y="19" width="160" height="12" uuid="23252f58-5cec-457d-81aa-7da90fcd5ad4">
-					<property name="local_mesure_unitwidth" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Empleado:]]></text>
-			</staticText>
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="160" y="91" width="120" height="12" uuid="bfef0497-002f-45cb-a616-f172c9250265">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{date}.toDate()]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="0" y="103" width="160" height="12" uuid="745baef0-e0d2-44f4-b404-ff70b3ad2b60">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Moneda:]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="160" y="19" width="395" height="12" uuid="7f11b774-b4f7-4d76-979c-9538bbfaf6fd">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{number} + " - " + $F{firstName} + " " + $F{lastName} + " " + $F{secondLastName}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="400" y="67" width="155" height="12" uuid="9017bffc-f5ca-47fd-87a3-be13de86028f">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{extraLaborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{extraLaborTimeUoM}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement mode="Transparent" x="0" y="31" width="160" height="12" uuid="d137c8a3-ba08-4ab9-aa1e-a74c0dbebf59">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Fecha de Ingreso o Reingreso:]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="400" y="43" width="155" height="12" uuid="55f84474-4cdf-42d4-9384-bf7f1be8f68c">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{position}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="280" y="79" width="120" height="12" uuid="3cf2c2ca-5107-4cbe-8f1b-eceaae56a280">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Horas dominical:]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Transparent" x="160" y="67" width="120" height="12" uuid="5478fa3b-d540-4df9-a9d7-7ab2e404c8f6">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{laborTimeUoM}.equals("h") ? ($F{laborTimeValue}.divide(new BigDecimal(8), BigDecimal.ROUND_HALF_UP).setScale(0, BigDecimal.ROUND_HALF_UP) + " d (" + $F{laborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{laborTimeUoM} + ")") : ($F{laborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{laborTimeUoM})]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement positionType="Float" mode="Transparent" x="280" y="91" width="120" height="12" uuid="620c1292-069b-4ae9-b01f-fdc160f284f8">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Hasta:]]></text>
-			</staticText>
-			<frame>
-				<reportElement x="0" y="55" width="555" height="12" uuid="5cdd260b-ca6d-471f-8610-3f8d209d75b0">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<staticText>
-					<reportElement mode="Transparent" x="0" y="0" width="160" height="12" uuid="eb09e801-3a44-441b-a094-093a1030fdcf">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unity" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						<property name="local_mesure_unitx" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					</reportElement>
-					<box leftPadding="2">
-						<pen lineWidth="0.0"/>
-						<topPen lineWidth="0.0"/>
-						<leftPen lineWidth="0.0"/>
-						<bottomPen lineWidth="0.0"/>
-						<rightPen lineWidth="0.0"/>
-					</box>
-					<textElement verticalAlignment="Middle">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[Regimen pensionario:]]></text>
-				</staticText>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement mode="Transparent" x="160" y="0" width="120" height="12" uuid="57422e77-126d-4341-a0f0-abe7101d7f7a">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
-					<box leftPadding="2"/>
-					<textElement verticalAlignment="Middle">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{afp}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement mode="Transparent" x="280" y="0" width="120" height="12" uuid="5746250d-ac70-47e0-b11e-cf5aa3f0a7ea">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
-					<box leftPadding="2">
-						<pen lineWidth="0.0"/>
-						<topPen lineWidth="0.0"/>
-						<leftPen lineWidth="0.0"/>
-						<bottomPen lineWidth="0.0"/>
-						<rightPen lineWidth="0.0"/>
-					</box>
-					<textElement verticalAlignment="Middle">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[CUSPP:]]></text>
-				</staticText>
-				<textField isBlankWhenNull="true">
-					<reportElement mode="Transparent" x="400" y="0" width="155" height="12" uuid="06ccc97a-603e-4c84-b446-f7b31b6635bf">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
-					<box leftPadding="2"/>
-					<textElement verticalAlignment="Middle">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{cuspp}]]></textFieldExpression>
-				</textField>
-			</frame>
-		</band>
-	</columnHeader>
-	<detail>
-		<band height="32" splitType="Stretch">
-			<subreport isUsingCache="false">
-				<reportElement x="20" y="17" width="525" height="15" uuid="32729045-f56d-4c97-ad1b-c8e34a652474">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="local_mesure_unitx" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				</reportElement>
-				<subreportParameter name="INSTANCE">
-					<subreportParameterExpression><![CDATA[$P{INSTANCE}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<returnValue subreportVariable="sum" toVariable="paymentTotal" calculation="Sum"/>
-				<subreportExpression><![CDATA["Payroll_PayslipPositionPayment.jrxml"]]></subreportExpression>
-			</subreport>
-			<staticText>
-				<reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="38149223-2235-4727-a9f5-bed711fbb8b0"/>
-				<box leftPadding="2"/>
-				<text><![CDATA[REMUNERACIÓN]]></text>
-			</staticText>
-		</band>
-		<band height="33">
-			<staticText>
-				<reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="83994517-cf10-4e61-91a9-a58b522d4504">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<text><![CDATA[DEDUCCIÓN]]></text>
-			</staticText>
-			<subreport isUsingCache="false">
-				<reportElement x="20" y="17" width="525" height="15" uuid="387286f3-eacd-45a8-9cfc-ee530baf8f72">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<subreportParameter name="INSTANCE">
-					<subreportParameterExpression><![CDATA[$P{INSTANCE}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<returnValue subreportVariable="sum" toVariable="deductionTotal" calculation="Sum"/>
-				<subreportExpression><![CDATA["Payroll_PayslipPositionDeduction.jrxml"]]></subreportExpression>
-			</subreport>
-		</band>
-		<band height="33">
-			<staticText>
-				<reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="a6d70a7a-78cd-4d75-8615-cdbe52d757f3">
-					<property name="local_mesure_unitx" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box leftPadding="2"/>
-				<text><![CDATA[APORTE]]></text>
-			</staticText>
-			<subreport isUsingCache="false">
-				<reportElement x="20" y="17" width="525" height="15" uuid="2a476d32-f750-4c82-a9b5-6a1d74888afc">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<subreportParameter name="INSTANCE">
-					<subreportParameterExpression><![CDATA[$P{INSTANCE}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Payroll_PayslipPositionNeutral.jrxml"]]></subreportExpression>
-			</subreport>
-		</band>
-	</detail>
-	<columnFooter>
-		<band height="32" splitType="Stretch">
-			<textField>
-				<reportElement mode="Transparent" x="427" y="3" width="32" height="17" uuid="3c7996be-98e6-4474-bcb9-7d171a84b08a">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2" rightPadding="2">
-					<topPen lineWidth="4.0" lineStyle="Double"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{currencySymbol}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00#;(#,##0.00#-)">
-				<reportElement x="459" y="3" width="86" height="17" uuid="9a20ca0b-41fc-4112-977f-6526935f8376">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineStyle="Double"/>
-					<topPen lineWidth="4.0" lineStyle="Double"/>
-					<leftPen lineStyle="Double"/>
-					<bottomPen lineStyle="Double"/>
-					<rightPen lineStyle="Double"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$V{paymentTotal}.subtract( $V{deductionTotal} )]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="327" y="3" width="100" height="17" uuid="8f921fc2-f81f-43bb-994d-b64277abb8c8">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<text><![CDATA[Neto a pagar:]]></text>
-			</staticText>
-		</band>
-	</columnFooter>
-	<pageFooter>
-		<band height="54" splitType="Stretch">
-			<staticText>
-				<reportElement x="20" y="20" width="170" height="20" uuid="62fa1643-329d-4e32-b55c-8d98fa1e2dbf"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[RR.HH.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="330" y="20" width="170" height="20" uuid="881be26c-92d8-4add-8b18-09d8db5fec7f">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[Recibido]]></text>
-			</staticText>
-		</band>
-	</pageFooter>
+            </textField>
+            <textField pattern="" isBlankWhenNull="true">
+                <reportElement mode="Transparent" x="0" y="24" width="555" height="16" uuid="410a9861-9e28-4bfd-a17e-d614313a3746"/>
+                <box leftPadding="2"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new StringBuilder(new SimpleDateFormat("MMMMM yyyy", $P{REPORT_LOCALE}).format($F{date}.toDate()).toUpperCase())]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="462" y="1" width="93" height="13" uuid="e4161387-b764-45c1-b987-bba99b62eac6"/>
+                <textElement textAlignment="Right">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageHeader>
+    <columnHeader>
+        <band height="116" splitType="Stretch">
+            <staticText>
+                <reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="169afffc-43e8-49f3-bad5-662ce5931c0c"/>
+                <box leftPadding="2"/>
+                <text><![CDATA[INFORMACIÓN GENERAL]]></text>
+            </staticText>
+            <staticText>
+                <reportElement positionType="Float" mode="Transparent" x="0" y="79" width="160" height="12" uuid="a7900ec7-8f16-4e97-aa19-1b0a5aecde1d">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Horas extras > 3h:]]></text>
+            </staticText>
+            <staticText>
+                <reportElement mode="Transparent" x="280" y="31" width="120" height="12" uuid="9c5228f2-f7fe-4850-bf27-8a99bbecb280">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Régimen Laboral:]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement positionType="Float" mode="Transparent" x="160" y="79" width="120" height="12" uuid="0bdeb722-d86e-4daa-8178-b416afdd435e">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{nightLaborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{nightLaborTimeUoM}]]></textFieldExpression>
+            </textField>
+            <textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                <reportElement positionType="Float" mode="Transparent" x="400" y="91" width="155" height="12" uuid="793c2fa1-80d4-4107-a560-058792db7b58">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{duedate}.toDate()]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement mode="Transparent" x="280" y="43" width="120" height="12" uuid="382bcf30-47be-4cd9-86e7-6bcb99f05e32">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Cargo:]]></text>
+            </staticText>
+            <staticText>
+                <reportElement positionType="Float" mode="Transparent" x="0" y="67" width="160" height="12" uuid="63307a5b-8f72-4153-a53e-0831e890caec">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Horas Laboradas:]]></text>
+            </staticText>
+            <textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                <reportElement mode="Transparent" x="160" y="31" width="120" height="12" uuid="6324d1b3-dea5-4a78-b3b8-780772fbc1bb">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{startDate}.toDate()]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement mode="Transparent" x="0" y="43" width="160" height="12" uuid="d5b205d8-2906-4e2b-b5f8-673101890a50">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Remuneración Básica:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement mode="Transparent" x="160" y="43" width="120" height="12" uuid="b32ed266-7a1e-4aa7-9cda-4a8f3ff0134e">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{remuneration}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement positionType="Float" mode="Transparent" x="0" y="91" width="160" height="12" uuid="af527db6-ca16-45bc-94f7-ebd9b4b289b7">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Desde:]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Transparent" x="400" y="31" width="155" height="12" uuid="b7216c44-15fc-4457-8b40-88ed0f50d249">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{laborSystem}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement positionType="Float" mode="Transparent" x="280" y="67" width="120" height="12" uuid="5943ef7e-fa82-4a78-aff6-f6e424e4328f">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Horas en Sobretiempo:]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement positionType="Float" mode="Transparent" x="400" y="79" width="155" height="12" uuid="5f1def21-899d-4161-8765-d26e0fd7448d">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{holidayLaborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{holidayLaborTimeUoM}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement positionType="Float" mode="Transparent" x="160" y="103" width="395" height="12" uuid="07a4a1a0-2741-46fe-bbd2-da5b3321c3a8">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{currency}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement mode="Transparent" x="0" y="19" width="160" height="12" uuid="23252f58-5cec-457d-81aa-7da90fcd5ad4">
+                    <property name="local_mesure_unitwidth" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Empleado:]]></text>
+            </staticText>
+            <textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                <reportElement positionType="Float" mode="Transparent" x="160" y="91" width="120" height="12" uuid="bfef0497-002f-45cb-a616-f172c9250265">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{date}.toDate()]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement positionType="Float" mode="Transparent" x="0" y="103" width="160" height="12" uuid="745baef0-e0d2-44f4-b404-ff70b3ad2b60">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Moneda:]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Transparent" x="160" y="19" width="395" height="12" uuid="7f11b774-b4f7-4d76-979c-9538bbfaf6fd">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{number} + " - " + $F{firstName} + " " + $F{lastName} + " " + $F{secondLastName}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement positionType="Float" mode="Transparent" x="400" y="67" width="155" height="12" uuid="9017bffc-f5ca-47fd-87a3-be13de86028f">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{extraLaborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{extraLaborTimeUoM}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement mode="Transparent" x="0" y="31" width="160" height="12" uuid="d137c8a3-ba08-4ab9-aa1e-a74c0dbebf59">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Fecha de Ingreso o Reingreso:]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Transparent" x="400" y="43" width="155" height="12" uuid="55f84474-4cdf-42d4-9384-bf7f1be8f68c">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{position}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement positionType="Float" mode="Transparent" x="280" y="79" width="120" height="12" uuid="3cf2c2ca-5107-4cbe-8f1b-eceaae56a280">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Horas dominical:]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement positionType="Float" mode="Transparent" x="160" y="67" width="120" height="12" uuid="5478fa3b-d540-4df9-a9d7-7ab2e404c8f6">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{laborTimeUoM}.equals("h") ? ($F{laborTimeValue}.divide(new BigDecimal(8), BigDecimal.ROUND_HALF_UP).setScale(0, BigDecimal.ROUND_HALF_UP) + " d (" + $F{laborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{laborTimeUoM} + ")") : ($F{laborTimeValue}.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + $F{laborTimeUoM})]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement positionType="Float" mode="Transparent" x="280" y="91" width="120" height="12" uuid="620c1292-069b-4ae9-b01f-fdc160f284f8">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Hasta:]]></text>
+            </staticText>
+            <frame>
+                <reportElement x="0" y="55" width="555" height="12" uuid="5cdd260b-ca6d-471f-8610-3f8d209d75b0">
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <staticText>
+                    <reportElement mode="Transparent" x="0" y="0" width="160" height="12" uuid="eb09e801-3a44-441b-a094-093a1030fdcf">
+                        <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                        <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                        <property name="local_mesure_unity" value="pixel"/>
+                        <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                        <property name="local_mesure_unitx" value="pixel"/>
+                        <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                    </reportElement>
+                    <box leftPadding="2">
+                        <pen lineWidth="0.0"/>
+                        <topPen lineWidth="0.0"/>
+                        <leftPen lineWidth="0.0"/>
+                        <bottomPen lineWidth="0.0"/>
+                        <rightPen lineWidth="0.0"/>
+                    </box>
+                    <textElement verticalAlignment="Middle">
+                        <font size="9" isBold="true"/>
+                    </textElement>
+                    <text><![CDATA[Regimen pensionario:]]></text>
+                </staticText>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement mode="Transparent" x="160" y="0" width="120" height="12" uuid="57422e77-126d-4341-a0f0-abe7101d7f7a">
+                        <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    </reportElement>
+                    <box leftPadding="2"/>
+                    <textElement verticalAlignment="Middle">
+                        <font size="9"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$F{afp}]]></textFieldExpression>
+                </textField>
+                <staticText>
+                    <reportElement mode="Transparent" x="280" y="0" width="120" height="12" uuid="5746250d-ac70-47e0-b11e-cf5aa3f0a7ea">
+                        <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                        <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    </reportElement>
+                    <box leftPadding="2">
+                        <pen lineWidth="0.0"/>
+                        <topPen lineWidth="0.0"/>
+                        <leftPen lineWidth="0.0"/>
+                        <bottomPen lineWidth="0.0"/>
+                        <rightPen lineWidth="0.0"/>
+                    </box>
+                    <textElement verticalAlignment="Middle">
+                        <font size="9" isBold="true"/>
+                    </textElement>
+                    <text><![CDATA[CUSPP:]]></text>
+                </staticText>
+                <textField isBlankWhenNull="true">
+                    <reportElement mode="Transparent" x="400" y="0" width="155" height="12" uuid="06ccc97a-603e-4c84-b446-f7b31b6635bf">
+                        <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                    </reportElement>
+                    <box leftPadding="2"/>
+                    <textElement verticalAlignment="Middle">
+                        <font size="9"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA[$F{cuspp}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="32" splitType="Stretch">
+            <subreport isUsingCache="false">
+                <reportElement x="20" y="17" width="525" height="15" uuid="32729045-f56d-4c97-ad1b-c8e34a652474">
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="local_mesure_unitx" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                </reportElement>
+                <subreportParameter name="INSTANCE">
+                    <subreportParameterExpression><![CDATA[$P{INSTANCE}]]></subreportParameterExpression>
+                </subreportParameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <returnValue subreportVariable="sum" toVariable="paymentTotal" calculation="Sum"/>
+                <subreportExpression><![CDATA["Payroll_PayslipPositionPayment.jrxml"]]></subreportExpression>
+            </subreport>
+            <staticText>
+                <reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="38149223-2235-4727-a9f5-bed711fbb8b0"/>
+                <box leftPadding="2"/>
+                <text><![CDATA[REMUNERACIÓN]]></text>
+            </staticText>
+        </band>
+        <band height="33">
+            <staticText>
+                <reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="83994517-cf10-4e61-91a9-a58b522d4504">
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <text><![CDATA[DEDUCCIÓN]]></text>
+            </staticText>
+            <subreport isUsingCache="false">
+                <reportElement x="20" y="17" width="525" height="15" uuid="387286f3-eacd-45a8-9cfc-ee530baf8f72">
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <subreportParameter name="INSTANCE">
+                    <subreportParameterExpression><![CDATA[$P{INSTANCE}]]></subreportParameterExpression>
+                </subreportParameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <returnValue subreportVariable="sum" toVariable="deductionTotal" calculation="Sum"/>
+                <subreportExpression><![CDATA["Payroll_PayslipPositionDeduction.jrxml"]]></subreportExpression>
+            </subreport>
+        </band>
+        <band height="33">
+            <staticText>
+                <reportElement style="heading2" x="0" y="0" width="555" height="17" uuid="a6d70a7a-78cd-4d75-8615-cdbe52d757f3">
+                    <property name="local_mesure_unitx" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box leftPadding="2"/>
+                <text><![CDATA[APORTE]]></text>
+            </staticText>
+            <subreport isUsingCache="false">
+                <reportElement x="20" y="17" width="525" height="15" uuid="2a476d32-f750-4c82-a9b5-6a1d74888afc">
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <subreportParameter name="INSTANCE">
+                    <subreportParameterExpression><![CDATA[$P{INSTANCE}]]></subreportParameterExpression>
+                </subreportParameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <subreportExpression><![CDATA["Payroll_PayslipPositionNeutral.jrxml"]]></subreportExpression>
+            </subreport>
+        </band>
+    </detail>
+    <columnFooter>
+        <band height="32" splitType="Stretch">
+            <textField>
+                <reportElement mode="Transparent" x="427" y="3" width="32" height="17" uuid="3c7996be-98e6-4474-bcb9-7d171a84b08a">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2" rightPadding="2">
+                    <topPen lineWidth="4.0" lineStyle="Double"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{currencySymbol}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00#;(#,##0.00#-)">
+                <reportElement x="459" y="3" width="86" height="17" uuid="9a20ca0b-41fc-4112-977f-6526935f8376">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineStyle="Double"/>
+                    <topPen lineWidth="4.0" lineStyle="Double"/>
+                    <leftPen lineStyle="Double"/>
+                    <bottomPen lineStyle="Double"/>
+                    <rightPen lineStyle="Double"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{paymentTotal}.subtract( $V{deductionTotal} == null ? BigDecimal.ZERO : $V{deductionTotal} )]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="327" y="3" width="100" height="17" uuid="8f921fc2-f81f-43bb-994d-b64277abb8c8">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Neto a pagar:]]></text>
+            </staticText>
+        </band>
+    </columnFooter>
+    <pageFooter>
+        <band height="54" splitType="Stretch">
+            <staticText>
+                <reportElement x="20" y="20" width="170" height="20" uuid="62fa1643-329d-4e32-b55c-8d98fa1e2dbf"/>
+                <box>
+                    <topPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[RR.HH.]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="330" y="20" width="170" height="20" uuid="881be26c-92d8-4add-8b18-09d8db5fec7f">
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <box>
+                    <topPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[Recibido]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
 </jasperReport>

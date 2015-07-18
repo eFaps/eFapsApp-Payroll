@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-01-24T18:38:01 -->
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.0.2  -->
+<!-- 2015-07-18T11:36:05 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_PayslipPositionNeutral" language="groovy" pageWidth="525" pageHeight="407" orientation="Landscape" columnWidth="525" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isFloatColumnFooter="true" uuid="a6501e8d-8316-401a-9683-fc003689f147">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
 	<parameter name="INSTANCE" class="java.lang.Object">
@@ -15,9 +15,10 @@
 	<field name="amount" class="java.math.BigDecimal"/>
 	<field name="currency" class="java.lang.String"/>
 	<field name="positionNumber" class="java.lang.Integer"/>
-    <sortField name="positionNumber"/>
+	<sortField name="positionNumber"/>
 	<variable name="sum" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<detail>
 		<band height="15" splitType="Stretch">
@@ -104,7 +105,7 @@
 					<topPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sum}]]></textFieldExpression>
 			</textField>
