@@ -80,12 +80,30 @@ public abstract class DataFunctions_Base
     }
 
     /**
+    * @param _month month to be used as filter
+    * @param _keys keys to be analized.
+    * @return the amount for anual
+    * @throws EFapsException on error
+    */
+   public BigDecimal getAnualMonth(final Integer _month,
+                                   final String... _keys)
+       throws EFapsException
+   {
+        return getAnualMonth(_month, true, _keys);
+   }
+
+
+    /**
+     * Gets the anual month.
+     *
      * @param _month month to be used as filter
+     * @param _excludeSettled exclude data that is already settled
      * @param _keys keys to be analized.
      * @return the amount for anual
      * @throws EFapsException on error
      */
     public BigDecimal getAnualMonth(final Integer _month,
+                                    final boolean _excludeSettled,
                                     final String... _keys)
         throws EFapsException
     {
@@ -98,10 +116,13 @@ public abstract class DataFunctions_Base
                 final DateTime endDate = date.monthOfYear().setCopy(_month).dayOfMonth().withMaximumValue()
                                 .plusMinutes(1);
 
-                final QueryBuilder relAttrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
                 final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-                attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
+                if (_excludeSettled) {
+                    final QueryBuilder relAttrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
+                    attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
                                 relAttrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
+                }
+
                 attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
                 attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status,
                                 Status.find(CIPayroll.PayslipStatus.Canceled));
@@ -140,14 +161,39 @@ public abstract class DataFunctions_Base
                                        final String... _keys)
         throws EFapsException
     {
+        return getAmount4Period(_startDate, _endDate, _minOccurrence, true, _keys);
+    }
+
+    /**
+     * Get the amount for a list of keys during a period, that have a minimum occurrence.
+     * e.g. the amount of extra time only if more than tree times received
+     *
+     * @param _startDate    start of the period
+     * @param _endDate      end of the period
+     * @param _minOccurrence minimum occurrence to be evaluated
+     * @param _excludeSettled exclude data that is already settled
+     * @param _keys keys to be analyzed.
+     * @return the amount for the period
+     * @throws EFapsException on error
+     */
+    public BigDecimal getAmount4Period(final DateTime _startDate,
+                                       final DateTime _endDate,
+                                       final Integer _minOccurrence,
+                                       final boolean _excludeSettled,
+                                       final String... _keys)
+        throws EFapsException
+    {
         BigDecimal ret = BigDecimal.ZERO;
         final Instance employeeInst = (Instance) getContext().get(AbstractParameter.PARAKEY4EMPLOYINST);
         if (employeeInst != null && employeeInst.isValid()) {
             final Set<Integer> months = new HashSet<>();
-            final QueryBuilder relAttrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
             final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
-            attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
+            if (_excludeSettled) {
+                final QueryBuilder relAttrQueryBldr = new QueryBuilder(CIPayroll.Settlement2Payslip);
+                attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
                             relAttrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
+            }
+
             attrQueryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
             attrQueryBldr.addWhereAttrNotEqValue(CIPayroll.Payslip.Status,
                             Status.find(CIPayroll.PayslipStatus.Canceled));
