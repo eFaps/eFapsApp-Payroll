@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2014 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,17 +14,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
-
 -->
 <datamodel-sqltable xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>16bde170-528b-456d-86ed-919243f7a416</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
     <specification/>
     <definition>
         <version-expression>(version==latest)</version-expression>
@@ -37,7 +31,7 @@
             <column name="KEY"       type="STRING_SHORT" not-null="true" length="32" />
             <column name="DESCR"     type="STRING_SHORT" not-null="true" length="256" />
             <column name="NOTE"      type="STRING_SHORT" not-null="true" length="512" />
-            <column name="EXPR"      type="STRING_SHORT"                 length="2048" />
+            <column name="EXPR"      type="STRING_SHORT"                 length="4096" />
             <column name="RULETYPE"  type="INTEGER"/>
             <column name="CONFIG"    type="INTEGER"/>
             <column name="CREATOR"   type="INTEGER"      not-null="true" />
