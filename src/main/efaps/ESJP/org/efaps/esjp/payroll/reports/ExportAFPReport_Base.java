@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2013 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev: 295 $
- * Last Changed:    $Date: 2011-06-06 15:37:52 -0500 (lun, 06 jun 2011) $
- * Last Changed By: $Author: Jorge Cueva $
  */
+
 package org.efaps.esjp.payroll.reports;
 
 import java.math.BigDecimal;
@@ -27,16 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
@@ -53,14 +46,18 @@ import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 /**
- * TODO comment!
+ * Report to be used to import in the Website provided by the AFP.
  *
  * @author The eFaps Team
- * @version $Id: $
  */
 @EFapsUUID("bb288739-7ecc-498b-9633-f32f21978999")
-@EFapsRevision("$Rev: 295 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class ExportAFPReport_Base
     extends AbstractReports
 {
@@ -115,7 +112,11 @@ public abstract class ExportAFPReport_Base
                 final DateTime dateTo = new DateTime(_parameter
                                 .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateTo.name));
 
+                final QueryBuilder pensAttrQueryBldr = new QueryBuilder(CIHumanResource.ClassTR_Pensioner);
+
                 final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Payslip);
+                attrQueryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.EmployeeAbstractLink,
+                                pensAttrQueryBldr.getAttributeQuery(CIHumanResource.ClassTR_Pensioner.EmployeeLink));
                 attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.Payslip.Date, dateFrom.minusMinutes(1));
                 attrQueryBldr.addWhereAttrLessValue(CIPayroll.Payslip.DueDate, dateTo.plusDays(1));
 
