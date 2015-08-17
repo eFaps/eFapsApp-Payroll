@@ -378,7 +378,7 @@ public abstract class Payslip_Base
 
             final Insert insert = new Insert(CIPayroll.Payslip);
             insert.add(CIPayroll.Payslip.Name, getDocName4Create(_parameter));
-            insert.add(CIPayroll.Payslip.Date, date);
+            insert.add(CIPayroll.Payslip.Date, getDate(_parameter, date, emplInst));
             insert.add(CIPayroll.Payslip.DueDate, dueDate);
             insert.add(CIPayroll.Payslip.EmployeeAbstractLink, emplInst);
             insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
@@ -1162,13 +1162,13 @@ public abstract class Payslip_Base
         final Field field = (Field) _parameter.get(ParameterValues.UIOBJECT);
 
         if (field != null) {
-            final Instance instance = Instance.get(_parameter.getParameterValue(field.getName()));
-            if (instance.isValid()) {
-                map.put("employeeData", getFieldValue4Employee(instance));
+            final Instance emplInst = Instance.get(_parameter.getParameterValue(field.getName()));
+            if (emplInst.isValid()) {
+                map.put("employeeData", getFieldValue4Employee(emplInst));
                 try {
                     if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
                         final QueryBuilder queryBldr = new QueryBuilder(CIProjects.ProjectService2Employee);
-                        queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, instance);
+                        queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, emplInst);
                         queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.Status,
                                         Status.find(CIProjects.ProjectService2EmployeeStatus.Active));
                         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -1189,8 +1189,10 @@ public abstract class Payslip_Base
                     throw new EFapsException("Catched Error.", e);
                 }
                 for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
-                    listener.add2UpdateMap4Employee(_parameter, instance, map);
+                    listener.add2UpdateMap4Employee(_parameter, emplInst, map);
                 }
+                final DateTime date = DateUtil.getDateFromParameter(_parameter.getParameterValue("date_eFapsDate"));
+                map.put("date_eFapsDate", DateUtil.getDate4Parameter(getDate(_parameter, date, emplInst)));
             } else {
                 map.put("employeeData", "????");
             }
@@ -1199,6 +1201,33 @@ public abstract class Payslip_Base
         final Return retVal = new Return();
         retVal.put(ReturnValues.VALUES, list);
         return retVal;
+    }
+
+    /**
+     * Gets the date.
+     *
+     * @param _parameter the _parameter
+     * @param _date the _date
+     * @param _emplInst the _empl inst
+     * @return the date
+     * @throws EFapsException on error
+     */
+    protected DateTime getDate(final Parameter _parameter,
+                               final DateTime _date,
+                               final Instance _emplInst)
+        throws EFapsException
+    {
+        DateTime ret = _date;
+        final PrintQuery print = CachedPrintQuery.get4Request(_emplInst);
+        final SelectBuilder selStartDate = SelectBuilder.get().clazz(CIHumanResource.ClassTR)
+                        .attribute(CIHumanResource.ClassTR.StartDate);
+        print.addSelect(selStartDate);
+        print.execute();
+        final DateTime startDate = print.getSelect(selStartDate);
+        if (startDate != null && ret.isBefore(startDate)) {
+            ret = startDate;
+        }
+        return ret;
     }
 
     /**
