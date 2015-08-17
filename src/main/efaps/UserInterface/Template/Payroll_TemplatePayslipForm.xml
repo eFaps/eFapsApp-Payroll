@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-  Copyright 2003 - 2010 The eFaps Team
+  Copyright 2003 - 2015 The eFaps Team
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,17 +14,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-  Author:          The eFaps Team
-  Revision:        $Rev$
-  Last Changed:    $Date$
-  Last Changed By: $Author$
-
 -->
 <ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>e33aa7d9-2e45-4cce-8c53-4c01bf285a7e</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_TemplatePayslipForm</name>
@@ -72,6 +66,42 @@
         </field>
         <field name="modified">
             <property name="Attribute">Modified</property>
+        </field>
+         <field name="defaultLaborTimeGroup" character="Group">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+        </field>
+        <field name="defaultLaborTime">
+            <property name="Attribute">DefaultLaborTime</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
+            <property name="Columns">5</property>
+        </field>
+        <field name="defaultExtraLaborTime">
+            <property name="Attribute">DefaultExtraLaborTime</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
+            <property name="Columns">5</property>
+        </field>
+         <field name="defaultLaborTimeGroup2" character="Group">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+        </field>
+         <field name="defaultNightLaborTime">
+            <property name="Attribute">DefaultNightLaborTime</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
+            <property name="Columns">5</property>
+        </field>
+        <field name="defaultHolidayLaborTime">
+            <property name="Attribute">DefaultHolidayLaborTime</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Align">right</property>
+            <property name="Columns">5</property>
         </field>
     </definition>
 </ui-form>

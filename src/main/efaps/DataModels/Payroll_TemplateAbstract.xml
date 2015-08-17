@@ -69,6 +69,34 @@
                 name="Payroll_TemplateAbstract.StatusAbstract.RANGE_VALUE" event="RANGE_VALUE">
             </trigger>
         </attribute>
+         <attribute>
+            <name>DefaultLaborTime</name>
+            <type>DecimalWithUoM</type>
+            <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
+            <sqltable>Payroll_TemplateSQLTable</sqltable>
+            <sqlcolumn>TIME,TIMEUOMID,TIMEBASE</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>DefaultExtraLaborTime</name>
+            <type>DecimalWithUoM</type>
+            <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
+            <sqltable>Payroll_TemplateSQLTable</sqltable>
+            <sqlcolumn>EXTRATIME,EXTRATIMEUOMID,EXTRATIMEBASE</sqlcolumn>
+        </attribute>
+         <attribute>
+            <name>DefaultNightLaborTime</name>
+            <type>DecimalWithUoM</type>
+            <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
+            <sqltable>Payroll_TemplateSQLTable</sqltable>
+            <sqlcolumn>NIGHTTIME,NIGHTTIMEUOMID,NIGHTTIMEBASE</sqlcolumn>
+        </attribute>
+         <attribute>
+            <name>DefaultHolidayLaborTime</name>
+            <type>DecimalWithUoM</type>
+            <dimensionUUID>8154e40c-3f2d-4bc0-91e6-b8510eaf642c</dimensionUUID>
+            <sqltable>Payroll_TemplateSQLTable</sqltable>
+            <sqlcolumn>HOLIDAYTIME,HOLIDAYTIMEUOMID,HOLIDAYTIMEBASE</sqlcolumn>
+        </attribute>
         <attribute>
             <name>Creator</name>
             <type>CreatorLink</type>
