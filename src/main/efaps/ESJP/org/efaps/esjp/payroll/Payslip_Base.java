@@ -33,10 +33,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.TreeMap;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.efaps.admin.datamodel.Dimension;
@@ -53,7 +51,9 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.program.esjp.Listener;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
 import org.efaps.admin.ui.field.Field;
+import org.efaps.ci.CIAttribute;
 import org.efaps.ci.CIType;
+import org.efaps.db.CachedPrintQuery;
 import org.efaps.db.Context;
 import org.efaps.db.Delete;
 import org.efaps.db.Insert;
@@ -85,7 +85,6 @@ import org.efaps.esjp.payroll.rules.IDocRuleListener;
 import org.efaps.esjp.payroll.rules.InputRule;
 import org.efaps.esjp.payroll.rules.Result;
 import org.efaps.esjp.payroll.util.Payroll;
-import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.esjp.projects.Project;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.sales.document.AbstractDocumentSum;
@@ -394,15 +393,16 @@ public abstract class Payslip_Base
             insert.add(CIPayroll.Payslip.CurrencyId, Currency.getBaseCurrency());
             insert.add(CIPayroll.Payslip.RateCurrencyId, Currency.getBaseCurrency());
             insert.add(CIPayroll.Payslip.LaborTime, new Object[] {
-                            getLaborTime(_parameter, null, date, dueDate, emplInst), timeDim.getBaseUoM().getId() });
+                            getLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
+                            timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.ExtraLaborTime,
-                            new Object[] {  getExtraLaborTime(_parameter, null, date, dueDate, emplInst),
+                            new Object[] {  getExtraLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
                                             timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] {
-                            getHolidayLaborTime(_parameter, null, date, dueDate, emplInst),
+                            getHolidayLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
                             timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.NightLaborTime,
-                            new Object[] {  getNightLaborTime(_parameter, null, date, dueDate, emplInst),
+                            new Object[] {  getNightLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
                                             timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.TemplateLink, templInst);
             insert.execute();
@@ -442,7 +442,9 @@ public abstract class Payslip_Base
             final PrintQuery print = new PrintQuery(payslipInst);
             final SelectBuilder selEmplInst = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
                             .instance();
-            print.addSelect(selEmplInst);
+            final SelectBuilder selTemplInst = SelectBuilder.get().linkto(CIPayroll.Payslip.TemplateLink)
+                            .instance();
+            print.addSelect(selEmplInst, selTemplInst);
             print.addAttribute(CIPayroll.Payslip.Date, CIPayroll.Payslip.DueDate, CIPayroll.Payslip.Status);
             print.execute();
             final Status status = Status.get(print.<Long>getAttribute(CIPayroll.Payslip.Status));
@@ -450,14 +452,15 @@ public abstract class Payslip_Base
                 final DateTime date = print.getAttribute(CIPayroll.Payslip.Date);
                 final DateTime dueDate = print.getAttribute(CIPayroll.Payslip.DueDate);
                 final Instance emplInst = print.getSelect(selEmplInst);
+                final Instance templInst = print.getSelect(selTemplInst);
 
                 final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
                                 .getDimension();
 
-                final BigDecimal lT = getLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
-                final BigDecimal elT = getExtraLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
-                final BigDecimal nlT = getNightLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
-                final BigDecimal hlT = getHolidayLaborTime(_parameter, payslipInst, date, dueDate, emplInst);
+                final BigDecimal lT = getLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
+                final BigDecimal elT = getExtraLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
+                final BigDecimal nlT = getNightLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
+                final BigDecimal hlT = getHolidayLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
 
                 if (lT != null || elT != null || nlT != null || hlT != null) {
                     final Update update = new Update(payslipInst);
@@ -485,17 +488,18 @@ public abstract class Payslip_Base
                                       final Instance _payslipInst,
                                       final DateTime _date,
                                       final DateTime _dueDate,
-                                      final Instance _emplInst)
+                                      final Instance _emplInst,
+                                      final Instance _templInst)
         throws EFapsException
     {
         BigDecimal ret = null;
-        if (isEvaluate(_parameter, "LaborTime")) {
+        if (Payroll.PAYSLIPEVALLABORTIME.get()) {
             for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
                 ret = listener.getLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
             }
         }
         if (ret == null) {
-            ret = getDefaultValue(_parameter, "LaborTime");
+            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultLaborTime);
         }
         return ret;
     }
@@ -504,17 +508,18 @@ public abstract class Payslip_Base
                                            final Instance _payslipInst,
                                            final DateTime _date,
                                            final DateTime _dueDate,
-                                           final Instance _emplInst)
+                                           final Instance _emplInst,
+                                           final Instance _templInst)
         throws EFapsException
     {
         BigDecimal ret = null;
-        if (isEvaluate(_parameter, "ExtraLaborTime")) {
+        if (Payroll.PAYSLIPEVALEXTRALABORTIME.get()) {
             for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
                 ret = listener.getExtraLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
             }
         }
         if (ret == null) {
-            ret = getDefaultValue(_parameter, "ExtraLaborTime");
+            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultExtraLaborTime);
         }
         return ret;
     }
@@ -523,17 +528,18 @@ public abstract class Payslip_Base
                                            final Instance _payslipInst,
                                            final DateTime _date,
                                            final DateTime _dueDate,
-                                           final Instance _emplInst)
+                                           final Instance _emplInst,
+                                           final Instance _templInst)
         throws EFapsException
     {
         BigDecimal ret = null;
-        if (isEvaluate(_parameter, "NightLaborTime")) {
+        if (Payroll.PAYSLIPEVALNIGHTLABORTIME.get()) {
             for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
                 ret = listener.getNightLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
             }
         }
         if (ret == null) {
-            ret = getDefaultValue(_parameter, "NightLaborTime");
+            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultNightLaborTime);
         }
         return ret;
     }
@@ -542,46 +548,49 @@ public abstract class Payslip_Base
                                              final Instance _payslipInst,
                                              final DateTime _date,
                                              final DateTime _dueDate,
-                                             final Instance _emplInst)
+                                             final Instance _emplInst,
+                                             final Instance _templInst)
         throws EFapsException
     {
         BigDecimal ret = null;
-        if (isEvaluate(_parameter, "HolidayLaborTime")) {
+        if (Payroll.PAYSLIPEVALHOLIDAYLABORTIME.get()) {
             for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
                 ret = listener.getHolidayLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
             }
         }
         if (ret == null) {
-            ret = getDefaultValue(_parameter, "HolidayLaborTime");
+            ret = getDefaultValue(_parameter,  _templInst, CIPayroll.TemplatePayslip.DefaultHolidayLaborTime);
         }
         return ret;
     }
 
-    protected boolean isEvaluate(final Parameter _parameter,
-                                 final String _key)
-        throws EFapsException
-    {
-        final Properties props = Payroll.getSysConfig().getAttributeValueAsProperties(PayrollSettings.TIMEEVAL);
-        return BooleanUtils.toBoolean(props.getProperty("Payslip." + _key + ".evaluate", "true"));
-    }
-
-
     protected BigDecimal getDefaultValue(final Parameter _parameter,
-                                         final String _key)
+                                         final Instance _templInst,
+                                         final CIAttribute _attr)
         throws EFapsException
     {
-        final Properties props = Payroll.getSysConfig().getAttributeValueAsProperties(PayrollSettings.TIMEEVAL);
         BigDecimal ret = null;
-        final DecimalFormat formatter = NumberFormatter.get().getFormatter();
-        try {
-            ret = (BigDecimal) formatter.parse(props.getProperty("Payslip." + _key + ".defaultValue", "-1"));
-        } catch (final ParseException e) {
-            LOG.debug("Catched ParseException", e);
+        if (_templInst != null && _templInst.isValid()) {
+            final PrintQuery print = CachedPrintQuery.get4Request(_templInst);
+            print.addAttribute(CIPayroll.TemplatePayslip.DefaultLaborTime,
+                            CIPayroll.TemplatePayslip.DefaultExtraLaborTime,
+                            CIPayroll.TemplatePayslip.DefaultHolidayLaborTime,
+                            CIPayroll.TemplatePayslip.DefaultNightLaborTime);
+            print.execute();
+            final Object[] obj = print.getAttribute(_attr);
+            if (obj != null) {
+                final BigDecimal val = (BigDecimal) obj[0];
+                final UoM uoM = (UoM) obj[1];
+                if (uoM.equals(uoM.getDimension().getBaseUoM())) {
+                    ret = val;
+                } else {
+                    ret = val.multiply(new BigDecimal(uoM.getNumerator())).setScale(8, BigDecimal.ROUND_HALF_UP)
+                                    .divide(new BigDecimal(uoM.getDenominator()), BigDecimal.ROUND_HALF_UP);
+                }
+            }
         }
         return ret != null && ret.compareTo(BigDecimal.ZERO) > -1 ? ret : null;
     }
-
-
 
     protected void addAdvance(final Parameter _parameter,
                               final CreatedDoc _createdDoc,
@@ -1186,7 +1195,7 @@ public abstract class Payslip_Base
 
             final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
             if (laborTime == null || laborTime != null && laborTime.isEmpty()) {
-                final BigDecimal time = getLaborTime(_parameter, null, date, dueDate, emplInst);
+                final BigDecimal time = getLaborTime(_parameter, null, date, dueDate, emplInst, templInst);
                 if (time != null) {
                     js.append(getSetFieldValue(0, CIFormPayroll.Payroll_PayslipForm.laborTime.name,
                                     formatter.format(time)));
@@ -1195,7 +1204,7 @@ public abstract class Payslip_Base
             final String extraLaborTime = _parameter
                             .getParameterValue(CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name);
             if (extraLaborTime == null || extraLaborTime != null && extraLaborTime.isEmpty()) {
-                final BigDecimal time = getExtraLaborTime(_parameter, null, date, dueDate, emplInst);
+                final BigDecimal time = getExtraLaborTime(_parameter, null, date, dueDate, emplInst, templInst);
                 if (time != null) {
                     js.append(getSetFieldValue(0, CIFormPayroll.Payroll_PayslipForm.extraLaborTime.name,
                                     formatter.format(time)));
@@ -1204,7 +1213,7 @@ public abstract class Payslip_Base
             final String nightLaborTime = _parameter
                             .getParameterValue(CIFormPayroll.Payroll_PayslipForm.nightLaborTime.name);
             if (nightLaborTime == null || nightLaborTime != null && nightLaborTime.isEmpty()) {
-                final BigDecimal time = getNightLaborTime(_parameter, null, date, dueDate, emplInst);
+                final BigDecimal time = getNightLaborTime(_parameter, null, date, dueDate, emplInst, templInst);
                 if (time != null) {
                     js.append(getSetFieldValue(0, CIFormPayroll.Payroll_PayslipForm.nightLaborTime.name,
                                     formatter.format(time)));
@@ -1213,7 +1222,7 @@ public abstract class Payslip_Base
             final String holidayLaborTime = _parameter
                             .getParameterValue(CIFormPayroll.Payroll_PayslipForm.holidayLaborTime.name);
             if (holidayLaborTime == null || holidayLaborTime != null && holidayLaborTime.isEmpty()) {
-                final BigDecimal time = getHolidayLaborTime(_parameter, null, date, dueDate, emplInst);
+                final BigDecimal time = getHolidayLaborTime(_parameter, null, date, dueDate, emplInst, templInst);
                 if (time != null) {
                     js.append(getSetFieldValue(0, CIFormPayroll.Payroll_PayslipForm.holidayLaborTime.name,
                                     formatter.format(time)));

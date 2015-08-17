@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2013 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.efaps.esjp.payroll.util;
@@ -26,20 +23,81 @@ import org.efaps.admin.common.SystemConfiguration;
 import org.efaps.admin.datamodel.IBitEnum;
 import org.efaps.admin.datamodel.IEnum;
 import org.efaps.admin.datamodel.attributetype.BitEnumType;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
+import org.efaps.api.annotation.EFapsSysConfAttribute;
+import org.efaps.esjp.admin.common.systemconfiguration.BooleanSysConfAttribute;
 import org.efaps.util.cache.CacheReloadException;
 
 /**
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
  */
 @EFapsUUID("e773a372-0d29-41bf-b064-c2fd1f84b279")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public final class Payroll
 {
+    /** The base. */
+    public static final String BASE = "org.efaps.payroll.";
+    /** Payroll-Configuration. */
+    public static final UUID SYSCONFUUID = UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute PAYSLIPEVALLABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Payslip.EvaluateLaborTime")
+                    .description("Evaluate the LaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute PAYSLIPEVALEXTRALABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Payslip.EvaluateExtraLaborTime")
+                    .description("Evaluate the ExtraLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute PAYSLIPEVALNIGHTLABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Payslip.EvaluateExtraLaborTime")
+                    .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute PAYSLIPEVALHOLIDAYLABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Payslip.EvaluateHolidayLaborTime")
+                    .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute ADVANCEEVALLABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Advance.EvaluateLaborTime")
+                    .description("Evaluate the LaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute ADVANCEEVALEXTRALABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Advance.EvaluateExtraLaborTime")
+                    .description("Evaluate the ExtraLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute ADVANCEEVALNIGHTLABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Advance.EvaluateExtraLaborTime")
+                    .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute ADVANCEEVALHOLIDAYLABORTIME = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Advance.EvaluateHolidayLaborTime")
+                    .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
 
     /**
      * Singelton.
@@ -124,6 +182,6 @@ public final class Payroll
         throws CacheReloadException
     {
         // Payroll-Configuration
-        return SystemConfiguration.get(UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e"));
+        return SystemConfiguration.get(SYSCONFUUID);
     }
 }
