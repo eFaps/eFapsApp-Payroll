@@ -559,7 +559,7 @@ public abstract class Payslip_Base
             }
         }
         if (ret == null) {
-            ret = getDefaultValue(_parameter,  _templInst, CIPayroll.TemplatePayslip.DefaultHolidayLaborTime);
+            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultHolidayLaborTime);
         }
         return ret;
     }
@@ -1106,6 +1106,53 @@ public abstract class Payslip_Base
      * @return new Return
      * @throws EFapsException on error
      */
+    public Return updateFields4Template(final Parameter _parameter)
+        throws EFapsException
+    {
+        final List<Map<String, Object>> list = new ArrayList<>();
+        final Map<String, Object> map = new HashMap<>();
+
+        final Field field = (Field) _parameter.get(ParameterValues.UIOBJECT);
+
+        if (field != null) {
+            final Instance templInst = Instance.get(_parameter.getParameterValue(field.getName()));
+            if (templInst.isValid()) {
+                final DecimalFormat formatter = NumberFormatter.get().getFormatter();
+                final BigDecimal laborTime = getDefaultValue(_parameter, templInst,
+                                CIPayroll.TemplatePayslip.DefaultLaborTime);
+                if (laborTime != null) {
+                    map.put("laborTime", formatter.format(laborTime));
+                }
+                final BigDecimal extraLaborTime = getDefaultValue(_parameter, templInst,
+                                CIPayroll.TemplatePayslip.DefaultExtraLaborTime);
+                if (extraLaborTime != null) {
+                    map.put("extraLaborTime", formatter.format(laborTime));
+                }
+                final BigDecimal nightLaborTime = getDefaultValue(_parameter, templInst,
+                                CIPayroll.TemplatePayslip.DefaultNightLaborTime);
+                if (nightLaborTime != null) {
+                    map.put("nightLaborTime", formatter.format(laborTime));
+                }
+                final BigDecimal holidayLaborTime = getDefaultValue(_parameter, templInst,
+                                CIPayroll.TemplatePayslip.DefaultHolidayLaborTime);
+                if (holidayLaborTime != null) {
+                    map.put("holidayLaborTime", formatter.format(laborTime));
+                }
+            }
+            list.add(map);
+        }
+        final Return retVal = new Return();
+        retVal.put(ReturnValues.VALUES, list);
+        return retVal;
+    }
+
+    /**
+     * Update fields4 employee.
+     *
+     * @param _parameter the _parameter
+     * @return the return
+     * @throws EFapsException on error
+     */
     public Return updateFields4Employee(final Parameter _parameter)
         throws EFapsException
     {
@@ -1116,7 +1163,6 @@ public abstract class Payslip_Base
 
         if (field != null) {
             final Instance instance = Instance.get(_parameter.getParameterValue(field.getName()));
-
             if (instance.isValid()) {
                 map.put("employeeData", getFieldValue4Employee(instance));
                 try {
