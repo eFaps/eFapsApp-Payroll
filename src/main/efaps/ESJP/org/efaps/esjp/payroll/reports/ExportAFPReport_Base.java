@@ -40,7 +40,6 @@ import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
-import org.efaps.esjp.common.jasperreport.datatype.DateTimeDate;
 import org.efaps.esjp.payroll.util.Payroll;
 import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.util.EFapsException;
@@ -171,10 +170,11 @@ public abstract class ExportAFPReport_Base
                         bean.setRemuneration(bean.getRemuneration().add(
                                         multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount)));
 
+                        bean.setWorkRel(true);
+
                         final DateTime startdate = multi.getSelect(selStartDate);
                         if (startdate.isAfter(dateFrom.minusMinutes(1)) && startdate.isBefore(dateTo.plusDays(1))) {
-                            bean.setMoveDate(startdate);
-                            bean.setMoveType(1);
+                            bean.setWorkRelStart(true);
                         }
                     }
                 }
@@ -200,21 +200,23 @@ public abstract class ExportAFPReport_Base
             throws EFapsException
         {
             _builder.addColumn(
-                            DynamicReports.col.reportRowNumberColumn(),
-                            DynamicReports.col.column("cuspp", DynamicReports.type.stringType()),
-                            DynamicReports.col.column("emplDocType", DynamicReports.type.integerType()),
-                            DynamicReports.col.column("emplNumber", DynamicReports.type.stringType()),
-                            DynamicReports.col.column("emplLastName", DynamicReports.type.stringType()),
-                            DynamicReports.col.column("emplSecondLastName", DynamicReports.type.stringType()),
-                            DynamicReports.col.column("emplName", DynamicReports.type.stringType()),
-                            DynamicReports.col.column("moveType", DynamicReports.type.integerType()),
-                            DynamicReports.col.column("moveDate", DateTimeDate.get()),
-                            DynamicReports.col.column("remuneration", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column("voluntary1", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column("voluntary2", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column("voluntary3", DynamicReports.type.bigDecimalType()),
-                            DynamicReports.col.column("emplType", DynamicReports.type.stringType()),
-                            DynamicReports.col.column("afp", DynamicReports.type.stringType())
+                            DynamicReports.col.reportRowNumberColumn(), //A
+                            DynamicReports.col.column("cuspp", DynamicReports.type.stringType()), //B
+                            DynamicReports.col.column("emplDocType", DynamicReports.type.integerType()), //C
+                            DynamicReports.col.column("emplNumber", DynamicReports.type.stringType()), //D
+                            DynamicReports.col.column("emplLastName", DynamicReports.type.stringType()), //E
+                            DynamicReports.col.column("emplSecondLastName", DynamicReports.type.stringType()), //F
+                            DynamicReports.col.column("emplName", DynamicReports.type.stringType()),//G
+                            DynamicReports.col.column("workRel", DynamicReports.type.stringType()), //H
+                            DynamicReports.col.column("workRelStart", DynamicReports.type.stringType()), //I
+                            DynamicReports.col.column("workRelStop", DynamicReports.type.stringType()), //J
+                            DynamicReports.col.column("contributeException", DynamicReports.type.stringType()), //K
+                            DynamicReports.col.column("remuneration", DynamicReports.type.bigDecimalType()), //L
+                            DynamicReports.col.column("voluntary1", DynamicReports.type.bigDecimalType()), //M
+                            DynamicReports.col.column("voluntary2", DynamicReports.type.bigDecimalType()), //N
+                            DynamicReports.col.column("voluntary3", DynamicReports.type.bigDecimalType()), //O
+                            DynamicReports.col.column("emplType", DynamicReports.type.stringType()),//P
+                            DynamicReports.col.column("afp", DynamicReports.type.stringType())//Q
                             );
         }
     }
@@ -228,14 +230,60 @@ public abstract class ExportAFPReport_Base
         private String emplLastName;
         private String emplSecondLastName;
         private String emplName;
-        private Integer moveType;
-        private DateTime moveDate;
+        private boolean workRel;
+        private boolean workRelStart;
+        private boolean workRelStop;
+        private String contributeException;
         private BigDecimal remuneration = BigDecimal.ZERO;
         private BigDecimal voluntary1 = BigDecimal.ZERO;
         private BigDecimal voluntary2 = BigDecimal.ZERO;
         private BigDecimal voluntary3 = BigDecimal.ZERO;
         private String emplType;
         private String afp;
+
+        public String getWorkRel()
+        {
+            return this.workRel ? "S" : "N";
+        }
+
+        public DataBean setWorkRel(final boolean  _hasWorkRel)
+        {
+            this.workRel = _hasWorkRel;
+            return this;
+        }
+
+        public String getWorkRelStart()
+        {
+            return this.workRelStart ? "S" : "N";
+        }
+
+        public DataBean setWorkRelStart(final boolean  _workRelStart)
+        {
+            this.workRelStart = _workRelStart;
+            return this;
+        }
+
+        public String getWorkRelStop()
+        {
+            return this.workRelStop ? "S" : "N";
+        }
+
+        public DataBean setWorkRelStop(final boolean _workRelStop)
+        {
+            this.workRelStop = _workRelStop;
+            return this;
+        }
+
+        public String getContributeException()
+        {
+            return this.contributeException;
+        }
+
+        public DataBean setContributeException(final String _contributeException)
+        {
+            this.contributeException = _contributeException;
+            return this;
+        }
 
         /**
          * @param _select
@@ -402,49 +450,7 @@ public abstract class ExportAFPReport_Base
             return this;
         }
 
-        /**
-         * Getter method for the instance variable {@link #moveType}.
-         *
-         * @return value of instance variable {@link #moveType}
-         */
-        public Integer getMoveType()
-        {
-            return this.moveType;
-        }
 
-        /**
-         * Setter method for instance variable {@link #moveType}.
-         *
-         * @param _moveType value for instance variable {@link #moveType}
-         * @return this for chaining
-         */
-        public DataBean setMoveType(final Integer _moveType)
-        {
-            this.moveType = _moveType;
-            return this;
-        }
-
-        /**
-         * Getter method for the instance variable {@link #moveDate}.
-         *
-         * @return value of instance variable {@link #moveDate}
-         */
-        public DateTime getMoveDate()
-        {
-            return this.moveDate;
-        }
-
-        /**
-         * Setter method for instance variable {@link #moveDate}.
-         *
-         * @param _moveDate value for instance variable {@link #moveDate}
-         * @return this for chaining
-         */
-        public DataBean setMoveDate(final DateTime _moveDate)
-        {
-            this.moveDate = _moveDate;
-            return this;
-        }
 
         /**
          * Getter method for the instance variable {@link #remuneration}.
