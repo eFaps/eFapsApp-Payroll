@@ -1126,17 +1126,17 @@ public abstract class Payslip_Base
                 final BigDecimal extraLaborTime = getDefaultValue(_parameter, templInst,
                                 CIPayroll.TemplatePayslip.DefaultExtraLaborTime);
                 if (extraLaborTime != null) {
-                    map.put("extraLaborTime", formatter.format(laborTime));
+                    map.put("extraLaborTime", formatter.format(extraLaborTime));
                 }
                 final BigDecimal nightLaborTime = getDefaultValue(_parameter, templInst,
                                 CIPayroll.TemplatePayslip.DefaultNightLaborTime);
                 if (nightLaborTime != null) {
-                    map.put("nightLaborTime", formatter.format(laborTime));
+                    map.put("nightLaborTime", formatter.format(nightLaborTime));
                 }
                 final BigDecimal holidayLaborTime = getDefaultValue(_parameter, templInst,
                                 CIPayroll.TemplatePayslip.DefaultHolidayLaborTime);
                 if (holidayLaborTime != null) {
-                    map.put("holidayLaborTime", formatter.format(laborTime));
+                    map.put("holidayLaborTime", formatter.format(holidayLaborTime));
                 }
             }
             list.add(map);
