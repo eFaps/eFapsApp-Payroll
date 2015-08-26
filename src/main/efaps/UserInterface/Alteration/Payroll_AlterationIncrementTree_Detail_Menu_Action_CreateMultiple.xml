@@ -14,17 +14,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev: 14698 $
- Last Changed:    $Date: 2014-12-28 20:15:38 -0500 (Sun, 28 Dec 2014) $
- Last Changed By: $Author: jan@moxter.net $
-
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>d473f779-5ab9-4881-ab44-6035b063df40</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 14698 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_AlterationIncrementTree_Detail_Menu_Action_CreateMultiple</name>
@@ -33,7 +27,7 @@
             <role>Payroll_Modifier</role>
         </access>
         <target>
-            <form>Payroll_AlterationIncrementDetailForm</form>
+            <form>Payroll_AlterationCreateMultipleForm</form>
             <execute method="createDetailMultiple" program="org.efaps.esjp.payroll.Increment"/>
         </target>
         <property name="Target">modal</property>
