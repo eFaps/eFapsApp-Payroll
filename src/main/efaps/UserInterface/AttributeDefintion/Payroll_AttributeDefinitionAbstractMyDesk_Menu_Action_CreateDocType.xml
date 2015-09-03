@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2013 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev: 8533 $
- Last Changed:    $Date: 2013-01-16 11:22:09 -0500 (mié, 16 ene 2013) $
- Last Changed By: $Author: jan@moxter.net $
-
---><ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>893e314b-2f86-4037-adad-b8c14d1ef147</uuid>
-    <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 8533 $</file-revision>
+-->
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>7dc5a6e6-45b9-497d-99c0-185a829cb29c</uuid>
+    <file-application>eFapsApp-HumanResource</file-application>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_AttributeDefinitionAbstractMyDesk_Menu_Action_CreateMovementType</name>
-        <!-- target definitions -->
+        <name>Payroll_AttributeDefinitionAbstractMyDesk_Menu_Action_CreateDocType</name>
         <access>
             <role>Payroll_Admin</role>
         </access>
@@ -34,9 +29,8 @@
             <form>ERP_AttributeDefinitionForm</form>
             <execute program="org.efaps.esjp.common.uiform.Create"/>
         </target>
-        <!-- properties -->
         <property name="Target">modal</property>
-        <property name="TargetCreateType">Payroll_AttributeDefinitionMovementType</property>
+        <property name="TargetCreateType">Payroll_AttributeDefinitionDocType</property>
         <property name="TargetMode">create</property>
     </definition>
 </ui-command>
