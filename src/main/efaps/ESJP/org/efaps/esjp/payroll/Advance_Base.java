@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.efaps.esjp.payroll;
@@ -33,7 +30,7 @@ import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.Type;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.program.esjp.Listener;
 import org.efaps.ci.CIAttribute;
@@ -75,10 +72,9 @@ import org.slf4j.LoggerFactory;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
  */
 @EFapsUUID("973456d7-c147-4f3b-893e-0f7852d4d084")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class Advance_Base
     extends AbstractDocument
 {
@@ -99,7 +95,7 @@ public abstract class Advance_Base
         throws EFapsException
     {
         final DateTime date = new DateTime(_parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.date.name));
-
+        final String docType = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.docType.name);
         final String[] employees = _parameter.getParameterValues(CITablePayroll.Payroll_AdvanceTable.employee.name);
         final String[] amount2Pays = _parameter
                         .getParameterValues(CITablePayroll.Payroll_AdvanceTable.rateCrossTotal.name);
@@ -138,6 +134,7 @@ public abstract class Advance_Base
                     final BigDecimal hlT = getHolidayLaborTime(_parameter, null, date, emplInst, null);
 
                     insert.add(CIPayroll.Advance.Name, name);
+                    insert.add(CIPayroll.Advance.DocType, docType);
                     insert.add(CIPayroll.Advance.Date, date);
                     insert.add(CIPayroll.Advance.EmployeeAbstractLink, emplInst);
                     insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Draft));
@@ -400,7 +397,7 @@ public abstract class Advance_Base
         new Return();
 
         final Instance instance = _parameter.getInstance();
-
+        final String docType = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.docType.name);
         final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.date.name);
         final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_AdvanceForm.laborTime.name);
         final String laborTimeUoM = _parameter.getParameterValue("laborTimeUoM");
@@ -415,6 +412,7 @@ public abstract class Advance_Base
         final String holidayLaborTimeUoM = _parameter.getParameterValue("holidayLaborTimeUoM");
 
         final Update update = new Update(instance);
+        update.add(CIPayroll.Advance.DocType, docType);
         update.add(CIPayroll.Advance.LaborTime, new Object[] { laborTime, laborTimeUoM });
         update.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { extraLaborTime, extraLaborTimeUoM });
         update.add(CIPayroll.Advance.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
@@ -466,6 +464,8 @@ public abstract class Advance_Base
         multi.execute();
 
         final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
+        final String docType = _parameter.getParameterValue(
+                        CIFormPayroll.Payroll_AdvanceCreateMultipleForm.docType.name);
         final DateTime date = new DateTime(_parameter.getParameterValue(
                         CIFormPayroll.Payroll_AdvanceCreateMultipleForm.date.name));
         final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
@@ -478,6 +478,7 @@ public abstract class Advance_Base
 
             final Insert insert = new Insert(CIPayroll.Advance);
             insert.add(CIPayroll.Advance.Name, getDocName4Create(_parameter));
+            insert.add(CIPayroll.Advance.DocType, docType);
             insert.add(CIPayroll.Advance.Date, getDate(_parameter, date, emplInst));
             insert.add(CIPayroll.Advance.EmployeeAbstractLink, emplInst);
             insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Draft));

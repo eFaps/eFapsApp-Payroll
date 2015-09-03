@@ -105,7 +105,7 @@ import net.sf.dynamicreports.report.builder.crosstab.CrosstabColumnGroupBuilder;
 import net.sf.dynamicreports.report.builder.crosstab.CrosstabRowGroupBuilder;
 import net.sf.dynamicreports.report.builder.style.Styles;
 import net.sf.dynamicreports.report.constant.Calculation;
-import net.sf.dynamicreports.report.constant.HorizontalAlignment;
+import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
 import net.sf.dynamicreports.report.constant.PageOrientation;
 import net.sf.dynamicreports.report.constant.PageType;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
@@ -251,7 +251,7 @@ public abstract class Payslip_Base
         final CreatedDoc createdDoc = new CreatedDoc();
 
         final String name = getDocName4Create(_parameter);
-
+        final String docType = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.docType.name);
         final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
         final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
         final Long employeeid = Instance.get(
@@ -276,6 +276,7 @@ public abstract class Payslip_Base
 
         final Insert insert = new Insert(CIPayroll.Payslip);
         insert.add(CIPayroll.Payslip.Name, name);
+        insert.add(CIPayroll.Payslip.DocType, docType);
         insert.add(CIPayroll.Payslip.Date, date);
         insert.add(CIPayroll.Payslip.DueDate, dueDate);
         insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
@@ -352,6 +353,8 @@ public abstract class Payslip_Base
         multi.execute();
 
         final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
+        final String docType = _parameter.getParameterValue(
+                        CIFormPayroll.Payroll_PayslipCreateMultipleForm.docType.name);
         final DateTime date = new DateTime(
                         _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.date.name));
         final DateTime dueDate = new DateTime(_parameter
@@ -378,6 +381,7 @@ public abstract class Payslip_Base
 
             final Insert insert = new Insert(CIPayroll.Payslip);
             insert.add(CIPayroll.Payslip.Name, getDocName4Create(_parameter));
+            insert.add(CIPayroll.Payslip.DocType, docType);
             insert.add(CIPayroll.Payslip.Date, getDate(_parameter, date, emplInst));
             insert.add(CIPayroll.Payslip.DueDate, dueDate);
             insert.add(CIPayroll.Payslip.EmployeeAbstractLink, emplInst);
@@ -688,7 +692,7 @@ public abstract class Payslip_Base
         final Return ret = new Return();
 
         final Instance instance = _parameter.getInstance();
-
+        final String docType = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.docType.name);
         final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
         final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
         final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
@@ -704,6 +708,7 @@ public abstract class Payslip_Base
         final String holidayLaborTimeUoM = _parameter.getParameterValue("holidayLaborTimeUoM");
 
         final Update update = new Update(instance);
+        update.add(CIPayroll.Payslip.DocType, docType);
         update.add(CIPayroll.Payslip.LaborTime, new Object[] { laborTime, laborTimeUoM });
         update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { extraLaborTime, extraLaborTimeUoM });
         update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
@@ -1470,9 +1475,9 @@ public abstract class Payslip_Base
                                 .addTitle(DynamicReports.cmp.horizontalList(
                                                 DynamicReports.cmp.text("ActionReport"),
                                                 DynamicReports.cmp
-                                                                .text(new Date())
-                                                                .setHorizontalAlignment(HorizontalAlignment.RIGHT)
-                                                                .setDataType(DynamicReports.type.dateYearToMinuteType())));
+                                                        .text(new Date())
+                                                        .setHorizontalTextAlignment(HorizontalTextAlignment.RIGHT)
+                                                        .setDataType(DynamicReports.type.dateYearToMinuteType())));
                 if (print) {
                     jrb.setPageMargin(DynamicReports.margin(20))
                                     .setPageFormat(PageType.A4, PageOrientation.LANDSCAPE)
@@ -1483,7 +1488,7 @@ public abstract class Payslip_Base
                                                     .setForegroundColor(Color.white))
                                     .highlightDetailEvenRows()
                                     .pageFooter(DynamicReports.cmp.pageXofY().setStyle(DynamicReports.stl.style()
-                                                    .setHorizontalAlignment(HorizontalAlignment.CENTER)));
+                                                    .setHorizontalTextAlignment(HorizontalTextAlignment.CENTER)));
                 } else {
                     jrb.setIgnorePagination(true)
                                     .setPageMargin(DynamicReports.margin(0));

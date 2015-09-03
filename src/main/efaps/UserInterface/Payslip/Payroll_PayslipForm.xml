@@ -30,9 +30,18 @@
             <application name="eFapsApp-Projects" exclude="true"/>
         </application-dependencies>
         <name>Payroll_PayslipForm</name>
+        <field name="typeGroup" character="Group">
+            <property name="GroupCount">2</property>
+            <property name="ModeEdit">NONE</property>
+        </field>
         <field name="type">
             <property name="Attribute">Type</property>
             <property name="ModeEdit">NONE</property>
+        </field>
+        <field name="docType">
+            <property name="Attribute">DocType</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
         </field>
         <field name="nameGroup" character="Group">
             <property name="GroupCount">3</property>
@@ -289,9 +298,18 @@
             <application name="eFapsApp-Projects"/>
         </application-dependencies>
         <name>Payroll_PayslipForm</name>
+        <field name="typeGroup" character="Group">
+            <property name="GroupCount">2</property>
+            <property name="ModeEdit">NONE</property>
+        </field>
         <field name="type">
             <property name="Attribute">Type</property>
             <property name="ModeEdit">NONE</property>
+        </field>
+        <field name="docType">
+            <property name="Attribute">DocType</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
         </field>
         <field name="nameGroup" character="Group">
             <property name="GroupCount">3</property>
