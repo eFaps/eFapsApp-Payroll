@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2014 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.efaps.esjp.payroll.reports;
@@ -37,20 +34,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
-import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
-import net.sf.dynamicreports.report.builder.expression.Expressions;
-import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder;
-import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
-import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
-import net.sf.dynamicreports.report.builder.style.StyleBuilder;
-import net.sf.dynamicreports.report.builder.subtotal.AggregationSubtotalBuilder;
-import net.sf.dynamicreports.report.definition.ReportParameters;
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
-
 import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.efaps.admin.common.MsgPhrase;
 import org.efaps.admin.datamodel.IEnum;
@@ -61,10 +44,13 @@ import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
+import org.efaps.admin.program.esjp.EFapsApplication;
+import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.MultiPrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
+import org.efaps.esjp.ci.CIERP;
 import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CIProjects;
@@ -79,11 +65,29 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.expression.Expressions;
+import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder;
+import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder;
+import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
+import net.sf.dynamicreports.report.builder.style.StyleBuilder;
+import net.sf.dynamicreports.report.builder.subtotal.AggregationSubtotalBuilder;
+import net.sf.dynamicreports.report.definition.ReportParameters;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRRewindableDataSource;
+import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
+
 /**
  * TODO comment!
  *
  * @author The eFaps Team
  */
+@EFapsUUID("31f170cf-2788-4800-9437-07387bfc6074")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class PositionAnalyzeReport_Base
     extends FilteredReport
 {
@@ -249,6 +253,12 @@ public abstract class PositionAnalyzeReport_Base
                                 .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink);
                 final SelectBuilder selDocInst = new SelectBuilder(selDoc).instance();
                 final SelectBuilder selDocName = new SelectBuilder(selDoc).attribute(CIPayroll.DocumentAbstract.Name);
+                final SelectBuilder selDocTypeVal = new SelectBuilder(selDoc)
+                                .linkto(CIPayroll.DocumentAbstract.DocType)
+                                .attribute(CIERP.AttributeDefinitionAbstract.Value);
+                final SelectBuilder selDocTypeDescr = new SelectBuilder(selDoc)
+                                .linkto(CIPayroll.DocumentAbstract.DocType)
+                                .attribute(CIERP.AttributeDefinitionAbstract.Description);
                 final SelectBuilder selCrossTotal = new SelectBuilder(selDoc)
                                 .attribute(CIPayroll.DocumentAbstract.CrossTotal);
                 final SelectBuilder selAmountCost = new SelectBuilder(selDoc)
@@ -316,7 +326,7 @@ public abstract class PositionAnalyzeReport_Base
 
                 multi.addMsgPhrase(selDoc, msgPhrase);
                 multi.addSelect(selCrossTotal, selAmountCost, selDocInst, selDocName, selDepName, selDocELT, selDocHLT,
-                                selDocLT, selDocNLT, selRemun, selEmplNum);
+                                selDocLT, selDocNLT, selRemun, selEmplNum, selDocTypeVal, selDocTypeDescr);
                 multi.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Description,
                                 CIPayroll.PositionAbstract.Key);
                 multi.execute();
@@ -330,6 +340,10 @@ public abstract class PositionAnalyzeReport_Base
                         this.data.put(docInst, map);
                         map.put("Remuneration", multi.getSelect(selRemun));
                         map.put(CIPayroll.DocumentAbstract.Name.name, multi.getSelect(selDocName));
+                        final String docTypeVal =  multi.getSelect(selDocTypeVal);
+                        final String docTypeDescr = multi.getSelect(selDocTypeDescr);
+                        map.put(CIPayroll.DocumentAbstract.DocType.name, docTypeVal
+                                   + (docTypeDescr != null && !docTypeDescr.isEmpty() ? (" - " + docTypeDescr) : ""));
                         map.put(CIPayroll.DocumentAbstract.CrossTotal.name, multi.getSelect(selCrossTotal));
                         map.put(CIPayroll.DocumentAbstract.AmountCost.name, multi.getSelect(selAmountCost));
                         final BigDecimal laborTime =  (BigDecimal) multi.<Object[]>getSelect(selDocLT)[0];
@@ -487,14 +501,56 @@ public abstract class PositionAnalyzeReport_Base
         protected JRDataSource createDataSource(final Parameter _parameter)
             throws EFapsException
         {
-            final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
+            JRRewindableDataSource ret;
+            if (getFilterReport().isCached(_parameter)) {
+                ret = getFilterReport().getDataSourceFromCache(_parameter);
+                try {
+                    ret.moveFirst();
+                } catch (final JRException e) {
+                    throw new EFapsException("JRException", e);
+                }
+            } else {
+                final Map<String, Object> filterMap = getFilterReport().getFilterMap(_parameter);
 
-            final Map<Instance, Map<String, Object>> maps = getData(_parameter);
-            final List<Map<String, Object>> values = new ArrayList<>(maps.values());
-            final ComparatorChain<Map<String, Object>> comp = new ComparatorChain<>();
+                final Map<Instance, Map<String, Object>> maps = getData(_parameter);
+                final List<Map<String, Object>> values = new ArrayList<>(maps.values());
+                final ComparatorChain<Map<String, Object>> comp = new ComparatorChain<>();
 
-            if (filterMap.containsKey("projectGroup")
-                            && GroupDisplay.GROUP.equals(FilteredReport.getEnumValue(filterMap.get("projectGroup")))) {
+                if (filterMap.containsKey("projectGroup") && GroupDisplay.GROUP.equals(
+                                FilteredReport.getEnumValue(filterMap.get("projectGroup")))) {
+                    comp.addComparator(new Comparator<Map<String, Object>>()
+                    {
+
+                        @Override
+                        public int compare(final Map<String, Object> _o1,
+                                           final Map<String, Object> _o2)
+                        {
+                            final String str1 = _o1.containsKey("Project") && _o1.get("Project") != null ? (String) _o1
+                                            .get("Project") : "";
+                            final String str2 = _o2.containsKey("Project") && _o2.get("Project") != null ? (String) _o2
+                                            .get("Project") : "";
+                            return str1.compareTo(str2);
+                        }
+                    });
+                }
+
+                if (filterMap.containsKey("departmentGroup") && !GroupDisplay.NONE.equals(
+                                FilteredReport.getEnumValue(filterMap.get("departmentGroup")))) {
+                    comp.addComparator(new Comparator<Map<String, Object>>()
+                    {
+                        @Override
+                        public int compare(final Map<String, Object> _o1,
+                                           final Map<String, Object> _o2)
+                        {
+                            final String str1 = _o1.containsKey("Department") && _o1.get("Department") != null
+                                            ? (String) _o1.get("Department") : "";
+                            final String str2 = _o2.containsKey("Department") && _o2.get("Department") != null
+                                            ? (String) _o2.get("Department") : "";
+                            return str1.compareTo(str2);
+                        }
+                    });
+                }
+
                 comp.addComparator(new Comparator<Map<String, Object>>()
                 {
 
@@ -502,66 +558,35 @@ public abstract class PositionAnalyzeReport_Base
                     public int compare(final Map<String, Object> _o1,
                                        final Map<String, Object> _o2)
                     {
-                        final String str1 = _o1.containsKey("Project") && _o1.get("Project") != null ? (String) _o1
-                                        .get("Project") : "";
-                        final String str2 = _o2.containsKey("Project") && _o2.get("Project") != null ? (String) _o2
-                                        .get("Project") : "";
+                        final String str1 = _o1.containsKey("EmployeeAbstractLink")
+                                        && _o1.get("EmployeeAbstractLink") != null ? (String) _o1
+                                        .get("EmployeeAbstractLink") : "";
+                        final String str2 = _o2.containsKey("EmployeeAbstractLink")
+                                        && _o2.get("EmployeeAbstractLink") != null ? (String) _o2
+                                        .get("EmployeeAbstractLink") : "";
                         return str1.compareTo(str2);
                     }
                 });
-            }
 
-            if (filterMap.containsKey("departmentGroup") && !GroupDisplay.NONE.equals(
-                            FilteredReport.getEnumValue(filterMap.get("departmentGroup")))) {
                 comp.addComparator(new Comparator<Map<String, Object>>()
                 {
+
                     @Override
                     public int compare(final Map<String, Object> _o1,
                                        final Map<String, Object> _o2)
                     {
-                        final String str1 = _o1.containsKey("Department") && _o1.get("Department") != null
-                                        ? (String) _o1.get("Department") : "";
-                        final String str2 = _o2.containsKey("Department") && _o2.get("Department") != null
-                                        ? (String) _o2.get("Department") : "";
+                        final String str1 = _o1.containsKey("Name") && _o1.get("Name") != null ? (String) _o1
+                                        .get("Name") : "";
+                        final String str2 = _o2.containsKey("Name") && _o2.get("Name") != null ? (String) _o2
+                                        .get("Name") : "";
                         return str1.compareTo(str2);
                     }
                 });
+                Collections.sort(values, comp);
+                ret = new JRMapCollectionDataSource(new ArrayList<Map<String, ?>>(values));
+                getFilterReport().cache(_parameter, ret);
             }
-
-            comp.addComparator(new Comparator<Map<String, Object>>()
-            {
-
-                @Override
-                public int compare(final Map<String, Object> _o1,
-                                   final Map<String, Object> _o2)
-                {
-                    final String str1 = _o1.containsKey("EmployeeAbstractLink")
-                                    && _o1.get("EmployeeAbstractLink") != null ? (String) _o1
-                                    .get("EmployeeAbstractLink") : "";
-                    final String str2 = _o2.containsKey("EmployeeAbstractLink")
-                                    && _o2.get("EmployeeAbstractLink") != null ? (String) _o2
-                                    .get("EmployeeAbstractLink") : "";
-                    return str1.compareTo(str2);
-                }
-            });
-
-            comp.addComparator(new Comparator<Map<String, Object>>()
-            {
-
-                @Override
-                public int compare(final Map<String, Object> _o1,
-                                   final Map<String, Object> _o2)
-                {
-                    final String str1 = _o1.containsKey("Name") && _o1.get("Name") != null ? (String) _o1
-                                    .get("Name") : "";
-                    final String str2 = _o2.containsKey("Name") && _o2.get("Name") != null ? (String) _o2
-                                    .get("Name") : "";
-                    return str1.compareTo(str2);
-                }
-            });
-
-            Collections.sort(values, comp);
-            return new JRMapCollectionDataSource(new ArrayList<Map<String, ?>>(values));
+            return ret;
         }
 
         /**
@@ -622,6 +647,12 @@ public abstract class PositionAnalyzeReport_Base
                 if (filter.getObject() != null && filter.getObject().isValid()) {
                     ret.addWhereAttrEqValue(CIPayroll.DocumentAbstract.EmployeeAbstractLink,
                                     filter.getObject());
+                }
+            }
+            if (filterMap.containsKey("docType")) {
+                final AttrDefFilterValue filter = (AttrDefFilterValue) filterMap.get("docType");
+                if (filter.getObject() != null && !filter.getObject().isEmpty()) {
+                    ret.addWhereAttrEqValue(CIPayroll.DocumentAbstract.DocType, filter.getObject().toArray());
                 }
             }
             return ret;
@@ -692,14 +723,24 @@ public abstract class PositionAnalyzeReport_Base
             numberCol.setWidth(15).setTitle(getLabel("RowNumber"));
             final TextColumnBuilder<String> nameCol = DynamicReports.col.column(getLabel("Name"),
                             CIPayroll.DocumentAbstract.Name.name, DynamicReports.type.stringType());
+            _builder.addColumn(numberCol, nameCol);
+            groups.add(numberCol);
+            groups.add(nameCol);
+
+            if (!DetailsDisplay.NONE.equals(details)) {
+                final TextColumnBuilder<String> docTypeCol = DynamicReports.col.column(getLabel("column.docType"),
+                            CIPayroll.DocumentAbstract.DocType.name, DynamicReports.type.stringType());
+                _builder.addColumn(docTypeCol);
+                groups.add(docTypeCol);
+            }
+
             final TextColumnBuilder<String> employeeCol = DynamicReports.col.column(getLabel("Employee"),
                             CIPayroll.DocumentAbstract.EmployeeAbstractLink.name, DynamicReports.type.stringType())
                             .setWidth(200);
             final TextColumnBuilder<String> employeeNumCol = DynamicReports.col.column(getLabel("EmployeeNumber"),
                             "EmployeeNumber", DynamicReports.type.stringType());
-            _builder.addColumn(numberCol, nameCol, employeeCol, employeeNumCol);
-            groups.add(numberCol);
-            groups.add(nameCol);
+            _builder.addColumn(employeeCol, employeeNumCol);
+
             groups.add(employeeCol);
             groups.add(employeeNumCol);
 

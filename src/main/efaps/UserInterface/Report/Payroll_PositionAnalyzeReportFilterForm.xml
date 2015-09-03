@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
-  Copyright 2003 - 2014 The eFaps Team
+  Copyright 2003 - 2015 The eFaps Team
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -13,11 +13,6 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-
-  Author:          The eFaps Team
-  Revision:        $Rev$
-  Last Changed:    $Date$
-  Last Changed By: $Author$
 
 -->
 <ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -58,6 +53,16 @@
                 <property name="Type01">Payroll_Advance</property>
                 <property name="Type02">Payroll_Payslip</property>
                 <property name="Type03">Payroll_Settlement</property>
+            </trigger>
+        </field>
+        <field name="docType">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIType">CHECKBOX</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.docType</property>
+            <trigger event="UI_FIELD_VALUE" method="getAttrDefFieldValue"
+                name="Payroll_PositionAnalyzeReportFilterForm.docType.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" >
+                <property name="Type">Payroll_AttributeDefinitionDocType</property>
             </trigger>
         </field>
          <field name="employee">
@@ -146,7 +151,17 @@
                 <property name="Type03">Payroll_Settlement</property>
             </trigger>
         </field>
-         <field name="employee">
+        <field name="docType">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="UIType">CHECKBOX</property>
+            <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.docType</property>
+            <trigger event="UI_FIELD_VALUE" method="getAttrDefFieldValue"
+                name="Payroll_PositionAnalyzeReportFilterForm.docType.UI_FIELD_VALUE"
+                program="org.efaps.esjp.erp.FilteredReport" >
+                <property name="Type">Payroll_AttributeDefinitionDocType</property>
+            </trigger>
+        </field>
+        <field name="employee">
             <property name="ModeEdit">EDITABLE</property>
             <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Label">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.employee</property>
