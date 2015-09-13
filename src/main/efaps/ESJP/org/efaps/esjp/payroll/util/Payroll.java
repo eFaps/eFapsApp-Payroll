@@ -27,6 +27,9 @@ import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.api.annotation.EFapsSysConfAttribute;
 import org.efaps.esjp.admin.common.systemconfiguration.BooleanSysConfAttribute;
+import org.efaps.esjp.admin.common.systemconfiguration.ListSysConfAttribute;
+import org.efaps.esjp.admin.common.systemconfiguration.PropertiesSysConfAttribute;
+import org.efaps.esjp.admin.common.systemconfiguration.StringSysConfAttribute;
 import org.efaps.util.cache.CacheReloadException;
 
 /**
@@ -42,6 +45,27 @@ public final class Payroll
     public static final String BASE = "org.efaps.payroll.";
     /** Payroll-Configuration. */
     public static final UUID SYSCONFUUID = UUID.fromString("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final ListSysConfAttribute RULESANDBOXWHITELIST = new ListSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "WhiteList4RuleSandbox")
+                    .description("List of class names that can be executed in the rule contexts.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final PropertiesSysConfAttribute STATICMETHODMAPPING = new PropertiesSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "StaticMethodMapping")
+                    .description("List of static methods added to the parameters.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final StringSysConfAttribute RULE4AFPTOTAL = new StringSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "RuleKey4AFPTotal")
+                    .description("Key of the Rule that contains the total for the AFP Report.");
 
     /** See description. */
     @EFapsSysConfAttribute

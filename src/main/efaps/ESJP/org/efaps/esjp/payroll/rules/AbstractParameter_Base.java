@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2014 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.efaps.esjp.payroll.rules;
@@ -28,8 +25,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.efaps.admin.event.Parameter;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsClassLoader;
-import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.ci.CIAttribute;
 import org.efaps.ci.CIField;
@@ -43,7 +40,6 @@ import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.util.Payroll;
-import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
@@ -54,12 +50,10 @@ import org.slf4j.LoggerFactory;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: AbstractParameter_Base.java 14638 2014-12-17 00:23:45Z
- *          jan@moxter.net $
  * @param <T> type of parameter
  */
 @EFapsUUID("45fcf09d-d676-4ac1-8f15-5f790f2eaf03")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class AbstractParameter_Base<T>
 {
 
@@ -303,10 +297,8 @@ public abstract class AbstractParameter_Base<T>
         throws EFapsException
     {
         final Map<String, Object> ret = new HashMap<>();
-
-        final Properties statics = Payroll.getSysConfig().getAttributeValueAsProperties(
-                        PayrollSettings.STATICMETHODMAPPING, true);
-        for (final Entry<Object, Object> entry : statics.entrySet()) {
+        final Properties props = Payroll.STATICMETHODMAPPING.get();
+        for (final Entry<Object, Object> entry : props.entrySet()) {
             try {
                 final Class<?> clazz = Class.forName((String) entry.getValue(), true, EFapsClassLoader.getInstance());
                 ret.put((String) entry.getKey(), clazz);

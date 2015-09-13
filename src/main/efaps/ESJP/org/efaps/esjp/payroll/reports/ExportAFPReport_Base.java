@@ -41,7 +41,6 @@ import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
 import org.efaps.esjp.payroll.util.Payroll;
-import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
@@ -103,8 +102,7 @@ public abstract class ExportAFPReport_Base
         {
             final List<DataBean> beans = new ArrayList<>();
 
-            final String totalKey = Payroll.getSysConfig().getAttributeValue(PayrollSettings.RULE4AFPTOTAL);
-
+            final String totalKey = Payroll.RULE4AFPTOTAL.get();
             if (totalKey != null && !totalKey.isEmpty()) {
                 final DateTime dateFrom = new DateTime(_parameter
                                 .getParameterValue(CIFormPayroll.Payroll_ExportAFPReportForm.dateFrom.name));

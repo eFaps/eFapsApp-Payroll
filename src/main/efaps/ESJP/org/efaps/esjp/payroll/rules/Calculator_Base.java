@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2014 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.efaps.esjp.payroll.rules;
@@ -41,12 +38,11 @@ import org.apache.commons.jexl2.introspection.JexlPropertySet;
 import org.apache.commons.jexl2.introspection.UberspectImpl;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.efaps.admin.event.Parameter;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsClassLoader;
-import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.esjp.payroll.util.Payroll;
-import org.efaps.esjp.payroll.util.PayrollSettings;
 import org.efaps.esjp.ui.html.Table;
 import org.efaps.util.EFapsException;
 import org.slf4j.Logger;
@@ -56,11 +52,9 @@ import org.slf4j.LoggerFactory;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: Calculator_Base.java 13971 2014-09-08 21:03:58Z jan@moxter.net
- *          $
  */
 @EFapsUUID("a18eb023-438e-442b-853e-3b5b61517ca8")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class Calculator_Base
 {
 
@@ -253,12 +247,8 @@ public abstract class Calculator_Base
             setClassLoader(EFapsClassLoader.getInstance());
             setLoader(EFapsClassLoader.getInstance());
             try {
-                final String whiteLstStr = Payroll.getSysConfig().getAttributeValue(
-                                PayrollSettings.RULESANDBOXWHITELIST);
-                if (whiteLstStr != null && !whiteLstStr.isEmpty()) {
-                    for (final String white : whiteLstStr.split("\n")) {
-                        this.classNames.add(white.trim());
-                    }
+                for (final String white : Payroll.RULESANDBOXWHITELIST.get()) {
+                    this.classNames.add(white.trim());
                 }
                 this.classNames.add(MathFunctions.class.getName());
                 this.classNames.add(DataFunctions.class.getName());
