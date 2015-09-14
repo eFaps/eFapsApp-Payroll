@@ -88,5 +88,12 @@
                 <property name="Type">Payroll_AttributeDefinitionDocType</property>
             </trigger>
         </attribute>
+         <attribute>
+            <name>Basis</name>
+            <type>Jaxb</type>
+            <className>org.efaps.esjp.payroll.basis.BasisAttribute</className>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>BASIS</sqlcolumn>
+        </attribute>
     </definition>
 </datamodel-type>

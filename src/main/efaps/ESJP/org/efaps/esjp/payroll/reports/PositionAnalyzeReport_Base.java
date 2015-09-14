@@ -58,6 +58,8 @@ import org.efaps.esjp.ci.CISales;
 import org.efaps.esjp.common.jasperreport.AbstractDynamicReport;
 import org.efaps.esjp.common.jasperreport.datatype.DateTimeDate;
 import org.efaps.esjp.erp.FilteredReport;
+import org.efaps.esjp.payroll.basis.BasisAttribute;
+import org.efaps.esjp.payroll.basis.xml.ValueList;
 import org.efaps.esjp.sales.report.DocumentSumReport;
 import org.efaps.ui.wicket.util.EnumUtil;
 import org.efaps.util.EFapsException;
@@ -286,6 +288,8 @@ public abstract class PositionAnalyzeReport_Base
                 final SelectBuilder selEmplNum = new SelectBuilder(selDoc)
                                 .linkto(CIPayroll.DocumentAbstract.EmployeeAbstractLink)
                                 .attribute(CIHumanResource.Employee.Number);
+                final SelectBuilder selBasis = new SelectBuilder(selDoc)
+                                .attribute(CIPayroll.DocumentAbstract.Basis);
                 if (project) {
                     multi.addMsgPhrase(selProj, msgPhrase4Project);
                 }
@@ -326,7 +330,7 @@ public abstract class PositionAnalyzeReport_Base
 
                 multi.addMsgPhrase(selDoc, msgPhrase);
                 multi.addSelect(selCrossTotal, selAmountCost, selDocInst, selDocName, selDepName, selDocELT, selDocHLT,
-                                selDocLT, selDocNLT, selRemun, selEmplNum, selDocTypeVal, selDocTypeDescr);
+                                selDocLT, selDocNLT, selRemun, selEmplNum, selDocTypeVal, selDocTypeDescr, selBasis);
                 multi.addAttribute(CIPayroll.PositionAbstract.Amount, CIPayroll.PositionAbstract.Description,
                                 CIPayroll.PositionAbstract.Key);
                 multi.execute();
@@ -338,7 +342,9 @@ public abstract class PositionAnalyzeReport_Base
                     } else {
                         map = new HashMap<>();
                         this.data.put(docInst, map);
-                        map.put("Remuneration", multi.getSelect(selRemun));
+                        final ValueList basis = multi.getSelect(selBasis);
+                        map.put("Remuneration", BasisAttribute.getObjectValue(_parameter, basis,
+                                        CIHumanResource.ClassTR_Labor.Remuneration, multi.getSelect(selRemun)));
                         map.put(CIPayroll.DocumentAbstract.Name.name, multi.getSelect(selDocName));
                         final String docTypeVal =  multi.getSelect(selDocTypeVal);
                         final String docTypeDescr = multi.getSelect(selDocTypeDescr);
@@ -367,11 +373,16 @@ public abstract class PositionAnalyzeReport_Base
                             map.put("Project", multi.getMsgPhrase(selProj, msgPhrase4Project));
                         }
                         if (DetailsDisplay.EXTRA.equals(details)) {
-                            map.put("pensionRegimeType", multi.getSelect(selEmplPRT));
-                            map.put("pensionRegime", multi.getSelect(selEmplPR));
-                            map.put("startDate", multi.getSelect(selEmplST));
-                            map.put("periodicity", multi.getSelect(selPeri));
-                            map.put("emplEmpl", multi.getSelect(selEmplEmpl));
+                            map.put("pensionRegimeType", BasisAttribute.getObjectValue(_parameter, basis,
+                                   CIHumanResource.ClassTR_Health.PensionRegimeTypeLink, multi.getSelect(selEmplPRT)));
+                            map.put("pensionRegime", BasisAttribute.getObjectValue(_parameter, basis,
+                                         CIHumanResource.ClassTR_Health.PensionRegimeLink, multi.getSelect(selEmplPR)));
+                            map.put("startDate", BasisAttribute.getObjectValue(_parameter, basis,
+                                            CIHumanResource.ClassTR.StartDate, multi.getSelect(selEmplST)));
+                            map.put("periodicity", BasisAttribute.getObjectValue(_parameter, basis,
+                                            CIHumanResource.ClassTR_Labor.PeriodicityLink,multi.getSelect(selPeri)));
+                            map.put("emplEmpl", BasisAttribute.getObjectValue(_parameter, basis,
+                                            CIHumanResource.Employee.EmployLink,multi.getSelect(selEmplEmpl)));
                             final Object valueTmp = multi.getSelect(selEmplAct);
                             if (valueTmp != null && valueTmp instanceof List) {
                                 final StringBuilder bldr = new StringBuilder();
@@ -384,7 +395,8 @@ public abstract class PositionAnalyzeReport_Base
                                     }
                                     bldr.append(EnumUtil.getUILabel((IEnum) obj));
                                 }
-                                map.put("emplAct", bldr.toString());
+                                map.put("emplAct", BasisAttribute.getObjectValue(_parameter, basis,
+                                                CIHumanResource.Employee.Activation, bldr.toString()));
                             }
                         }
                         PositionAnalyzeReport_Base.LOG.debug("Read: {}", map);

@@ -78,6 +78,7 @@ import org.efaps.esjp.common.util.InterfaceUtils_Base.DojoLibs;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
+import org.efaps.esjp.payroll.basis.BasisAttribute;
 import org.efaps.esjp.payroll.listener.IOnPayslip;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
@@ -254,8 +255,8 @@ public abstract class Payslip_Base
         final String docType = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.docType.name);
         final String date = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.date.name);
         final String dueDate = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.dueDate.name);
-        final Long employeeid = Instance.get(
-                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.employee.name)).getId();
+        final Instance employeeInst = Instance.get(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.employee.name));
         final String laborTime = _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.laborTime.name);
         final String laborTimeUoM = _parameter.getParameterValue("laborTimeUoM");
         final String extraLaborTime = _parameter
@@ -279,7 +280,7 @@ public abstract class Payslip_Base
         insert.add(CIPayroll.Payslip.DocType, docType);
         insert.add(CIPayroll.Payslip.Date, date);
         insert.add(CIPayroll.Payslip.DueDate, dueDate);
-        insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeid);
+        insert.add(CIPayroll.Payslip.EmployeeAbstractLink, employeeInst);
         insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
         insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
         insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
@@ -297,6 +298,7 @@ public abstract class Payslip_Base
         insert.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
         insert.add(CIPayroll.Payslip.TemplateLink,  Instance.get(
                         _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipForm.template.name)));
+        insert.add(CIPayroll.Payslip.Basis, BasisAttribute.getValueList4Inst(_parameter, employeeInst));
         insert.execute();
 
         createdDoc.setInstance(insert.getInstance());
@@ -409,6 +411,7 @@ public abstract class Payslip_Base
                             new Object[] {  getNightLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
                                             timeDim.getBaseUoM().getId() });
             insert.add(CIPayroll.Payslip.TemplateLink, templInst);
+            insert.add(CIPayroll.Payslip.Basis, BasisAttribute.getValueList4Inst(_parameter, emplInst));
             insert.execute();
 
             createdDoc.setInstance(insert.getInstance());
@@ -715,6 +718,7 @@ public abstract class Payslip_Base
         update.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { holidayLaborTime, holidayLaborTimeUoM });
         update.add(CIPayroll.Payslip.Date, date);
         update.add(CIPayroll.Payslip.DueDate, dueDate);
+        update.add(CIPayroll.Payslip.Basis, BasisAttribute.getValueList4Inst(_parameter, instance));
         update.execute();
 
         final PrintQuery print = new PrintQuery(instance);

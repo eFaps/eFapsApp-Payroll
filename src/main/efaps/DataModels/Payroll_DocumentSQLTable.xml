@@ -48,6 +48,7 @@
             <column name="VACATION"         type="INTEGER"/>
             <column name="STARTDATE"        type="DATETIME"/>
             <column name="ENDDATE"          type="DATETIME"/>
+            <column name="BASIS"            type="CLOB"/>
             <foreign name="T_PRDOC_EMPLOYEEID"   key="EMPLOYEEID"      reference="T_HREMPLOYEE(ID)"/>
             <foreign name="T_PRDOC_TEMPLATEID"   key="TEMPLATEID"      reference="T_PRTEMPLATE(ID)"/>
         </database>

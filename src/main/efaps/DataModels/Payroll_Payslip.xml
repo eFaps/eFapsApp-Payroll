@@ -60,6 +60,7 @@
             <property name="Select01">linkto[RateCurrencyId].attribute[ISOCode]</property>
             <property name="SelectAttribute02">CurrencyId</property>
             <property name="Select02">linkto[CurrencyId].attribute[ISOCode]</property>
+            <property name="IgnoreAttribute">Basis</property>
         </trigger>
         <trigger program="org.efaps.esjp.common.history.UpdateHistoryTrigger"
             name="Payroll_Payslip.UPDATE_POST"
@@ -68,6 +69,7 @@
             <property name="Select01">linkto[RateCurrencyId].attribute[ISOCode]</property>
             <property name="SelectAttribute02">CurrencyId</property>
             <property name="Select02">linkto[CurrencyId].attribute[ISOCode]</property>
+            <property name="IgnoreAttribute">Basis</property>
         </trigger>
         <trigger program="org.efaps.esjp.common.history.DeleteHistoryTrigger"
             name="Payroll_Payslip.DELETE_PRE.2"
