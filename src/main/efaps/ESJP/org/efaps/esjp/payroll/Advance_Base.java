@@ -54,6 +54,7 @@ import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
+import org.efaps.esjp.payroll.basis.BasisAttribute;
 import org.efaps.esjp.payroll.listener.IOnAdvance;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
@@ -156,6 +157,7 @@ public abstract class Advance_Base
                                     new Object[] { nlT == null ? BigDecimal.ZERO : nlT, timeDim.getBaseUoM().getId() });
                     insert.add(CIPayroll.Advance.HolidayLaborTime,
                                     new Object[] { hlT == null ? BigDecimal.ZERO : hlT, timeDim.getBaseUoM().getId() });
+                    insert.add(CIPayroll.Advance.Basis, BasisAttribute.getValueList4Inst(_parameter, emplInst));
                     insert.execute();
                 }
             }
@@ -418,6 +420,7 @@ public abstract class Advance_Base
         update.add(CIPayroll.Advance.NightLaborTime, new Object[] { nightLaborTime, nightLaborTimeUoM });
         update.add(CIPayroll.Advance.HolidayLaborTime, new Object[] { holidayLaborTime, holidayLaborTimeUoM });
         update.add(CIPayroll.Advance.Date, date);
+        update.add(CIPayroll.Advance.Basis, BasisAttribute.getValueList4Inst(_parameter, instance));
         update.execute();
 
         final PrintQuery print = new PrintQuery(instance);
@@ -577,6 +580,7 @@ public abstract class Advance_Base
                 if (selected.equals("NightLaborTime")) {
                     update.add(CIPayroll.Advance.NightLaborTime, new Object[] { values[i], nightLaborTime[1] });
                 }
+                update.add(CIPayroll.Advance.Basis, BasisAttribute.getValueList4Inst(_parameter, docInst));
                 update.execute();
 
                 final Payslip payslip = new Payslip();

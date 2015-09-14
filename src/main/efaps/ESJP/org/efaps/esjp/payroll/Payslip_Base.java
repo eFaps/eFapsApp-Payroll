@@ -1845,6 +1845,7 @@ public abstract class Payslip_Base
                 if (selected.equals("NightLaborTime")) {
                     update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { values[i], nightLaborTime[1] });
                 }
+                update.add(CIPayroll.Advance.Basis, BasisAttribute.getValueList4Inst(_parameter, docInst));
                 update.execute();
 
                 final List<? extends AbstractRule<?>> rules = analyseRulesFomDoc(_parameter, docInst, mapping);

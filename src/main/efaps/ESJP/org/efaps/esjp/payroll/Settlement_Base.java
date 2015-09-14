@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2014 The eFaps Team
+ * Copyright 2003 - 2015 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.efaps.esjp.payroll;
@@ -26,7 +23,7 @@ import java.util.List;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
@@ -36,6 +33,7 @@ import org.efaps.db.QueryBuilder;
 import org.efaps.db.Update;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.payroll.basis.BasisAttribute;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
 import org.efaps.esjp.payroll.rules.Result;
@@ -46,11 +44,9 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: Settlement_Base.java 14615 2014-12-11 21:26:33Z jan@moxter.net
- *          $
  */
 @EFapsUUID("89fc5497-2f5f-480e-bb82-cc29259603dd")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class Settlement_Base
     extends AbstractDocumentSum
 {
@@ -140,6 +136,7 @@ public abstract class Settlement_Base
                         _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name));
         _insert.add(CIPayroll.Settlement.EndDate,
                         _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name));
+        _insert.add(CIPayroll.Settlement.Basis, BasisAttribute.getValueList4Inst(_parameter, employeeInst));
     }
 
     public Return edit(final Parameter _parameter)
@@ -183,6 +180,7 @@ public abstract class Settlement_Base
                         _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.startDate.name));
         _update.add(CIPayroll.Settlement.EndDate,
                         _parameter.getParameterValue(CIFormPayroll.Payroll_SettlementForm.endDate.name));
+        _update.add(CIPayroll.Settlement.Basis, BasisAttribute.getValueList4Inst(_parameter, _update.getInstance()));
     }
 
     /**

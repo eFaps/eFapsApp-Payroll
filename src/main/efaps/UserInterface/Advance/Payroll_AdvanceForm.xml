@@ -195,6 +195,13 @@
             <property name="Label">Payroll_PayslipForm.Sums.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
+        <field name="basis">
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeView">READONLY</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Attribute">Basis</property>
+            <property name="Label">Payroll_Advance/Basis.Label</property>
+        </field>
         <field name="javaScript">
             <property name="ModeCreate">HIDDEN</property>
             <property name="ModeEdit">NONE</property>
@@ -404,6 +411,13 @@
                 <property name="Type">Payroll_PositionAbstract</property>
                 <property name="LinkFrom">DocumentAbstractLink</property>
             </evaluate>
+        </field>
+        <field name="basis">
+            <property name="ModeCreate">NONE</property>
+            <property name="ModeView">READONLY</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="Attribute">Basis</property>
+            <property name="Label">Payroll_Advance/Basis.Label</property>
         </field>
         <field name="sums">
             <property name="ModeCreate">READONLY</property>
