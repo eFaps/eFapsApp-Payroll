@@ -17,20 +17,13 @@
 -->
 <ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>e547d6a0-44c1-47a0-a292-53f12bce9522</uuid>
+    <uuid>38eeda04-902c-4d4e-ad4f-e46eb106824a</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_MyDesk_Admin</name>
-        <access>
-            <role>Administration</role>
-        </access>
+        <name>Payroll_EmployeeGroupTree_Menu</name>
         <childs>
-            <child>Payroll_RuleMyDesk</child>
-            <child>Payroll_TemplateMyDesk</child>
-            <child>Payroll_ParameterMyDesk</child>
-            <child>Payroll_ProcessDefinitionMyDesk</child>
-            <child>Payroll_EmployeeGroupMyDesk</child>
+            <child>Payroll_EmployeeGroupTree_Menu_Action</child>
         </childs>
     </definition>
 </ui-menu>

@@ -15,22 +15,19 @@
  limitations under the License.
 
 -->
-<ui-menu xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<datamodel-statusgroup xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>e547d6a0-44c1-47a0-a292-53f12bce9522</uuid>
-    <file-application>eFapsApp-Payroll</file-application>
+    <uuid>f7588e6f-e9b7-482d-ae40-6831afc38d91</uuid>
+    <file-application>eFapsApp-Sales</file-application>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_MyDesk_Admin</name>
-        <access>
-            <role>Administration</role>
-        </access>
-        <childs>
-            <child>Payroll_RuleMyDesk</child>
-            <child>Payroll_TemplateMyDesk</child>
-            <child>Payroll_ParameterMyDesk</child>
-            <child>Payroll_ProcessDefinitionMyDesk</child>
-            <child>Payroll_EmployeeGroupMyDesk</child>
-        </childs>
+        <name>Payroll_EmployeeGroupStatus</name>
+        <parent>Admin_DataModel_StatusAbstract</parent>
+        <status key="Active">
+            <description>This EmployeeGroup is active.</description>
+        </status>
+        <status key="Inactive">
+            <description>This EmployeeGroup is inactive.</description>
+        </status>
     </definition>
-</ui-menu>
+</datamodel-statusgroup>
