@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+
+  Copyright 2003 - 2015 The eFaps Team
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+<ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>0fe40b04-a366-40ea-8717-c598e386603e</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_ProcessPaymentForm</name>
+        <field name="type">
+            <property name="Attribute">Type</property>
+        </field>
+        <field name="status">
+            <property name="Attribute">Status</property>
+        </field>
+        <field name="processDefinitionPaymentLink">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeView">NONE</property>
+            <property name="Attribute">ProcessDefinitionPaymentLink</property>
+            <property name="Label">Payroll_ProcessPayment/ProcessDefinitionPaymentLink.Label</property>
+            <trigger event="UI_FIELD_VALUE" method="dropDownFieldValue"
+                name="Payroll_ProcessPaymentForm.processDefinitionPaymentLink.UI_FIELD_VALUE"
+                program="org.efaps.esjp.common.uiform.Field">
+                <property name="Type">Payroll_ProcessDefinitionPayment</property>
+                <property name="StatusGroup">Payroll_ProcessDefinitionStatus</property>
+                <property name="Status">Active</property>
+                <property name="Select">attribute[Name]</property>
+                <property name="SetSelected">true</property>
+            </trigger>
+        </field>
+        <field name="processDefinitionPaymentLink4view">
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeEdit">NONE</property>
+            <property name="SelectAlternateOID">linkto[ProcessDefinitionPaymentLink].oid</property>
+            <property name="Select">linkto[ProcessDefinitionPaymentLink].attribute[Name]</property>
+            <property name="Label">Payroll_ProcessPayment/ProcessDefinitionPaymentLink.Label</property>
+            <property name="HRef">TREE</property>
+        </field>
+        <field name="name">
+            <property name="Attribute">Name</property>
+            <property name="Required">true</property>
+        </field>
+        <field name="description">
+            <property name="Attribute">Description</property>
+            <property name="Columns">80</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+        </field>
+        <field character="Group" name="startDateGroup">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+        </field>
+        <field name="startDate">
+            <property name="Attribute">StartDate</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
+        <field name="endDate">
+            <property name="Attribute">EndDate</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
+        <field character="Group" name="cutDateGroup">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+        </field>
+        <field name="cutDate">
+            <property name="Attribute">CutDate</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
+        <field name="payDate">
+            <property name="Attribute">PayDate</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+            <property name="Required">true</property>
+        </field>
+        <field character="Group" name="createGroup">
+            <property name="GroupCount">2</property>
+        </field>
+        <field name="creator">
+            <property name="SelectAlternateOID">linkto[Creator].oid</property>
+            <property name="Attribute">Creator</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="created">
+            <property name="Attribute">Created</property>
+        </field>
+        <field character="Group" name="modifyGroup">
+            <property name="GroupCount">2</property>
+        </field>
+        <field name="modifier">
+            <property name="SelectAlternateOID">linkto[Modifier].oid</property>
+            <property name="Attribute">Modifier</property>
+            <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
+            <property name="ShowTypeIcon">true</property>
+        </field>
+        <field name="modified">
+            <property name="Attribute">Modified</property>
+        </field>
+        <field character="Group" name="defaultLaborTimeGroup">
+            <property name="GroupCount">2</property>
+            <property name="ModeCreate">READONLY</property>
+        </field>
+    </definition>
+</ui-form>
