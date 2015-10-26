@@ -27,6 +27,9 @@
             <form>Payroll_EmployeeGroupForm</form>
         </target>
         <type>Payroll_EmployeeGroup</type>
+        <childs>
+            <child>Payroll_EmployeeGroupTree_Employee</child>
+        </childs>
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>
