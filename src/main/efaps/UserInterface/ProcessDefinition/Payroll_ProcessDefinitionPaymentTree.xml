@@ -27,6 +27,9 @@
             <form>Payroll_ProcessDefinitionPaymentForm</form>
         </target>
         <type>Payroll_ProcessDefinitionPayment</type>
+        <childs>
+            <child>Payroll_ProcessDefinitionPaymentTree_Process</child>
+        </childs>
         <property name="Target">content</property>
         <property name="TargetMode">view</property>
     </definition>
