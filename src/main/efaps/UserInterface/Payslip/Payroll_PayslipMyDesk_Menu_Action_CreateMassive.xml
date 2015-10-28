@@ -2,7 +2,7 @@
 
 <!--
 
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,19 +16,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
-
 -->
 
-<ui-command xmlns="http://www.efaps.org/xsd"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>c8705c09-5b38-47f9-817f-48a2ca4c7371</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_PayslipMyDesk_Menu_Action_CreateMassive</name>
@@ -36,12 +29,18 @@
             <role>Payroll_Admin</role>
             <role>Payroll_Modifier</role>
         </access>
-        <!-- target definitions -->
         <target>
             <form>Payroll_PayslipCreateMassiveForm</form>
             <execute program="org.efaps.esjp.payroll.Payslip" method="createMassive" />
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_PayslipMyDesk_Menu_Action_CreateMassive.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+                <property name="Inverse">true</property>
+            </trigger>
         </target>
-        <!-- properties -->
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Payslip</property>
         <property name="TargetMode">create</property>

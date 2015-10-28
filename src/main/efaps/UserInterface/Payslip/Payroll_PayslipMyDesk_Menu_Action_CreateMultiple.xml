@@ -34,6 +34,14 @@
                 <property name="Mime">pdf</property>
                 <property name="NoDataSource">true</property>
             </execute>
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_PayslipMyDesk_Menu_Action_CreateMultiple.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+                <property name="Inverse">true</property>
+            </trigger>
         </target>
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Payslip</property>

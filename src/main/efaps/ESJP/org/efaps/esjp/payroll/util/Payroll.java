@@ -26,6 +26,7 @@ import org.efaps.admin.datamodel.attributetype.BitEnumType;
 import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.api.annotation.EFapsSysConfAttribute;
+import org.efaps.api.annotation.EFapsSystemConfiguration;
 import org.efaps.esjp.admin.common.systemconfiguration.BooleanSysConfAttribute;
 import org.efaps.esjp.admin.common.systemconfiguration.ListSysConfAttribute;
 import org.efaps.esjp.admin.common.systemconfiguration.PropertiesSysConfAttribute;
@@ -39,6 +40,7 @@ import org.efaps.util.cache.CacheReloadException;
  */
 @EFapsUUID("e773a372-0d29-41bf-b064-c2fd1f84b279")
 @EFapsApplication("eFapsApp-Payroll")
+@EFapsSystemConfiguration("6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e")
 public final class Payroll
 {
     /** The base. */
@@ -85,7 +87,7 @@ public final class Payroll
     @EFapsSysConfAttribute
     public static final BooleanSysConfAttribute PAYSLIPEVALNIGHTLABORTIME = new BooleanSysConfAttribute()
                     .sysConfUUID(SYSCONFUUID)
-                    .key(BASE + "Payslip.EvaluateExtraLaborTime")
+                    .key(BASE + "Payslip.EvaluateNightLaborTime")
                     .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
 
     /** See description. */
@@ -113,7 +115,7 @@ public final class Payroll
     @EFapsSysConfAttribute
     public static final BooleanSysConfAttribute ADVANCEEVALNIGHTLABORTIME = new BooleanSysConfAttribute()
                     .sysConfUUID(SYSCONFUUID)
-                    .key(BASE + "Advance.EvaluateExtraLaborTime")
+                    .key(BASE + "Advance.EvaluateNightLaborTime")
                     .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
 
     /** See description. */
@@ -121,6 +123,13 @@ public final class Payroll
     public static final BooleanSysConfAttribute ADVANCEEVALHOLIDAYLABORTIME = new BooleanSysConfAttribute()
                     .sysConfUUID(SYSCONFUUID)
                     .key(BASE + "Advance.EvaluateHolidayLaborTime")
+                    .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute PROCESSACTIVATE = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Process.Activate")
                     .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
 
     /**

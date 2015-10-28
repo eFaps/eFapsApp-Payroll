@@ -33,6 +33,13 @@
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
                 <property name="Type">Payroll_EmployeeGroup</property>
             </evaluate>
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_EmployeeGroupMyDesk.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+            </trigger>
         </target>
         <property name="Target">content</property>
         <property name="TargetShowCheckBoxes">true</property>

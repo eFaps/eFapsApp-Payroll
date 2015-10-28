@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,17 +14,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev: 14616 $
- Last Changed:    $Date: 2014-12-12 13:02:35 -0500 (Fri, 12 Dec 2014) $
- Last Changed By: $Author: jan@moxter.net $
-
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>4895a84b-3e2e-4f94-a017-6082ad9a81a1</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 14616 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_AdvanceMyDesk_Menu_Action_CreateMultiple</name>
@@ -37,6 +31,14 @@
             <execute method="createMultiple" program="org.efaps.esjp.payroll.Advance">
                 <property name="UseNumberGenerator4Name">true</property>
             </execute>
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_AdvanceMyDesk_Menu_Action_CreateMultiple.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+                <property name="Inverse">true</property>
+            </trigger>
         </target>
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Advance</property>

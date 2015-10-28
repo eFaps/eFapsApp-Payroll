@@ -45,7 +45,7 @@
             </trigger>
         </field>
         <field name="processDefinitionPaymentLink4view">
-            <property name="ModeCreate">EDITABLE</property>
+            <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
             <property name="SelectAlternateOID">linkto[ProcessDefinitionPaymentLink].oid</property>
             <property name="Select">linkto[ProcessDefinitionPaymentLink].attribute[Name]</property>
