@@ -41,6 +41,13 @@
             <sqltable>Payroll_DocumentSQLTable</sqltable>
             <sqlcolumn>TEMPLATEID</sqlcolumn>
         </attribute>
+         <attribute>
+            <name>ProcessLink</name>
+            <type>Link</type>
+            <typelink>Payroll_ProcessPayment</typelink>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>PROCESSID</sqlcolumn>
+        </attribute>
         <trigger program="org.efaps.esjp.payroll.Advance"
             method="deletePreTrigger"
             name="Payroll_Advance.DELETE_PRE"

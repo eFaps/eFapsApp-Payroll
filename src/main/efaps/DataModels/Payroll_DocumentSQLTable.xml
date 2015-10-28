@@ -45,6 +45,7 @@
             <column name="HOLIDAYTIMEBASE"  type="REAL"/>
             <column name="DOCTYPE"          type="INTEGER"/>
             <column name="TEMPLATEID"       type="INTEGER"/>
+            <column name="PROCESSID"        type="INTEGER"/>
             <column name="VACATION"         type="INTEGER"/>
             <column name="STARTDATE"        type="DATETIME"/>
             <column name="ENDDATE"          type="DATETIME"/>

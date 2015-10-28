@@ -16,8 +16,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
-
 -->
 
 <datamodel-type  xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -45,6 +43,13 @@
             <typelink>Payroll_TemplatePayslip</typelink>
             <sqltable>Payroll_DocumentSQLTable</sqltable>
             <sqlcolumn>TEMPLATEID</sqlcolumn>
+        </attribute>
+        <attribute>
+            <name>ProcessLink</name>
+            <type>Link</type>
+            <typelink>Payroll_ProcessPayment</typelink>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>PROCESSID</sqlcolumn>
         </attribute>
         <trigger program="org.efaps.esjp.payroll.Payslip"
             method="deletePreTrigger"

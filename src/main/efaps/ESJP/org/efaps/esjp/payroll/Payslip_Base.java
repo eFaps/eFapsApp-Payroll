@@ -354,7 +354,6 @@ public abstract class Payslip_Base
         multi.addSelect(selTemplInst, selEmplInst);
         multi.execute();
 
-        final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
         final String docType = _parameter.getParameterValue(
                         CIFormPayroll.Payroll_PayslipCreateMultipleForm.docType.name);
         final DateTime date = new DateTime(
@@ -362,75 +361,103 @@ public abstract class Payslip_Base
         final DateTime dueDate = new DateTime(_parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.dueDate.name));
 
-        final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
-                        .getDimension();
         while (multi.next()) {
             final Instance templInst = multi.getSelect(selTemplInst);
             final Instance emplInst = multi.getSelect(selEmplInst);
-            final List<Instance> timecardInsts = new ArrayList<>();
-            for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
-                timecardInsts.addAll(listener.getEmployeeTimeCardInst(_parameter, emplInst));
-            }
-            final List<String> timecardOids = new ArrayList<>();
-            for (final Instance timecardInst : timecardInsts) {
-                timecardOids.add(timecardInst.getOid());
-            }
-            if (!timecardOids.isEmpty()) {
-                ParameterUtil.setParmeterValue(_parameter, "TimeReport_EmployeeTimeCard",
-                                timecardOids.toArray(new String[timecardOids.size()]));
-            }
-            final CreatedDoc createdDoc = new CreatedDoc();
-
-            final Insert insert = new Insert(CIPayroll.Payslip);
-            insert.add(CIPayroll.Payslip.Name, getDocName4Create(_parameter));
-            insert.add(CIPayroll.Payslip.DocType, docType);
-            insert.add(CIPayroll.Payslip.Date, getDate(_parameter, date, emplInst));
-            insert.add(CIPayroll.Payslip.DueDate, dueDate);
-            insert.add(CIPayroll.Payslip.EmployeeAbstractLink, emplInst);
-            insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
-            insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.Rate, rateObj);
-            insert.add(CIPayroll.Payslip.CrossTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.NetTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.DiscountTotal, 0);
-            insert.add(CIPayroll.Payslip.RateDiscountTotal, 0);
-            insert.add(CIPayroll.Payslip.AmountCost, BigDecimal.ZERO);
-            insert.add(CIPayroll.Payslip.CurrencyId, Currency.getBaseCurrency());
-            insert.add(CIPayroll.Payslip.RateCurrencyId, Currency.getBaseCurrency());
-            insert.add(CIPayroll.Payslip.LaborTime, new Object[] {
-                            getLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
-                            timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Payslip.ExtraLaborTime,
-                            new Object[] {  getExtraLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
-                                            timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] {
-                            getHolidayLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
-                            timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Payslip.NightLaborTime,
-                            new Object[] {  getNightLaborTime(_parameter, null, date, dueDate, emplInst, templInst),
-                                            timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Payslip.TemplateLink, templInst);
-            insert.add(CIPayroll.Payslip.Basis, BasisAttribute.getValueList4Inst(_parameter, emplInst));
-            insert.execute();
-
-            createdDoc.setInstance(insert.getInstance());
-            addAdvance(_parameter, createdDoc, emplInst);
-            connect2Project(_parameter, createdDoc, emplInst);
-
-            for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
-                listener.afterCreate(_parameter, createdDoc);
-            }
-
-            final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
-            Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
-            final Result result = Calculator.getResult(_parameter, rules);
-            updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
-            updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
-
-            createReport(_parameter, createdDoc);
+            create(_parameter, templInst, emplInst, date, dueDate, docType);
         }
         return new Return();
+    }
+
+    /**
+     * Creates a Payslip.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _templInst the template instance
+     * @param _emplInst the employee instance
+     * @param _date the date
+     * @param _dueDate the due date
+     * @param _docType the doc type
+     * @throws EFapsException on error
+     */
+    protected void create(final Parameter _parameter,
+                          final Instance _templInst,
+                          final Instance _emplInst,
+                          final DateTime _date,
+                          final DateTime _dueDate,
+                          final Object _docType)
+        throws EFapsException
+    {
+        final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
+        final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
+                        .getDimension();
+        final List<Instance> timecardInsts = new ArrayList<>();
+        for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
+            timecardInsts.addAll(listener.getEmployeeTimeCardInst(_parameter, _emplInst));
+        }
+        final List<String> timecardOids = new ArrayList<>();
+        for (final Instance timecardInst : timecardInsts) {
+            timecardOids.add(timecardInst.getOid());
+        }
+        if (!timecardOids.isEmpty()) {
+            ParameterUtil.setParmeterValue(_parameter, "TimeReport_EmployeeTimeCard",
+                            timecardOids.toArray(new String[timecardOids.size()]));
+        }
+        final CreatedDoc createdDoc = new CreatedDoc();
+
+        final Insert insert = new Insert(CIPayroll.Payslip);
+        insert.add(CIPayroll.Payslip.Name, getDocName4Create(_parameter));
+        insert.add(CIPayroll.Payslip.DocType, _docType);
+        insert.add(CIPayroll.Payslip.Date, getDate(_parameter, _date, _emplInst));
+        insert.add(CIPayroll.Payslip.DueDate, _dueDate);
+        insert.add(CIPayroll.Payslip.EmployeeAbstractLink, _emplInst);
+        insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
+        insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.RateNetTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.Rate, rateObj);
+        insert.add(CIPayroll.Payslip.CrossTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.NetTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.DiscountTotal, 0);
+        insert.add(CIPayroll.Payslip.RateDiscountTotal, 0);
+        insert.add(CIPayroll.Payslip.AmountCost, BigDecimal.ZERO);
+        insert.add(CIPayroll.Payslip.CurrencyId, Currency.getBaseCurrency());
+        insert.add(CIPayroll.Payslip.RateCurrencyId, Currency.getBaseCurrency());
+        insert.add(CIPayroll.Payslip.LaborTime, new Object[] {
+                        getLaborTime(_parameter, null, _date, _dueDate, _emplInst, _templInst),
+                        timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Payslip.ExtraLaborTime,
+                        new Object[] {  getExtraLaborTime(_parameter, null, _date, _dueDate, _emplInst, _templInst),
+                                        timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] {
+                        getHolidayLaborTime(_parameter, null, _date, _dueDate, _emplInst, _templInst),
+                        timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Payslip.NightLaborTime,
+                        new Object[] {  getNightLaborTime(_parameter, null, _date, _dueDate, _emplInst, _templInst),
+                                        timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Payslip.TemplateLink, _templInst);
+        insert.add(CIPayroll.Payslip.Basis, BasisAttribute.getValueList4Inst(_parameter, _emplInst));
+
+        if (_parameter.getInstance() != null
+                        && _parameter.getInstance().getType().isKindOf(CIPayroll.ProcessAbstract)) {
+            insert.add(CIPayroll.Payslip.ProcessAbstractLink, _parameter.getInstance());
+        }
+        insert.execute();
+
+        createdDoc.setInstance(insert.getInstance());
+        addAdvance(_parameter, createdDoc, _emplInst);
+        connect2Project(_parameter, createdDoc, _emplInst);
+
+        for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
+            listener.afterCreate(_parameter, createdDoc);
+        }
+
+        final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, _templInst);
+        Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
+        final Result result = Calculator.getResult(_parameter, rules);
+        updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+        updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+
+        createReport(_parameter, createdDoc);
     }
 
     public Return evaluateTimes(final Parameter _parameter)

@@ -76,6 +76,13 @@
             <sqlcolumn>TEMPLATEID</sqlcolumn>
         </attribute>
         <attribute>
+            <name>ProcessAbstractLink</name>
+            <type>Link</type>
+            <typelink>Payroll_ProcessAbstract</typelink>
+            <sqltable>Payroll_DocumentSQLTable</sqltable>
+            <sqlcolumn>PROCESSID</sqlcolumn>
+        </attribute>
+        <attribute>
             <name>DocType</name>
             <type>LinkWithRanges</type>
             <typelink>Payroll_AttributeDefinitionDocType</typelink>

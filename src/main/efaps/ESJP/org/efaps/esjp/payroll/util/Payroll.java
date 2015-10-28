@@ -99,6 +99,20 @@ public final class Payroll
 
     /** See description. */
     @EFapsSysConfAttribute
+    public static final StringSysConfAttribute PAYSLIPJASPERREPORT = new StringSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Payslip.JasperReport")
+                    .description("JasperReport for Payslip.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final StringSysConfAttribute PAYSLIPMIME = new StringSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Payslip.Mime")
+                    .description("Mime for the Payslip report.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
     public static final BooleanSysConfAttribute ADVANCEEVALLABORTIME = new BooleanSysConfAttribute()
                     .sysConfUUID(SYSCONFUUID)
                     .key(BASE + "Advance.EvaluateLaborTime")
@@ -124,6 +138,20 @@ public final class Payroll
                     .sysConfUUID(SYSCONFUUID)
                     .key(BASE + "Advance.EvaluateHolidayLaborTime")
                     .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final StringSysConfAttribute ADVANCEJASPERREPORT = new StringSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Advance.JasperReport")
+                    .description("JasperReport for Advance.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final StringSysConfAttribute ADVANCEMIME = new StringSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Advance.Mime")
+                    .description("Mime for the Advance Report.");
 
     /** See description. */
     @EFapsSysConfAttribute

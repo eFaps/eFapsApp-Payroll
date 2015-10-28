@@ -76,6 +76,7 @@
             <property name="SelectAlternateOID">linkto[TemplateLink].oid</property>
             <property name="Select">linkto[TemplateLink].attribute[Name]</property>
             <property name="Label">Payroll_ProcessDefinitionPayment/TemplateLink.Label</property>
+            <property name="HRef">TREE</property>
         </field>
         <field name="employeeGroupLink">
             <property name="ModeCreate">EDITABLE</property>
@@ -98,6 +99,7 @@
             <property name="SelectAlternateOID">linkto[EmployeeGroupLink].oid</property>
             <property name="Select">linkto[EmployeeGroupLink].attribute[Name]</property>
             <property name="Label">Payroll_ProcessDefinitionPayment/EmployeeGroupLink.Label</property>
+            <property name="HRef">TREE</property>
         </field>
         <field character="Group" name="createGroup">
             <property name="GroupCount">2</property>

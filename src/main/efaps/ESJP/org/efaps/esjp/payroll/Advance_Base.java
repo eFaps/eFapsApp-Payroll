@@ -466,55 +466,81 @@ public abstract class Advance_Base
         multi.addSelect(selTemplInst, selEmplInst);
         multi.execute();
 
-        final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
         final String docType = _parameter.getParameterValue(
                         CIFormPayroll.Payroll_AdvanceCreateMultipleForm.docType.name);
         final DateTime date = new DateTime(_parameter.getParameterValue(
                         CIFormPayroll.Payroll_AdvanceCreateMultipleForm.date.name));
-        final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
-                        .getDimension();
         while (multi.next()) {
             final Instance templInst = multi.getSelect(selTemplInst);
             final Instance emplInst = multi.getSelect(selEmplInst);
-
-            final CreatedDoc createdDoc = new CreatedDoc();
-
-            final Insert insert = new Insert(CIPayroll.Advance);
-            insert.add(CIPayroll.Advance.Name, getDocName4Create(_parameter));
-            insert.add(CIPayroll.Advance.DocType, docType);
-            insert.add(CIPayroll.Advance.Date, getDate(_parameter, date, emplInst));
-            insert.add(CIPayroll.Advance.EmployeeAbstractLink, emplInst);
-            insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Draft));
-            insert.add(CIPayroll.Advance.RateCrossTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Advance.RateNetTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Advance.Rate, rateObj);
-            insert.add(CIPayroll.Advance.CrossTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Advance.NetTotal, BigDecimal.ZERO);
-            insert.add(CIPayroll.Advance.DiscountTotal, 0);
-            insert.add(CIPayroll.Advance.RateDiscountTotal, 0);
-            insert.add(CIPayroll.Advance.AmountCost, BigDecimal.ZERO);
-            insert.add(CIPayroll.Advance.CurrencyId, Currency.getBaseCurrency());
-            insert.add(CIPayroll.Advance.RateCurrencyId, Currency.getBaseCurrency());
-            insert.add(CIPayroll.Advance.LaborTime, new Object[] { 120, timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Advance.NightLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Advance.HolidayLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
-            insert.add(CIPayroll.Advance.TemplateLinkAbstract, templInst);
-            insert.execute();
-
-            createdDoc.setInstance(insert.getInstance());
-            connect2Project(_parameter, createdDoc, emplInst);
-
-            final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, templInst);
-            Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
-            final Result result = Calculator.getResult(_parameter, rules);
-            final Payslip payslip = new Payslip();
-            payslip.updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
-            payslip.updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+            create(_parameter, templInst, emplInst, date, docType);
         }
-
         return new Return();
     }
+
+    /**
+     * Creates a Payslip.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _templInst the template instance
+     * @param _emplInst the employee instance
+     * @param _date the date
+     * @param _docType the doc type
+     * @throws EFapsException on error
+     */
+    protected void create(final Parameter _parameter,
+                          final Instance _templInst,
+                          final Instance _emplInst,
+                          final DateTime _date,
+                          final Object _docType)
+        throws EFapsException
+    {
+        final Object[] rateObj = new Object[] { BigDecimal.ONE, BigDecimal.ONE };
+        final Dimension timeDim = CIPayroll.Advance.getType().getAttribute(CIPayroll.Advance.LaborTime.name)
+                        .getDimension();
+
+        final CreatedDoc createdDoc = new CreatedDoc();
+
+        final Insert insert = new Insert(CIPayroll.Advance);
+        insert.add(CIPayroll.Advance.Name, getDocName4Create(_parameter));
+        insert.add(CIPayroll.Advance.DocType, _docType);
+        insert.add(CIPayroll.Advance.Date, getDate(_parameter, _date, _emplInst));
+        insert.add(CIPayroll.Advance.EmployeeAbstractLink, _emplInst);
+        insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Draft));
+        insert.add(CIPayroll.Advance.RateCrossTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Advance.RateNetTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Advance.Rate, rateObj);
+        insert.add(CIPayroll.Advance.CrossTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Advance.NetTotal, BigDecimal.ZERO);
+        insert.add(CIPayroll.Advance.DiscountTotal, 0);
+        insert.add(CIPayroll.Advance.RateDiscountTotal, 0);
+        insert.add(CIPayroll.Advance.AmountCost, BigDecimal.ZERO);
+        insert.add(CIPayroll.Advance.CurrencyId, Currency.getBaseCurrency());
+        insert.add(CIPayroll.Advance.RateCurrencyId, Currency.getBaseCurrency());
+        insert.add(CIPayroll.Advance.LaborTime, new Object[] { 120, timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Advance.NightLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Advance.HolidayLaborTime, new Object[] { 0, timeDim.getBaseUoM().getId() });
+        insert.add(CIPayroll.Advance.TemplateLinkAbstract, _templInst);
+
+        if (_parameter.getInstance() != null
+                        && _parameter.getInstance().getType().isKindOf(CIPayroll.ProcessAbstract)) {
+            insert.add(CIPayroll.Payslip.ProcessAbstractLink, _parameter.getInstance());
+        }
+
+        insert.execute();
+
+        createdDoc.setInstance(insert.getInstance());
+        connect2Project(_parameter, createdDoc, _emplInst);
+
+        final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, _templInst);
+        Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
+        final Result result = Calculator.getResult(_parameter, rules);
+        final Payslip payslip = new Payslip();
+        payslip.updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+        payslip.updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+    }
+
 
     public Return edit4Multiple(final Parameter _parameter)
         throws EFapsException
