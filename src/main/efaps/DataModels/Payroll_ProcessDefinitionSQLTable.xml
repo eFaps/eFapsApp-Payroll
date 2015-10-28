@@ -31,6 +31,7 @@
             <column name="NAME"         type="STRING_SHORT" not-null="true" length="64" />
             <column name="DESCR"        type="STRING_SHORT" not-null="true" length="256" />
             <column name="PRCSSTYPEID"  type="INTEGER"/>
+            <column name="DOCTYPEID"    type="INTEGER"/>
             <column name="TEMPLATEID"   type="INTEGER"      not-null="true" />
             <column name="EMPLGRPID"    type="INTEGER"      not-null="true" />
             <column name="CREATOR"      type="INTEGER"      not-null="true" />

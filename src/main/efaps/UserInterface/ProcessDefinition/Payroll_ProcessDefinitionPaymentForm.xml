@@ -49,6 +49,12 @@
             <property name="ModeEdit">EDITABLE</property>
             <property name="ModeCreate">EDITABLE</property>
         </field>
+         <field name="docType">
+            <property name="Attribute">DocType</property>
+            <property name="Label">Payroll_ProcessDefinitionPayment/DocType.Label</property>
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="ModeCreate">EDITABLE</property>
+        </field>
         <field name="templateLink">
             <property name="ModeCreate">EDITABLE</property>
             <property name="ModeEdit">EDITABLE</property>
