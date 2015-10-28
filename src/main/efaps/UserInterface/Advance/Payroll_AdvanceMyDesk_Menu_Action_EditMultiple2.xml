@@ -34,7 +34,12 @@
         </access>
         <target>
             <form>Payroll_PayslipEditMassiveUpdateForm</form>
-            <execute method="edit4Multiple" program="org.efaps.esjp.payroll.Advance"/>
+            <execute method="edit4Multiple" program="org.efaps.esjp.payroll.Advance">
+                <!-- eFapsApp-Payroll -->
+                <property name="JasperConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="JasperConfigReport">org.efaps.payroll.Advance.JasperReport</property>
+                <property name="JasperConfigMime">org.efaps.payroll.Advance.Mime</property>
+            </execute>
         </target>
         <property name="Target">modal</property>
         <property name="TargetCreateType">Payroll_Payslip</property>

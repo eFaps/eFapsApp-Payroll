@@ -30,9 +30,10 @@
             <form>Payroll_PayslipCreateMultipleForm</form>
             <execute method="createMultiple" program="org.efaps.esjp.payroll.Payslip" >
                 <property name="UseNumberGenerator4Name">true</property>
-                <property name="JasperReport">Payroll_Payslip</property>
-                <property name="Mime">pdf</property>
-                <property name="NoDataSource">true</property>
+                 <!-- eFapsApp-Payroll -->
+                <property name="JasperConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="JasperConfigReport">org.efaps.payroll.Payslip.JasperReport</property>
+                <property name="JasperConfigMime">org.efaps.payroll.Payslip.Mime</property>
             </execute>
             <trigger event="UI_ACCESSCHECK" method="configCheck"
                 name="Payroll_PayslipMyDesk_Menu_Action_CreateMultiple.UI_ACCESSCHECK"

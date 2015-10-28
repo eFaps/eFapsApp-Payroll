@@ -35,6 +35,10 @@
         <target>
             <form>Payroll_AdvanceForm</form>
             <execute program="org.efaps.esjp.payroll.Advance" method="edit" >
+                <!-- eFapsApp-Payroll -->
+                <property name="JasperConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="JasperConfigReport">org.efaps.payroll.Advance.JasperReport</property>
+                <property name="JasperConfigMime">org.efaps.payroll.Advance.Mime</property>
             </execute>
             <trigger event="UI_ACCESSCHECK" method="check4Status"
                 name="Payroll_AdvanceTree_Menu_Action_SetPaid.UI_ACCESSCHECK"

@@ -30,6 +30,10 @@
             <form>Payroll_AdvanceCreateForm</form>
             <execute method="create" program="org.efaps.esjp.payroll.Advance">
                 <property name="UseNumberGenerator4Name">true</property>
+                <!-- eFapsApp-Payroll -->
+                <property name="JasperConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="JasperConfigReport">org.efaps.payroll.Advance.JasperReport</property>
+                <property name="JasperConfigMime">org.efaps.payroll.Advance.Mime</property>
             </execute>
             <trigger event="UI_ACCESSCHECK" method="configCheck"
                 name="Payroll_AdvanceMyDesk_Menu_Action_CreateAdvance.UI_ACCESSCHECK"

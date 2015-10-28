@@ -2,7 +2,7 @@
 
 <!--
 
- Copyright 2003 - 2010 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,19 +16,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev$
- Last Changed:    $Date$
- Last Changed By: $Author$
-
 -->
 
-<ui-command xmlns="http://www.efaps.org/xsd"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>61338f54-f2f9-4044-b864-cd65e2cebc6a</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <application-dependencies>
@@ -43,9 +36,10 @@
             <form>Payroll_PayslipForm</form>
             <execute program="org.efaps.esjp.payroll.Payslip" method="create" >
                 <property name="UseNumberGenerator4Name">true</property>
-                <property name="JasperReport">Payroll_Payslip</property>
-                <property name="Mime">pdf</property>
-                <property name="NoDataSource">true</property>
+                 <!-- eFapsApp-Payroll -->
+                <property name="JasperConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="JasperConfigReport">org.efaps.payroll.Payslip.JasperReport</property>
+                <property name="JasperConfigMime">org.efaps.payroll.Payslip.Mime</property>
             </execute>
         </target>
         <property name="Target">modal</property>
@@ -69,9 +63,10 @@
             <form>Payroll_PayslipForm</form>
             <execute program="org.efaps.esjp.payroll.Payslip" method="create" >
                 <property name="UseNumberGenerator4Name">true</property>
-                <property name="JasperReport">Payroll_Payslip</property>
-                <property name="Mime">pdf</property>
-                <property name="NoDataSource">true</property>
+                <!-- eFapsApp-Payroll -->
+                <property name="JasperConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="JasperConfigReport">org.efaps.payroll.Payslip.JasperReport</property>
+                <property name="JasperConfigMime">org.efaps.payroll.Payslip.Mime</property>
 
                 <!-- PayRoll_Projects_ProjectService2Payslip -->
                 <property name="ConnectType01">465b22a4-485c-4622-abcb-12c93cb45bdd</property>
