@@ -158,7 +158,14 @@ public final class Payroll
     public static final BooleanSysConfAttribute PROCESSACTIVATE = new BooleanSysConfAttribute()
                     .sysConfUUID(SYSCONFUUID)
                     .key(BASE + "Process.Activate")
-                    .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
+                    .description("Activate the Process Mechanism.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final BooleanSysConfAttribute PROCESSEXECASJOB = new BooleanSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Process.ExecuteAsJob")
+                    .description("Execute the Process as background jobs.");
 
     /**
      * Singelton.

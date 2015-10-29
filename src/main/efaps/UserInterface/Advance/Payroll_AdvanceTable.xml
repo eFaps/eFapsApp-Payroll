@@ -108,6 +108,34 @@
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_AdvanceForm.payslip.Label</property>
         </field>
+         <field name="process">
+            <property name="FilterType">PICKLIST</property>
+            <property name="SelectAlternateOID">linkto[ProcessAbstractLink].oid</property>
+            <property name="Select">linkto[ProcessAbstractLink].attribute[Name]</property>
+            <property name="Label">Payroll_DocumentAbstract/ProcessAbstractLink.Label</property>
+            <property name="HRef">TREE</property>
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_PayslipTable.process.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+            </trigger>
+        </field>
+        <field name="employeeGroup">
+            <property name="FilterType">PICKLIST</property>
+            <property name="SelectAlternateOID">linkto[ProcessAbstractLink].linkto[ProcessDefinitionAbstractLink].linkto[EmployeeGroupLink].oid</property>
+            <property name="Select">linkto[ProcessAbstractLink].linkto[ProcessDefinitionAbstractLink].linkto[EmployeeGroupLink].attribute[Name]</property>
+            <property name="Label">Payroll_EmployeeGroup.Label</property>
+            <property name="HRef">TREE</property>
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_PayslipTable.employeeGroup.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+            </trigger>
+        </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
@@ -212,6 +240,34 @@
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_PayslipForm.project.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+        </field>
+         <field name="process">
+            <property name="FilterType">PICKLIST</property>
+            <property name="SelectAlternateOID">linkto[ProcessAbstractLink].oid</property>
+            <property name="Select">linkto[ProcessAbstractLink].attribute[Name]</property>
+            <property name="Label">Payroll_DocumentAbstract/ProcessAbstractLink.Label</property>
+            <property name="HRef">TREE</property>
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_PayslipTable.process.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+            </trigger>
+        </field>
+        <field name="employeeGroup">
+            <property name="FilterType">PICKLIST</property>
+            <property name="SelectAlternateOID">linkto[ProcessAbstractLink].linkto[ProcessDefinitionAbstractLink].linkto[EmployeeGroupLink].oid</property>
+            <property name="Select">linkto[ProcessAbstractLink].linkto[ProcessDefinitionAbstractLink].linkto[EmployeeGroupLink].attribute[Name]</property>
+            <property name="Label">Payroll_EmployeeGroup.Label</property>
+            <property name="HRef">TREE</property>
+            <trigger event="UI_ACCESSCHECK" method="configCheck"
+                name="Payroll_PayslipTable.employeeGroup.UI_ACCESSCHECK"
+                program="org.efaps.esjp.admin.access.AccessCheck4UI">
+                <!-- eFapsApp-Payroll -->
+                <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
+                <property name="Attribute">org.efaps.payroll.Process.Activate</property>
+            </trigger>
         </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>

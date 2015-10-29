@@ -17,30 +17,35 @@
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
-    <uuid>cb11d662-4b13-4290-9a2f-f4b46c735e89</uuid>
+    <uuid>fec6814c-6f52-482e-b1de-996863c9745b</uuid>
     <file-application>eFapsApp-Payroll</file-application>
     <definition>
         <version-expression>(version==latest)</version-expression>
-        <name>Payroll_ProcessPaymentTree_Menu_Action_Execute</name>
+        <name>Payroll_ProcessPaymentTree_Menu_Action_ExecuteAsJob</name>
         <access>
             <role>Payroll_Admin</role>
         </access>
         <target>
-            <execute program="org.efaps.esjp.payroll.Process" method="executeProcess">
+            <execute method="executeProcessAsJob" program="org.efaps.esjp.payroll.Process">
                 <property name="UseNumberGenerator4Name">true</property>
             </execute>
             <trigger event="UI_ACCESSCHECK" method="configCheck" index="1"
-                name="Payroll_ProcessPaymentTree_Menu_Action_Execute.UI_ACCESSCHECK.1"
+                name="ayroll_ProcessPaymentTree_Menu_Action_ExecuteAsJob.UI_ACCESSCHECK.1"
                 program="org.efaps.esjp.admin.access.AccessCheck4UI">
                 <!-- eFapsApp-Payroll -->
                 <property name="SystemConfig">6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</property>
                 <property name="Attribute">org.efaps.payroll.Process.ExecuteAsJob</property>
-                <property name="Inverse">true</property>
             </trigger>
             <trigger event="UI_ACCESSCHECK" method="check4Status" index="2"
-                name="Payroll_ProcessPaymentTree_Menu_Action_Execute.UI_ACCESSCHECK.2"
+                name="Payroll_ProcessPaymentTree_Menu_Action_ExecuteAsJob.UI_ACCESSCHECK.2"
                 program="org.efaps.esjp.admin.access.AccessCheck4UI">
                 <property name="Status">Open</property>
+            </trigger>
+            <trigger event="UI_ACCESSCHECK" method="accessCheck4Single" index="3"
+                name="Payroll_ProcessPaymentTree_Menu_Action_ExecuteAsJob.UI_ACCESSCHECK.3"
+                program="org.efaps.esjp.common.background.Job">
+                <!-- Payroll_BackgroundJobPayment -->
+                <property name="Type">d0d2ba0c-678f-4739-935a-9640c46748f6</property>
             </trigger>
         </target>
         <property name="AskUser">true</property>
