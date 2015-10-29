@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+
+  Copyright 2003 - 2015 The eFaps Team
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+<ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+    <uuid>3a85a4ae-d966-4665-8665-1b51edb94b19</uuid>
+    <file-application>eFapsApp-Payroll</file-application>
+    <definition>
+        <version-expression>(version==latest)</version-expression>
+        <name>Payroll_EmployeeGroupAssignForm</name>
+        <field name="employeeGroupLink">
+            <property name="ModeEdit">EDITABLE</property>
+            <property name="Label">Payroll_EmployeeGroup.Label</property>
+            <property name="UIType">DROPDOWN</property>
+            <property name="Select">linkfrom[Payroll_Employee2EmployeeGroup#FromLink].linkto[ToLink].id</property>
+            <trigger event="UI_FIELD_VALUE" method="getOptionListFieldValue"
+                name="Payroll_ProcessDefinitionPaymentForm.employeeGroupLink.UI_FIELD_VALUE"
+                program="org.efaps.esjp.common.uiform.Field">
+                <property name="Type">Payroll_EmployeeGroup</property>
+                <property name="StatusGroup">Payroll_EmployeeGroupStatus</property>
+                <property name="Status">Active</property>
+                <property name="Select">attribute[Name]</property>
+                <property name="ValueSelect">oid</property>
+                <property name="OrderSelect">attribute[Name]</property>
+                <property name="SetSelected">true</property>
+            </trigger>
+        </field>
+    </definition>
+</ui-form>
