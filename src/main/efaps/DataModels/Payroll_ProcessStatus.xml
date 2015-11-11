@@ -24,13 +24,19 @@
         <name>Payroll_ProcessStatus</name>
         <parent>Admin_DataModel_StatusAbstract</parent>
         <status key="Open">
-            <description>This ProcessDefinition is active.</description>
+            <description>This Process is due to be executed. (Activo)</description>
+        </status>
+         <status key="Finished">
+            <description>This Process was executed. (Processado)</description>
         </status>
         <status key="Closed">
-            <description>This ProcessDefinition is inactive.</description>
+            <description>This Process is closed and the related Payslips are note editable any more. (Pendeinte de pago)</description>
+        </status>
+         <status key="Payed">
+            <description>This Process related Payslips are payed for. (Pagado)</description>
         </status>
         <status key="Canceled">
-            <description>This ProcessDefinition is inactive.</description>
+            <description>This ProcessDefinition is inactive. (Anulado)</description>
         </status>
     </definition>
 </datamodel-statusgroup>
