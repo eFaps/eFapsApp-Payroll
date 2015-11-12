@@ -35,6 +35,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.program.esjp.Listener;
 import org.efaps.ci.CIAttribute;
 import org.efaps.ci.CIType;
+import org.efaps.db.AttributeQuery;
 import org.efaps.db.CachedPrintQuery;
 import org.efaps.db.Delete;
 import org.efaps.db.Insert;
@@ -245,7 +246,7 @@ public abstract class Advance_Base
     }
 
     /**
-     * Gets the date.
+     * Gets the start date.
      *
      * @param _parameter the _parameter
      * @param _date the _date
@@ -253,9 +254,9 @@ public abstract class Advance_Base
      * @return the date
      * @throws EFapsException on error
      */
-    protected DateTime getDate(final Parameter _parameter,
-                               final DateTime _date,
-                               final Instance _emplInst)
+    protected DateTime getStartDate(final Parameter _parameter,
+                                    final DateTime _date,
+                                    final Instance _emplInst)
         throws EFapsException
     {
         DateTime ret = _date;
@@ -271,6 +272,15 @@ public abstract class Advance_Base
         return ret;
     }
 
+    /**
+     * Gets the default value.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _templInst the templ inst
+     * @param _attr the attr
+     * @return the default value
+     * @throws EFapsException on error
+     */
     protected BigDecimal getDefaultValue(final Parameter _parameter,
                                          final Instance _templInst,
                                          final CIAttribute _attr)
@@ -448,13 +458,12 @@ public abstract class Advance_Base
     {
         final List<Instance> templates = getInstances(_parameter,
                         CIFormPayroll.Payroll_AdvanceCreateMultipleForm.templates.name);
-        final QueryBuilder attrQueryBldr = new QueryBuilder(CIHumanResource.EmployeeAbstract);
-        attrQueryBldr.addWhereAttrEqValue(CIHumanResource.EmployeeAbstract.StatusAbstract,
-                        Status.find(CIHumanResource.EmployeeStatus.Worker));
+        final DateTime date = new DateTime(_parameter.getParameterValue(
+                        CIFormPayroll.Payroll_AdvanceCreateMultipleForm.date.name));
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2EmployeeAbstract);
         queryBldr.addWhereAttrInQuery(CIPayroll.Template2EmployeeAbstract.ToAbstractLink,
-                        attrQueryBldr.getAttributeQuery(CIHumanResource.EmployeeAbstract.ID));
+                        getAttrQuery4Employees(_parameter, date.withDayOfMonth(1) , date));
         queryBldr.addWhereAttrEqValue(CIPayroll.Template2EmployeeAbstract.FromAbstractLink, templates.toArray());
 
         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -468,8 +477,7 @@ public abstract class Advance_Base
 
         final String docType = _parameter.getParameterValue(
                         CIFormPayroll.Payroll_AdvanceCreateMultipleForm.docType.name);
-        final DateTime date = new DateTime(_parameter.getParameterValue(
-                        CIFormPayroll.Payroll_AdvanceCreateMultipleForm.date.name));
+
         while (multi.next()) {
             final Instance templInst = multi.getSelect(selTemplInst);
             final Instance emplInst = multi.getSelect(selEmplInst);
@@ -504,7 +512,7 @@ public abstract class Advance_Base
         final Insert insert = new Insert(CIPayroll.Advance);
         insert.add(CIPayroll.Advance.Name, getDocName4Create(_parameter));
         insert.add(CIPayroll.Advance.DocType, _docType);
-        insert.add(CIPayroll.Advance.Date, getDate(_parameter, _date, _emplInst));
+        insert.add(CIPayroll.Advance.Date, getStartDate(_parameter, _date, _emplInst));
         insert.add(CIPayroll.Advance.EmployeeAbstractLink, _emplInst);
         insert.add(CIPayroll.Advance.Status, Status.find(CIPayroll.AdvanceStatus.Draft));
         insert.add(CIPayroll.Advance.RateCrossTotal, BigDecimal.ZERO);
@@ -696,4 +704,42 @@ public abstract class Advance_Base
         }
     }
 
+    /**
+     * Gets the attribute query 4 employees.
+     * All active employees and inactive in the given timeframe.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _minDate the min date
+     * @param _maxDate the max date
+     * @return the att query4 employees
+     * @throws EFapsException on error
+     */
+    protected AttributeQuery getAttrQuery4Employees(final Parameter _parameter,
+                                                    final DateTime _minDate,
+                                                    final DateTime _maxDate)
+        throws EFapsException
+    {
+        final QueryBuilder queryBldr = new QueryBuilder(CIHumanResource.Employee);
+        queryBldr.addWhereAttrEqValue(CIHumanResource.Employee.Status, Status.find(
+                        CIHumanResource.EmployeeStatus.Worker));
+
+        if (_minDate != null && _maxDate != null) {
+            // inactive employees that where inactivated in the given timeframe
+            final QueryBuilder classQueryBldr = new QueryBuilder(CIHumanResource.ClassTR);
+            classQueryBldr.addWhereAttrGreaterValue(CIHumanResource.ClassTR.EndDate,
+                            _minDate.withTimeAtStartOfDay().minusDays(1));
+            classQueryBldr.addWhereAttrLessValue(CIHumanResource.ClassTR.EndDate,
+                            _maxDate.withTimeAtStartOfDay().plusDays(1));
+
+            final QueryBuilder queryBldr2 = new QueryBuilder(CIHumanResource.Employee);
+            queryBldr2.addWhereAttrEqValue(CIHumanResource.Employee.Status, Status.find(
+                            CIHumanResource.EmployeeStatus.Notworked));
+            queryBldr2.addWhereAttrInQuery(CIHumanResource.Employee.ID, classQueryBldr.getAttributeQuery(
+                            CIHumanResource.ClassTR.EmployeeLink));
+            queryBldr.setOr(true);
+            queryBldr.addWhereAttrInQuery(CIHumanResource.Employee.ID,
+                            queryBldr2.getAttributeQuery(CIHumanResource.Employee.ID));
+        }
+        return queryBldr.getAttributeQuery(CIHumanResource.Employee.ID);
+    }
 }

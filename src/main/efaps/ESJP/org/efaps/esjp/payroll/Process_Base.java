@@ -27,9 +27,9 @@ import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.api.background.IExecutionBridge;
 import org.efaps.api.background.IJob;
+import org.efaps.db.AttributeQuery;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
-import org.efaps.db.InstanceQuery;
 import org.efaps.db.PrintQuery;
 import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
@@ -157,18 +157,18 @@ public abstract class Process_Base
             attrQueryBldr.addWhereAttrEqValue(CIPayroll.Employee2EmployeeGroup.ToLink, emplGrpInst);
 
             final QueryBuilder queryBldr = new QueryBuilder(CIHumanResource.Employee);
-            queryBldr.addWhereAttrEqValue(CIHumanResource.Employee.Status, Status.find(
-                            CIHumanResource.EmployeeStatus.Worker));
             queryBldr.addWhereAttrInQuery(CIHumanResource.Employee.ID, attrQueryBldr.getAttributeQuery(
                             CIPayroll.Employee2EmployeeGroup.FromLink));
-            final InstanceQuery query = queryBldr.getQuery();
-            final List<Instance> list = query.execute();
+            queryBldr.addWhereAttrInQuery(CIHumanResource.Employee.ID,
+                            payslip.getAttrQuery4Employees(_parameter, startDate, endDate));
+            final List<Instance> emplInsts = queryBldr.getQuery().execute();
+
             if (bridge != null) {
-                bridge.setTarget(list.size());
+                bridge.setTarget(emplInsts.size());
             }
-            while (query.next()) {
+            for (final Instance emplInst : emplInsts) {
                 parameter.put(ParameterValues.INSTANCE, processInst);
-                payslip.create(parameter, templInst, query.getCurrentValue(), startDate, endDate, docTypeInst);
+                payslip.create(parameter, templInst, emplInst, startDate, endDate, docTypeInst);
                 if (bridge != null) {
                     bridge.registerProgress();
                 }
@@ -180,7 +180,7 @@ public abstract class Process_Base
             ParameterUtil.setProperty(parameter, "JasperConfigReport", Payroll.ADVANCEJASPERREPORT.getKey());
             ParameterUtil.setProperty(parameter, "JasperConfigMime", Payroll.ADVANCEMIME.getKey());
 
-            final Advance adavance = new Advance()
+            final Advance advance = new Advance()
             {
 
                 @Override
@@ -190,24 +190,21 @@ public abstract class Process_Base
                     return CIPayroll.Advance.getType();
                 }
             };
-            ;
-
             final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.Employee2EmployeeGroup);
             attrQueryBldr.addWhereAttrEqValue(CIPayroll.Employee2EmployeeGroup.ToLink, emplGrpInst);
 
             final QueryBuilder queryBldr = new QueryBuilder(CIHumanResource.Employee);
-            queryBldr.addWhereAttrEqValue(CIHumanResource.Employee.Status, Status.find(
-                            CIHumanResource.EmployeeStatus.Worker));
             queryBldr.addWhereAttrInQuery(CIHumanResource.Employee.ID, attrQueryBldr.getAttributeQuery(
                             CIPayroll.Employee2EmployeeGroup.FromLink));
-            final InstanceQuery query = queryBldr.getQuery();
-            final List<Instance> list = query.execute();
+            queryBldr.addWhereAttrInQuery(CIHumanResource.Employee.ID,
+                            advance.getAttrQuery4Employees(_parameter, startDate, endDate));
+            final List<Instance> emplInsts = queryBldr.getQuery().execute();
             if (bridge != null) {
-                bridge.setTarget(list.size());
+                bridge.setTarget(emplInsts.size());
             }
-            while (query.next()) {
+            for (final Instance emplInst : emplInsts) {
                 parameter.put(ParameterValues.INSTANCE, processInst);
-                adavance.create(parameter, templInst, query.getCurrentValue(), startDate, docTypeInst);
+                advance.create(parameter, templInst, emplInst, startDate, docTypeInst);
                 if (bridge != null) {
                     bridge.registerProgress();
                 }
@@ -219,6 +216,22 @@ public abstract class Process_Base
         if (bridge != null) {
             bridge.setProgress(bridge.getTarget());
         }
+    }
+
+    /**
+     * Gets the attribute query 4 employees.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the att query4 employees
+     * @throws EFapsException on error
+     */
+    protected AttributeQuery getAttrQuery4Employees(final Parameter _parameter)
+        throws EFapsException
+    {
+        final QueryBuilder queryBldr = new QueryBuilder(CIHumanResource.Employee);
+        queryBldr.addWhereAttrEqValue(CIHumanResource.Employee.Status, Status.find(
+                        CIHumanResource.EmployeeStatus.Worker));
+        return null;
     }
 
     /**

@@ -53,6 +53,7 @@ import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
 import org.efaps.admin.ui.field.Field;
 import org.efaps.ci.CIAttribute;
 import org.efaps.ci.CIType;
+import org.efaps.db.AttributeQuery;
 import org.efaps.db.CachedPrintQuery;
 import org.efaps.db.Context;
 import org.efaps.db.Delete;
@@ -336,13 +337,14 @@ public abstract class Payslip_Base
         final List<Instance> templates = getInstances(_parameter,
                         CIFormPayroll.Payroll_PayslipCreateMultipleForm.templates.name);
 
-        final QueryBuilder attrQueryBldr = new QueryBuilder(CIHumanResource.EmployeeAbstract);
-        attrQueryBldr.addWhereAttrEqValue(CIHumanResource.EmployeeAbstract.StatusAbstract,
-                        Status.find(CIHumanResource.EmployeeStatus.Worker));
+        final DateTime date = new DateTime(
+                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.date.name));
+        final DateTime dueDate = new DateTime(_parameter
+                        .getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.dueDate.name));
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2EmployeeAbstract);
         queryBldr.addWhereAttrInQuery(CIPayroll.Template2EmployeeAbstract.ToAbstractLink,
-                        attrQueryBldr.getAttributeQuery(CIHumanResource.EmployeeAbstract.ID));
+                       getAttrQuery4Employees(_parameter, date, dueDate));
         queryBldr.addWhereAttrEqValue(CIPayroll.Template2EmployeeAbstract.FromAbstractLink, templates.toArray());
 
         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -356,10 +358,6 @@ public abstract class Payslip_Base
 
         final String docType = _parameter.getParameterValue(
                         CIFormPayroll.Payroll_PayslipCreateMultipleForm.docType.name);
-        final DateTime date = new DateTime(
-                        _parameter.getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.date.name));
-        final DateTime dueDate = new DateTime(_parameter
-                        .getParameterValue(CIFormPayroll.Payroll_PayslipCreateMultipleForm.dueDate.name));
 
         while (multi.next()) {
             final Instance templInst = multi.getSelect(selTemplInst);
@@ -408,8 +406,8 @@ public abstract class Payslip_Base
         final Insert insert = new Insert(CIPayroll.Payslip);
         insert.add(CIPayroll.Payslip.Name, getDocName4Create(_parameter));
         insert.add(CIPayroll.Payslip.DocType, _docType);
-        insert.add(CIPayroll.Payslip.Date, getDate(_parameter, _date, _emplInst));
-        insert.add(CIPayroll.Payslip.DueDate, _dueDate);
+        insert.add(CIPayroll.Payslip.Date, getStartDate(_parameter, _date, _emplInst));
+        insert.add(CIPayroll.Payslip.DueDate, getEndDate(_parameter, _date, _dueDate, _emplInst));
         insert.add(CIPayroll.Payslip.EmployeeAbstractLink, _emplInst);
         insert.add(CIPayroll.Payslip.StatusAbstract, Status.find(CIPayroll.PayslipStatus.Draft));
         insert.add(CIPayroll.Payslip.RateCrossTotal, BigDecimal.ZERO);
@@ -1228,7 +1226,7 @@ public abstract class Payslip_Base
                     listener.add2UpdateMap4Employee(_parameter, emplInst, map);
                 }
                 final DateTime date = DateUtil.getDateFromParameter(_parameter.getParameterValue("date_eFapsDate"));
-                map.put("date_eFapsDate", DateUtil.getDate4Parameter(getDate(_parameter, date, emplInst)));
+                map.put("date_eFapsDate", DateUtil.getDate4Parameter(getStartDate(_parameter, date, emplInst)));
             } else {
                 map.put("employeeData", "????");
             }
@@ -1240,7 +1238,7 @@ public abstract class Payslip_Base
     }
 
     /**
-     * Gets the date.
+     * Gets the start date.
      *
      * @param _parameter the _parameter
      * @param _date the _date
@@ -1248,9 +1246,9 @@ public abstract class Payslip_Base
      * @return the date
      * @throws EFapsException on error
      */
-    protected DateTime getDate(final Parameter _parameter,
-                               final DateTime _date,
-                               final Instance _emplInst)
+    protected DateTime getStartDate(final Parameter _parameter,
+                                    final DateTime _date,
+                                    final Instance _emplInst)
         throws EFapsException
     {
         DateTime ret = _date;
@@ -1262,6 +1260,35 @@ public abstract class Payslip_Base
         final DateTime startDate = print.getSelect(selStartDate);
         if (startDate != null && ret.isBefore(startDate)) {
             ret = startDate;
+        }
+        return ret;
+    }
+
+    /**
+     * Gets the start date.
+     *
+     * @param _parameter the _parameter
+     * @param _startDate the start date
+     * @param _endDate the end date
+     * @param _emplInst the _empl inst
+     * @return the date
+     * @throws EFapsException on error
+     */
+    protected DateTime getEndDate(final Parameter _parameter,
+                                  final DateTime _startDate,
+                                  final DateTime _endDate,
+                                  final Instance _emplInst)
+        throws EFapsException
+    {
+        DateTime ret = _endDate;
+        final PrintQuery print = CachedPrintQuery.get4Request(_emplInst);
+        final SelectBuilder selEndDate = SelectBuilder.get().clazz(CIHumanResource.ClassTR)
+                        .attribute(CIHumanResource.ClassTR.EndDate);
+        print.addSelect(selEndDate);
+        print.execute();
+        final DateTime endDate = print.getSelect(selEndDate);
+        if (endDate != null && endDate.isBefore(ret) && endDate.isAfter(_startDate)) {
+            ret = endDate;
         }
         return ret;
     }
@@ -1956,4 +1983,42 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    /**
+     * Gets the attribute query 4 employees.
+     * All active employees and inactive in the given timeframe.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _minDate the min date
+     * @param _maxDate the max date
+     * @return the att query4 employees
+     * @throws EFapsException on error
+     */
+    protected AttributeQuery getAttrQuery4Employees(final Parameter _parameter,
+                                                    final DateTime _minDate,
+                                                    final DateTime _maxDate)
+        throws EFapsException
+    {
+        final QueryBuilder queryBldr = new QueryBuilder(CIHumanResource.Employee);
+        queryBldr.addWhereAttrEqValue(CIHumanResource.Employee.Status, Status.find(
+                        CIHumanResource.EmployeeStatus.Worker));
+
+        if (_minDate != null && _maxDate != null) {
+            // inactive employees that where inactivated in the given timeframe
+            final QueryBuilder classQueryBldr = new QueryBuilder(CIHumanResource.ClassTR);
+            classQueryBldr.addWhereAttrGreaterValue(CIHumanResource.ClassTR.EndDate,
+                            _minDate.withTimeAtStartOfDay().minusDays(1));
+            classQueryBldr.addWhereAttrLessValue(CIHumanResource.ClassTR.EndDate,
+                            _maxDate.withTimeAtStartOfDay().plusDays(1));
+
+            final QueryBuilder queryBldr2 = new QueryBuilder(CIHumanResource.Employee);
+            queryBldr2.addWhereAttrEqValue(CIHumanResource.Employee.Status, Status.find(
+                            CIHumanResource.EmployeeStatus.Notworked));
+            queryBldr2.addWhereAttrInQuery(CIHumanResource.Employee.ID, classQueryBldr.getAttributeQuery(
+                            CIHumanResource.ClassTR.EmployeeLink));
+            queryBldr.setOr(true);
+            queryBldr.addWhereAttrInQuery(CIHumanResource.Employee.ID,
+                            queryBldr2.getAttributeQuery(CIHumanResource.Employee.ID));
+        }
+        return queryBldr.getAttributeQuery(CIHumanResource.Employee.ID);
+    }
 }
