@@ -14,17 +14,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-  Author:          The eFaps Team
-  Revision:        $Rev: 14698 $
-  Last Changed:    $Date: 2014-12-28 20:15:38 -0500 (Sun, 28 Dec 2014) $
-  Last Changed By: $Author: jan@moxter.net $
-
 -->
 <ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>c566697a-68cb-4819-98b0-e0f8fcd5d143</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 14698 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_RuleReportForm</name>
@@ -43,7 +37,7 @@
                 <property name="FilterType01">DateTime</property>
                 <property name="FilterType02">DateTime</property>
                 <property name="FilterType03">Instance</property>
-                <property name="FilterType04">Instance</property>
+                <property name="FilterType04">InstanceSet</property>
                 <property name="FilterDefault01">MONTH:-1</property>
                 <property name="FilterDefault02">TODAY</property>
                 <property name="FilterDefault03">-</property>

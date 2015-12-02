@@ -14,17 +14,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev: 14564 $
- Last Changed:    $Date: 2014-12-02 14:05:52 -0500 (Tue, 02 Dec 2014) $
- Last Changed By: $Author: jan@moxter.net $
-
 -->
 <ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>2afd1d85-f608-46e2-97fb-5c7bc01d548d</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 14564 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_RuleReportMyDesk</name>

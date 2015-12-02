@@ -14,23 +14,9 @@
  * limitations under the License.
  *
  */
-
-package org.efaps.esjp.payroll.reports;
-
-import org.efaps.admin.program.esjp.EFapsApplication;
-import org.efaps.admin.program.esjp.EFapsUUID;
-
 /**
- * This class must be replaced for customization, therefore it is left empty.
- * Functional description can be found in the related "<code>_Base</code>"
- * class.
+ * Reports for payroll.
  *
  * @author The eFaps Team
  */
-@EFapsUUID("48bae9fb-f49e-4744-8986-d00a0f9d487d")
-@EFapsApplication("eFapsApp-Payroll")
-public class RuleReport
-    extends RuleReport_Base
-{
-
-}
+package org.efaps.esjp.payroll.reports;

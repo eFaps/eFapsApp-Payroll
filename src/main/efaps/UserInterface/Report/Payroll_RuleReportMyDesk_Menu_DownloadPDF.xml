@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
 
- Copyright 2003 - 2014 The eFaps Team
+ Copyright 2003 - 2015 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,15 +15,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author:          The eFaps Team
- Revision:        $Rev: 14564 $
- Last Changed:    $Date: 2014-12-02 14:05:52 -0500 (Tue, 02 Dec 2014) $
- Last Changed By: $Author: jan@moxter.net $
-
---><ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+-->
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>6bad628f-5513-491d-b528-61b1f0ce05eb</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev: 14564 $</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_RuleReportMyDesk_Menu_DownloadPDF</name>
@@ -31,13 +28,13 @@
             <role>Sales_Admin</role>
         </access>
         <target>
-            <execute method="exportReport" program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
+            <execute method="exportReport" program="org.efaps.esjp.payroll.reports.RuleReport">
                 <property name="Mime">pdf</property>
                 <property name="PageType">A4</property>
                 <property name="PageOrientation">LANDSCAPE</property>
-                <property name="FilterKey">org.efaps.esjp.payroll.reports.PositionAnalyzeReport.FilterKey</property>
-                <property name="Type">Sales_RetentionCertificate</property>
-                <property name="StatusGroup">Sales_RetentionCertificateStatus</property>
+                <property name="FilterKey">org.efaps.esjp.payroll.reports.RuleReport.FilterKey</property>
+                <property name="Type">Payroll_Payslip</property>
+                <property name="StatusGroup">Payroll_PayslipStatus</property>
                 <property name="Status">!Canceled</property>
             </execute>
         </target>
