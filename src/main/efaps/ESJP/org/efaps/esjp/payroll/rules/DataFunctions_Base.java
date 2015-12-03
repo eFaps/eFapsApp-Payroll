@@ -85,13 +85,12 @@ public abstract class DataFunctions_Base
     * @return the amount for anual
     * @throws EFapsException on error
     */
-   public BigDecimal getAnualMonth(final Integer _month,
+    public BigDecimal getAnualMonth(final Integer _month,
                                    final String... _keys)
-       throws EFapsException
-   {
+        throws EFapsException
+    {
         return getAnualMonth(_month, true, _keys);
-   }
-
+    }
 
     /**
      * Gets the anual month.
@@ -134,11 +133,23 @@ public abstract class DataFunctions_Base
                 queryBldr.addWhereAttrInQuery(CIPayroll.PositionAbstract.DocumentAbstractLink,
                                 attrQueryBldr.getAttributeQuery(CIPayroll.Payslip.ID));
                 final MultiPrintQuery multi = queryBldr.getPrint();
+                final SelectBuilder selInst = SelectBuilder.get().linkto(
+                                CIPayroll.PositionAbstract.DocumentAbstractLink).instance();
+                multi.addSelect(selInst);
                 multi.addAttribute(CIPayroll.PositionPayment.Amount);
                 multi.execute();
                 while (multi.next()) {
-                    final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
-                    ret = ret.add(amount);
+                    // check if the found is part of the currenct document, if it is exclude it!
+                    boolean exclude = false;
+                    final Instance currDocInst = (Instance) getContext().get(AbstractParameter.PARAKEY4DOCINST);
+                    if (currDocInst != null && currDocInst.isValid()) {
+                        final Instance docInst = multi.getSelect(selInst);
+                        exclude = currDocInst.equals(docInst);
+                    }
+                    if (!exclude) {
+                        final BigDecimal amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionPayment.Amount);
+                        ret = ret.add(amount);
+                    }
                 }
             }
         }
@@ -223,6 +234,9 @@ public abstract class DataFunctions_Base
     }
 
     /**
+     * Gets the advance.
+     *
+     * @param _keys the keys
      * @return the amount for anual
      * @throws EFapsException on error
      */
@@ -263,8 +277,17 @@ public abstract class DataFunctions_Base
         return ret;
     }
 
+    /**
+     * Gets the adv val.
+     *
+     * @param _queryBldr the query bldr
+     * @param _instances the instances
+     * @param _keys the keys
+     * @return the adv val
+     * @throws EFapsException on error
+     */
     protected BigDecimal getAdvVal(final QueryBuilder _queryBldr,
-                                   final Set<Instance> instances,
+                                   final Set<Instance> _instances,
                                    final String... _keys)
         throws EFapsException
     {
@@ -275,7 +298,7 @@ public abstract class DataFunctions_Base
             multi.execute();
             while (multi.next()) {
                 ret = ret.add(multi.<BigDecimal>getAttribute(CIPayroll.Advance.CrossTotal));
-                instances.add(multi.getCurrentInstance());
+                _instances.add(multi.getCurrentInstance());
             }
         } else {
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
@@ -290,7 +313,7 @@ public abstract class DataFunctions_Base
             multi.execute();
             while (multi.next()) {
                 ret = ret.add(multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.Amount));
-                instances.add(multi.<Instance>getSelect(selDocInst));
+                _instances.add(multi.<Instance>getSelect(selDocInst));
             }
         }
         return ret;
