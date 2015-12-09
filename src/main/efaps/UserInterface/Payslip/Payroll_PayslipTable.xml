@@ -52,11 +52,15 @@
             <property name="Attribute">Name</property>
             <property name="Label">Payroll_Payslip/Name.Label</property>
         </field>
+        <field name="employeeNumber">
+            <property name="Select">linkto[EmployeeAbstractLink].attribute[Number]</property>
+            <property name="Label">HumanResource_Employee/Number.Label</property>
+        </field>
         <field name="employee">
             <property name="ModeCreate">EDITABLE</property>
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
+            <property name="MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"
@@ -210,11 +214,15 @@
             <property name="Attribute">Name</property>
             <property name="Label">Payroll_Payslip/Name.Label</property>
         </field>
+        <field name="employeeNumber">
+            <property name="Select">linkto[EmployeeAbstractLink].attribute[Number]</property>
+            <property name="Label">HumanResource_Employee/Number.Label</property>
+        </field>
         <field name="employee">
             <property name="ModeCreate">EDITABLE</property>
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="MsgPhrase">HumanResource_EmployeeWithNumberMsgPhrase</property>
+            <property name="MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"

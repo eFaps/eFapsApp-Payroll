@@ -49,11 +49,15 @@
             <property name="ShowTypeIcon">true</property>
             <property name="HRef">TREE</property>
         </field>
+        <field name="employeeNumber">
+            <property name="Select">linkto[EmployeeAbstractLink].attribute[Number]</property>
+            <property name="Label">HumanResource_Employee/Number.Label</property>
+        </field>
         <field name="employee">
             <property name="ModeCreate">EDITABLE</property>
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
+            <property name="MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee"
@@ -174,11 +178,15 @@
             <property name="ShowTypeIcon">true</property>
             <property name="HRef">TREE</property>
         </field>
+        <field name="employeeNumber">
+            <property name="Select">linkto[EmployeeAbstractLink].attribute[Number]</property>
+            <property name="Label">HumanResource_Employee/Number.Label</property>
+        </field>
         <field name="employee">
             <property name="ModeCreate">EDITABLE</property>
             <property name="SelectAlternateOID">linkto[EmployeeAbstractLink].oid</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
-            <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
+            <property name="MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
             <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger event="UI_FIELD_AUTOCOMPLETE" method="autoComplete4Employee"
