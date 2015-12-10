@@ -28,6 +28,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.api.annotation.EFapsSysConfAttribute;
 import org.efaps.api.annotation.EFapsSystemConfiguration;
 import org.efaps.esjp.admin.common.systemconfiguration.BooleanSysConfAttribute;
+import org.efaps.esjp.admin.common.systemconfiguration.IntegerSysConfAttribute;
 import org.efaps.esjp.admin.common.systemconfiguration.ListSysConfAttribute;
 import org.efaps.esjp.admin.common.systemconfiguration.PropertiesSysConfAttribute;
 import org.efaps.esjp.admin.common.systemconfiguration.StringSysConfAttribute;
@@ -99,6 +100,13 @@ public final class Payroll
 
     /** See description. */
     @EFapsSysConfAttribute
+    public static final IntegerSysConfAttribute PAYSLIPEDITMASSRULEQTY = new IntegerSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Payslip.RuleQuantity4EditMassive")
+                    .description("Quantity of rules that can be edited in the massive form.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
     public static final StringSysConfAttribute PAYSLIPJASPERREPORT = new StringSysConfAttribute()
                     .sysConfUUID(SYSCONFUUID)
                     .key(BASE + "Payslip.JasperReport")
@@ -138,6 +146,13 @@ public final class Payroll
                     .sysConfUUID(SYSCONFUUID)
                     .key(BASE + "Advance.EvaluateHolidayLaborTime")
                     .description("Evaluate the NightLaborTime for Payslip from TimeReports.");
+
+    /** See description. */
+    @EFapsSysConfAttribute
+    public static final IntegerSysConfAttribute ADVANCEEDITMASSRULEQTY = new IntegerSysConfAttribute()
+                    .sysConfUUID(SYSCONFUUID)
+                    .key(BASE + "Advance.RuleQuantity4EditMassive")
+                    .description("Quantity of rules that can be edited in the massive form.");
 
     /** See description. */
     @EFapsSysConfAttribute
@@ -215,11 +230,11 @@ public final class Payroll
          */
         EXCLUDEZERO,
         /**
-         * INclude it in the report for PLAME.
+         * Include it in the report for PLAME.
          */
         INCLUDEPLAME,
         /**
-         * Evaluate for Alteration.;
+         * Evaluate for Alteration.
          */
         EVALUATEALTERATION;
 

@@ -20,10 +20,7 @@ package org.efaps.esjp.payroll;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Status;
@@ -32,8 +29,6 @@ import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
-import org.efaps.admin.program.esjp.Listener;
-import org.efaps.ci.CIAttribute;
 import org.efaps.ci.CIType;
 import org.efaps.db.AttributeQuery;
 import org.efaps.db.CachedPrintQuery;
@@ -56,13 +51,10 @@ import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.basis.BasisAttribute;
-import org.efaps.esjp.payroll.listener.IOnAdvance;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
 import org.efaps.esjp.payroll.rules.Result;
-import org.efaps.esjp.payroll.util.Payroll;
 import org.efaps.esjp.sales.PriceUtil;
-import org.efaps.esjp.sales.document.AbstractDocument;
 import org.efaps.update.AppDependency;
 import org.efaps.update.util.InstallationException;
 import org.efaps.util.EFapsException;
@@ -130,10 +122,10 @@ public abstract class Advance_Base
                     final Instance emplInst = Instance.get(employees[i]);
                     final String name = getDocName4Create(_parameter);
 
-                    final BigDecimal lT = getLaborTime(_parameter, null, date, emplInst, null);
-                    final BigDecimal elT = getExtraLaborTime(_parameter, null, date, emplInst, null);
-                    final BigDecimal nlT = getNightLaborTime(_parameter, null, date, emplInst, null);
-                    final BigDecimal hlT = getHolidayLaborTime(_parameter, null, date, emplInst, null);
+                    final BigDecimal lT = getLaborTime(_parameter, null, date, null, emplInst, null);
+                    final BigDecimal elT = getExtraLaborTime(_parameter, null, date, null, emplInst, null);
+                    final BigDecimal nlT = getNightLaborTime(_parameter, null, date, null, emplInst, null);
+                    final BigDecimal hlT = getHolidayLaborTime(_parameter, null, date, null, emplInst, null);
 
                     insert.add(CIPayroll.Advance.Name, name);
                     insert.add(CIPayroll.Advance.DocType, docType);
@@ -168,82 +160,14 @@ public abstract class Advance_Base
         return new Return();
     }
 
-    public Return evaluateTimes(final Parameter _parameter)
+    @Override
+    protected Status getStatus4evaluateTimes(final Parameter _parameter)
         throws EFapsException
     {
-        final List<Instance> advanceInsts = new ArrayList<>();
-
-        final Instance tmpinst = _parameter.getInstance();
-        if (tmpinst != null && tmpinst.isValid()) {
-            advanceInsts.add(tmpinst);
-        } else {
-            advanceInsts.addAll(getSelectedInstances(_parameter));
-        }
-
-        for (final Instance advanceInst : advanceInsts) {
-
-            final PrintQuery print = new PrintQuery(advanceInst);
-            final SelectBuilder selEmplInst = SelectBuilder.get().linkto(CIPayroll.Advance.EmployeeAbstractLink)
-                            .instance();
-            final SelectBuilder selTemplInst = SelectBuilder.get().linkto(CIPayroll.Payslip.TemplateLink)
-                            .instance();
-            print.addSelect(selEmplInst, selTemplInst);
-            print.addAttribute(CIPayroll.Advance.Date, CIPayroll.Advance.Status);
-            print.execute();
-            final Status status = Status.get(print.<Long>getAttribute(CIPayroll.Advance.Status));
-            if (Status.find(CIPayroll.AdvanceStatus.Draft).equals(status)) {
-                final DateTime date = print.getAttribute(CIPayroll.Advance.Date);
-                final Instance emplInst = print.getSelect(selEmplInst);
-                final Instance templInst = print.getSelect(selTemplInst);
-
-                final Dimension timeDim = CIPayroll.Advance.getType().getAttribute(CIPayroll.Advance.LaborTime.name)
-                                .getDimension();
-
-                final BigDecimal lT = getLaborTime(_parameter, advanceInst, date, emplInst, templInst);
-                final BigDecimal elT = getExtraLaborTime(_parameter, advanceInst, date, emplInst, templInst);
-                final BigDecimal nlT = getNightLaborTime(_parameter, advanceInst, date, emplInst, templInst);
-                final BigDecimal hlT = getHolidayLaborTime(_parameter, advanceInst, date, emplInst, templInst);
-
-                if (lT != null || elT != null || nlT != null || hlT != null) {
-                    final Update update = new Update(advanceInst);
-                    if (lT != null) {
-                        update.add(CIPayroll.Advance.LaborTime, new Object[] { lT, timeDim.getBaseUoM().getId() });
-                    }
-                    if (elT != null) {
-                        update.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { elT, timeDim.getBaseUoM().getId() });
-                    }
-                    if (nlT != null) {
-                        update.add(CIPayroll.Advance.NightLaborTime, new Object[] { nlT, timeDim.getBaseUoM().getId() });
-                    }
-                    if (hlT != null) {
-                        update.add(CIPayroll.Advance.HolidayLaborTime,
-                                        new Object[] { hlT, timeDim.getBaseUoM().getId() });
-                    }
-                    update.execute();
-                }
-            }
-        }
-        return new Return();
+        return Status.find(CIPayroll.AdvanceStatus.Draft);
     }
 
-    protected BigDecimal getLaborTime(final Parameter _parameter,
-                                      final Instance _advanceInst,
-                                      final DateTime _date,
-                                      final Instance _emplInst,
-                                      final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.ADVANCEEVALLABORTIME.get()) {
-            for (final IOnAdvance listener : Listener.get().<IOnAdvance>invoke(IOnAdvance.class)) {
-                ret = listener.getLaborTime(_parameter, _advanceInst, _date, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplateAdvance.DefaultLaborTime);
-        }
-        return ret;
-    }
+
 
     /**
      * Gets the start date.
@@ -268,90 +192,6 @@ public abstract class Advance_Base
         final DateTime startDate = print.getSelect(selStartDate);
         if (startDate != null && ret.isBefore(startDate)) {
             ret = startDate;
-        }
-        return ret;
-    }
-
-    /**
-     * Gets the default value.
-     *
-     * @param _parameter Parameter as passed by the eFaps API
-     * @param _templInst the templ inst
-     * @param _attr the attr
-     * @return the default value
-     * @throws EFapsException on error
-     */
-    protected BigDecimal getDefaultValue(final Parameter _parameter,
-                                         final Instance _templInst,
-                                         final CIAttribute _attr)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (_templInst != null && _templInst.isValid()) {
-            final PrintQuery print = CachedPrintQuery.get4Request(_templInst);
-            print.addAttribute(CIPayroll.TemplateAdvance.DefaultLaborTime,
-                            CIPayroll.TemplateAdvance.DefaultExtraLaborTime,
-                            CIPayroll.TemplateAdvance.DefaultHolidayLaborTime,
-                            CIPayroll.TemplateAdvance.DefaultNightLaborTime);
-            print.execute();
-            ret = print.getAttribute(_attr);
-        }
-        return ret != null && ret.compareTo(BigDecimal.ZERO) > -1 ? ret : null;
-    }
-
-    protected BigDecimal getExtraLaborTime(final Parameter _parameter,
-                                           final Instance _advanceInst,
-                                           final DateTime _date,
-                                           final Instance _emplInst,
-                                           final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.ADVANCEEVALEXTRALABORTIME.get()) {
-            for (final IOnAdvance listener : Listener.get().<IOnAdvance>invoke(IOnAdvance.class)) {
-                ret = listener.getExtraLaborTime(_parameter, _advanceInst, _date, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplateAdvance.DefaultExtraLaborTime);
-        }
-        return ret;
-    }
-
-    protected BigDecimal getNightLaborTime(final Parameter _parameter,
-                                           final Instance _advanceInst,
-                                           final DateTime _date,
-                                           final Instance _emplInst,
-                                           final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.ADVANCEEVALNIGHTLABORTIME.get()) {
-            for (final IOnAdvance listener : Listener.get().<IOnAdvance>invoke(IOnAdvance.class)) {
-                ret = listener.getNightLaborTime(_parameter, _advanceInst, _date, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplateAdvance.DefaultNightLaborTime);
-        }
-        return ret;
-    }
-
-    protected BigDecimal getHolidayLaborTime(final Parameter _parameter,
-                                             final Instance _advanceInst,
-                                             final DateTime _date,
-                                             final Instance _emplInst,
-                                             final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.ADVANCEEVALHOLIDAYLABORTIME.get()) {
-            for (final IOnAdvance listener : Listener.get().<IOnAdvance>invoke(IOnAdvance.class)) {
-                ret = listener.getHolidayLaborTime(_parameter, _advanceInst, _date, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplateAdvance.DefaultHolidayLaborTime);
         }
         return ret;
     }
@@ -453,6 +293,13 @@ public abstract class Advance_Base
         return new Return();
     }
 
+    /**
+     * Creates the multiple.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the return
+     * @throws EFapsException on error
+     */
     public Return createMultiple(final Parameter _parameter)
         throws EFapsException
     {
@@ -463,7 +310,7 @@ public abstract class Advance_Base
 
         final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.Template2EmployeeAbstract);
         queryBldr.addWhereAttrInQuery(CIPayroll.Template2EmployeeAbstract.ToAbstractLink,
-                        getAttrQuery4Employees(_parameter, date.withDayOfMonth(1) , date));
+                        getAttrQuery4Employees(_parameter, date.withDayOfMonth(1), date));
         queryBldr.addWhereAttrEqValue(CIPayroll.Template2EmployeeAbstract.FromAbstractLink, templates.toArray());
 
         final MultiPrintQuery multi = queryBldr.getPrint();
@@ -544,87 +391,9 @@ public abstract class Advance_Base
         final List<? extends AbstractRule<?>> rules = Template.getRules4Template(_parameter, _templInst);
         Calculator.evaluate(_parameter, rules, createdDoc.getInstance());
         final Result result = Calculator.getResult(_parameter, rules);
-        final Payslip payslip = new Payslip();
-        payslip.updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
-        payslip.updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
-    }
 
-
-    public Return edit4Multiple(final Parameter _parameter)
-        throws EFapsException
-    {
-        final String selected = _parameter.getParameterValue("selected");
-        final String[] oids = _parameter.getParameterValues("oid");
-        final String[] values = _parameter.getParameterValues("newValue");
-        if (oids != null && values != null && oids.length == values.length) {
-            for (int i = 0; i < values.length; i++) {
-                final Instance tmpInst = Instance.get(oids[i]);
-                final Instance docInst;
-                final Map<Instance, BigDecimal> mapping = new HashMap<>();
-                if (tmpInst.getType().isKindOf(CIPayroll.PositionAbstract)) {
-                    final PrintQuery print = new PrintQuery(tmpInst);
-                    final SelectBuilder selDocInst = SelectBuilder.get()
-                                    .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink).instance();
-                    print.addSelect(selDocInst);
-                    print.execute();
-                    docInst = print.getSelect(selDocInst);
-                    try {
-                        final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
-                                        .parse(values[i]);
-                        mapping.put(tmpInst, amount);
-                    } catch (final ParseException e) {
-                        LOG.error("Catched ParserException", e);
-                    }
-                } else {
-                    docInst = tmpInst;
-                    try {
-                        final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
-                                        .parse(values[i]);
-                        mapping.put(Instance.get(selected), amount);
-                    } catch (final ParseException e) {
-                        LOG.error("Catched ParserException", e);
-                    }
-                }
-                final PrintQuery print = new PrintQuery(docInst);
-                final SelectBuilder selRateCurInst = SelectBuilder.get().linkto(CIPayroll.Payslip.RateCurrencyId)
-                                .instance();
-                print.addSelect(selRateCurInst);
-                print.addAttribute(CIPayroll.Advance.Rate, CIPayroll.Advance.Date,
-                                CIPayroll.Advance.LaborTime, CIPayroll.Advance.HolidayLaborTime,
-                                CIPayroll.Advance.ExtraLaborTime, CIPayroll.Advance.NightLaborTime);
-                print.execute();
-
-                final Instance rateCurrInst = print.getSelect(selRateCurInst);
-                final Object[] rateObj = print.getAttribute(CIPayroll.Advance.Rate);
-                final Object[] laborTime = print.getAttribute(CIPayroll.Advance.LaborTime);
-                final Object[] extraLaborTime = print.getAttribute(CIPayroll.Advance.ExtraLaborTime);
-                final Object[] holidayLaborTime = print.getAttribute(CIPayroll.Advance.HolidayLaborTime);
-                final Object[] nightLaborTime = print.getAttribute(CIPayroll.Advance.NightLaborTime);
-
-                final Update update = new Update(docInst);
-                if (selected.equals("LaborTime")) {
-                    update.add(CIPayroll.Advance.LaborTime, new Object[] { values[i], laborTime[1] });
-                }
-                if (selected.equals("ExtraLaborTime")) {
-                    update.add(CIPayroll.Advance.ExtraLaborTime, new Object[] { values[i], extraLaborTime[1] });
-                }
-                if (selected.equals("HolidayLaborTime")) {
-                    update.add(CIPayroll.Advance.HolidayLaborTime, new Object[] { values[i], holidayLaborTime[1] });
-                }
-                if (selected.equals("NightLaborTime")) {
-                    update.add(CIPayroll.Advance.NightLaborTime, new Object[] { values[i], nightLaborTime[1] });
-                }
-                update.add(CIPayroll.Advance.Basis, BasisAttribute.getValueList4Inst(_parameter, docInst));
-                update.execute();
-
-                final Payslip payslip = new Payslip();
-                final List<? extends AbstractRule<?>> rules = payslip.analyseRulesFomDoc(_parameter, docInst, mapping);
-                final Result result = Calculator.getResult(_parameter, rules);
-                payslip.updateTotals(_parameter, docInst, result, rateCurrInst, rateObj);
-                payslip.updatePositions(_parameter, docInst, result, rateCurrInst, rateObj);
-            }
-        }
-        return new Return();
+        updateTotals(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
+        updatePositions(_parameter, insert.getInstance(), result, Currency.getBaseCurrency(), rateObj);
     }
 
     @Override
@@ -674,6 +443,14 @@ public abstract class Advance_Base
         return new Return();
     }
 
+    /**
+     * Connect2 project.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _createdDoc the created doc
+     * @param _emplInst the empl inst
+     * @throws EFapsException on error
+     */
     protected void connect2Project(final Parameter _parameter,
                                    final CreatedDoc _createdDoc,
                                    final Instance _emplInst)

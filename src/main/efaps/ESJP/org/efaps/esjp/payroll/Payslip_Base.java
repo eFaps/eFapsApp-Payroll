@@ -28,20 +28,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.ui.FieldValue;
-import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
@@ -51,8 +47,6 @@ import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.program.esjp.Listener;
 import org.efaps.admin.ui.AbstractUserInterfaceObject.TargetMode;
 import org.efaps.admin.ui.field.Field;
-import org.efaps.ci.CIAttribute;
-import org.efaps.ci.CIType;
 import org.efaps.db.AttributeQuery;
 import org.efaps.db.CachedPrintQuery;
 import org.efaps.db.Context;
@@ -73,9 +67,8 @@ import org.efaps.esjp.ci.CIProjects;
 import org.efaps.esjp.ci.CITablePayroll;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.common.parameter.ParameterUtil;
-import org.efaps.esjp.common.uiform.Field_Base.DropDownPosition;
 import org.efaps.esjp.common.util.InterfaceUtils;
-import org.efaps.esjp.common.util.InterfaceUtils_Base.DojoLibs;
+import org.efaps.esjp.erp.AbstractWarning;
 import org.efaps.esjp.erp.Currency;
 import org.efaps.esjp.erp.CurrencyInst;
 import org.efaps.esjp.erp.NumberFormatter;
@@ -83,13 +76,10 @@ import org.efaps.esjp.payroll.basis.BasisAttribute;
 import org.efaps.esjp.payroll.listener.IOnPayslip;
 import org.efaps.esjp.payroll.rules.AbstractRule;
 import org.efaps.esjp.payroll.rules.Calculator;
-import org.efaps.esjp.payroll.rules.IDocRuleListener;
 import org.efaps.esjp.payroll.rules.InputRule;
 import org.efaps.esjp.payroll.rules.Result;
-import org.efaps.esjp.payroll.util.Payroll;
 import org.efaps.esjp.projects.Project;
 import org.efaps.esjp.sales.PriceUtil;
-import org.efaps.esjp.sales.document.AbstractDocumentSum;
 import org.efaps.esjp.ui.html.Table;
 import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.ui.wicket.util.EFapsKey;
@@ -123,7 +113,7 @@ import net.sf.jasperreports.engine.JRException;
 @EFapsUUID("f1c7d3d5-23d2-4d72-a5d4-3c811a159062")
 @EFapsApplication("eFapsApp-Payroll")
 public abstract class Payslip_Base
-    extends AbstractDocumentSum
+    extends AbstractDocument
 {
 
     /**
@@ -458,172 +448,25 @@ public abstract class Payslip_Base
         createReport(_parameter, createdDoc);
     }
 
-    public Return evaluateTimes(final Parameter _parameter)
+    @Override
+    protected Status getStatus4evaluateTimes(final Parameter _parameter)
         throws EFapsException
     {
-        final List<Instance> payslipInsts = new ArrayList<>();
-
-        final Instance tmpinst = _parameter.getInstance();
-        if (tmpinst != null && tmpinst.isValid()) {
-            payslipInsts.add(tmpinst);
-        } else {
-            payslipInsts.addAll(getSelectedInstances(_parameter));
-        }
-
-        for (final Instance payslipInst : payslipInsts) {
-            final PrintQuery print = new PrintQuery(payslipInst);
-            final SelectBuilder selEmplInst = SelectBuilder.get().linkto(CIPayroll.Payslip.EmployeeAbstractLink)
-                            .instance();
-            final SelectBuilder selTemplInst = SelectBuilder.get().linkto(CIPayroll.Payslip.TemplateLink)
-                            .instance();
-            print.addSelect(selEmplInst, selTemplInst);
-            print.addAttribute(CIPayroll.Payslip.Date, CIPayroll.Payslip.DueDate, CIPayroll.Payslip.Status);
-            print.execute();
-            final Status status = Status.get(print.<Long>getAttribute(CIPayroll.Payslip.Status));
-            if (Status.find(CIPayroll.PayslipStatus.Draft).equals(status)) {
-                final DateTime date = print.getAttribute(CIPayroll.Payslip.Date);
-                final DateTime dueDate = print.getAttribute(CIPayroll.Payslip.DueDate);
-                final Instance emplInst = print.getSelect(selEmplInst);
-                final Instance templInst = print.getSelect(selTemplInst);
-
-                final Dimension timeDim = CIPayroll.Payslip.getType().getAttribute(CIPayroll.Payslip.LaborTime.name)
-                                .getDimension();
-
-                final BigDecimal lT = getLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
-                final BigDecimal elT = getExtraLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
-                final BigDecimal nlT = getNightLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
-                final BigDecimal hlT = getHolidayLaborTime(_parameter, payslipInst, date, dueDate, emplInst, templInst);
-
-                if (lT != null || elT != null || nlT != null || hlT != null) {
-                    final Update update = new Update(payslipInst);
-                    if (lT != null) {
-                        update.add(CIPayroll.Payslip.LaborTime, new Object[] { lT, timeDim.getBaseUoM().getId() });
-                    }
-                    if (elT != null) {
-                        update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { elT, timeDim.getBaseUoM().getId() });
-                    }
-                    if (nlT != null) {
-                        update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { nlT, timeDim.getBaseUoM().getId() });
-                    }
-                    if (hlT != null) {
-                        update.add(CIPayroll.Payslip.HolidayLaborTime,
-                                        new Object[] { hlT, timeDim.getBaseUoM().getId() });
-                    }
-                    update.execute();
-                }
-            }
-        }
-        return new Return();
+        return Status.find(CIPayroll.PayslipStatus.Draft);
     }
 
-    protected BigDecimal getLaborTime(final Parameter _parameter,
-                                      final Instance _payslipInst,
-                                      final DateTime _date,
-                                      final DateTime _dueDate,
-                                      final Instance _emplInst,
-                                      final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.PAYSLIPEVALLABORTIME.get()) {
-            for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
-                ret = listener.getLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultLaborTime);
-        }
-        return ret;
-    }
 
-    protected BigDecimal getExtraLaborTime(final Parameter _parameter,
-                                           final Instance _payslipInst,
-                                           final DateTime _date,
-                                           final DateTime _dueDate,
-                                           final Instance _emplInst,
-                                           final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.PAYSLIPEVALEXTRALABORTIME.get()) {
-            for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
-                ret = listener.getExtraLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultExtraLaborTime);
-        }
-        return ret;
-    }
 
-    protected BigDecimal getNightLaborTime(final Parameter _parameter,
-                                           final Instance _payslipInst,
-                                           final DateTime _date,
-                                           final DateTime _dueDate,
-                                           final Instance _emplInst,
-                                           final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.PAYSLIPEVALNIGHTLABORTIME.get()) {
-            for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
-                ret = listener.getNightLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultNightLaborTime);
-        }
-        return ret;
-    }
 
-    protected BigDecimal getHolidayLaborTime(final Parameter _parameter,
-                                             final Instance _payslipInst,
-                                             final DateTime _date,
-                                             final DateTime _dueDate,
-                                             final Instance _emplInst,
-                                             final Instance _templInst)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (Payroll.PAYSLIPEVALHOLIDAYLABORTIME.get()) {
-            for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
-                ret = listener.getHolidayLaborTime(_parameter, _payslipInst, _date, _dueDate, _emplInst);
-            }
-        }
-        if (ret == null) {
-            ret = getDefaultValue(_parameter, _templInst, CIPayroll.TemplatePayslip.DefaultHolidayLaborTime);
-        }
-        return ret;
-    }
 
-    protected BigDecimal getDefaultValue(final Parameter _parameter,
-                                         final Instance _templInst,
-                                         final CIAttribute _attr)
-        throws EFapsException
-    {
-        BigDecimal ret = null;
-        if (_templInst != null && _templInst.isValid()) {
-            final PrintQuery print = CachedPrintQuery.get4Request(_templInst);
-            print.addAttribute(CIPayroll.TemplatePayslip.DefaultLaborTime,
-                            CIPayroll.TemplatePayslip.DefaultExtraLaborTime,
-                            CIPayroll.TemplatePayslip.DefaultHolidayLaborTime,
-                            CIPayroll.TemplatePayslip.DefaultNightLaborTime);
-            print.execute();
-            final Object[] obj = print.getAttribute(_attr);
-            if (obj != null) {
-                final BigDecimal val = (BigDecimal) obj[0];
-                final UoM uoM = (UoM) obj[1];
-                if (uoM.equals(uoM.getDimension().getBaseUoM())) {
-                    ret = val;
-                } else {
-                    ret = val.multiply(new BigDecimal(uoM.getNumerator())).setScale(8, BigDecimal.ROUND_HALF_UP)
-                                    .divide(new BigDecimal(uoM.getDenominator()), BigDecimal.ROUND_HALF_UP);
-                }
-            }
-        }
-        return ret != null && ret.compareTo(BigDecimal.ZERO) > -1 ? ret : null;
-    }
-
+    /**
+     * Adds the advance.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _createdDoc the created doc
+     * @param _emplInst the empl inst
+     * @throws EFapsException on error
+     */
     protected void addAdvance(final Parameter _parameter,
                               final CreatedDoc _createdDoc,
                               final Instance _emplInst)
@@ -644,6 +487,14 @@ public abstract class Payslip_Base
         }
     }
 
+    /**
+     * Connect2 project.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _createdDoc the created doc
+     * @param _emplInst the empl inst
+     * @throws EFapsException on error
+     */
     protected void connect2Project(final Parameter _parameter,
                                    final CreatedDoc _createdDoc,
                                    final Instance _emplInst)
@@ -674,46 +525,13 @@ public abstract class Payslip_Base
         }
     }
 
-
-    protected void updateTotals(final Parameter _parameter,
-                                final Instance _docInst,
-                                final Result _result,
-                                final Instance _rateCurInst,
-                                final Object[] _rateObj)
-        throws EFapsException
-    {
-        final Instance baseCurIns = Currency.getBaseCurrency();
-        final BigDecimal rate = ((BigDecimal) _rateObj[0]).divide((BigDecimal) _rateObj[1], 12,
-                        BigDecimal.ROUND_HALF_UP);
-
-        final BigDecimal rateCrossTotal = _result.getTotal()
-                        .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-
-        final BigDecimal crossTotal = rateCrossTotal.divide(rate, BigDecimal.ROUND_HALF_UP)
-                        .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-
-        final BigDecimal cost = _result.getCost().divide(rate, BigDecimal.ROUND_HALF_UP)
-                        .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-
-        final Update insert = new Update(_docInst);
-        insert.add(CIPayroll.Payslip.RateCrossTotal, rateCrossTotal);
-        insert.add(CIPayroll.Payslip.Rate, _rateObj);
-        insert.add(CIPayroll.Payslip.CrossTotal, crossTotal);
-        insert.add(CIPayroll.Payslip.AmountCost, cost);
-        insert.add(CIPayroll.Payslip.CurrencyId, baseCurIns);
-        insert.add(CIPayroll.Payslip.RateCurrencyId, _rateCurInst);
-        insert.execute();
-
-        for (final AbstractRule<?> rule : _result.getRules()) {
-            if (rule.add()) {
-                for (final IDocRuleListener listener : rule.getRuleListeners(IDocRuleListener.class)) {
-                    listener.execute(_parameter, _docInst);
-                }
-            }
-        }
-
-    }
-
+    /**
+     * Edits the.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the return
+     * @throws EFapsException on error
+     */
     public Return edit(final Parameter _parameter)
         throws EFapsException
     {
@@ -771,81 +589,7 @@ public abstract class Payslip_Base
         return ret;
     }
 
-    protected void updatePositions(final Parameter _parameter,
-                                   final Instance _docInst,
-                                   final Result _result,
-                                   final Instance _rateCurInst,
-                                   final Object[] _rateObj)
-        throws EFapsException
-    {
-        final BigDecimal rate = ((BigDecimal) _rateObj[0]).divide((BigDecimal) _rateObj[1], 12,
-                        BigDecimal.ROUND_HALF_UP);
-        final Instance baseCurIns = Currency.getBaseCurrency();
 
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
-        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
-        final InstanceQuery query = queryBldr.getQuery();
-        final List<Instance> posInsts = query.executeWithoutAccessCheck();
-        final Iterator<Instance> posIter = posInsts.iterator();
-        int idx = 1;
-        for (final AbstractRule<?> rule : _result.getRules()) {
-            if (rule.add()) {
-                CIType ciType;
-                switch (rule.getRuleType()) {
-                    case PAYMENT:
-                        ciType = CIPayroll.PositionPayment;
-                        break;
-                    case DEDUCTION:
-                        ciType = CIPayroll.PositionDeduction;
-                        break;
-                    case NEUTRAL:
-                        ciType = CIPayroll.PositionNeutral;
-                        break;
-                    default:
-                        ciType = CIPayroll.PositionSum;
-                }
-
-                Update update;
-                Instance posInst = null;
-                if (posIter.hasNext()) {
-                    posInst = posIter.next();
-
-                    if (posInst.getType().isCIType(ciType)) {
-                        update = new Update(posInst);
-                    } else {
-                        update = new Insert(ciType);
-                        update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
-                        new Delete(posInst).execute();
-                    }
-                } else {
-                    update = new Insert(ciType);
-                    update.add(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
-                }
-
-                final BigDecimal rateAmount = _result.getBigDecimal(rule.getResult())
-                                .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-
-                final BigDecimal amount = rateAmount.divide(rate, BigDecimal.ROUND_HALF_UP)
-                                .setScale(_result.getFormatter().getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-
-                update.add(CIPayroll.PositionAbstract.RuleAbstractLink, rule.getInstance());
-                update.add(CIPayroll.PositionAbstract.PositionNumber, idx);
-                update.add(CIPayroll.PositionAbstract.Description, rule.getDescription());
-                update.add(CIPayroll.PositionAbstract.Key, rule.getKey());
-                update.add(CIPayroll.PositionAbstract.RateAmount, rateAmount);
-                update.add(CIPayroll.PositionAbstract.Rate, _rateObj);
-                update.add(CIPayroll.PositionAbstract.Amount, amount);
-                update.add(CIPayroll.PositionAbstract.CurrencyLink, baseCurIns);
-                update.add(CIPayroll.PositionAbstract.RateCurrencyLink, _rateCurInst);
-                update.execute();
-                idx++;
-            }
-        }
-
-        while (posIter.hasNext()) {
-            new Delete(posIter.next()).execute();
-        }
-    }
 
     /**
      * @param _parameter Parameter as passed from the eFaps API
@@ -1001,10 +745,10 @@ public abstract class Payslip_Base
         return ret;
     }
 
-
     /**
      * Method to get the javascript part for setting the values.
      *
+     * @param _parameter Parameter as passed by the eFaps API
      * @param _instance instance to be copied
      * @return javascript
      * @throws EFapsException on error
@@ -1408,6 +1152,14 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    /**
+     * Analyse rules fom ui.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _ruleInsts the rule insts
+     * @return the list<? extends abstract rule<?>>
+     * @throws EFapsException on error
+     */
     protected List<? extends AbstractRule<?>> analyseRulesFomUI(final Parameter _parameter,
                                                                 final Map<Instance, Integer> _ruleInsts)
         throws EFapsException
@@ -1427,7 +1179,7 @@ public abstract class Payslip_Base
                         amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
                                         .parse(amountStr);
                     }
-                    rule.setExpression(Calculator.toJexlBigDecimal(_parameter, amount));;
+                    rule.setExpression(Calculator.toJexlBigDecimal(_parameter, amount));
                 } catch (final ParseException e) {
                     LOG.error("Catched ParserException", e);
                 }
@@ -1437,11 +1189,19 @@ public abstract class Payslip_Base
         return ret;
     }
 
+    /**
+     * Gets the html4 positions.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _rules the rules
+     * @return the html4 positions
+     * @throws EFapsException on error
+     */
     protected CharSequence getHtml4Positions(final Parameter _parameter,
-                                             final List<? extends AbstractRule<?>> rules)
+                                             final List<? extends AbstractRule<?>> _rules)
         throws EFapsException
     {
-        final Result result = Calculator.getResult(_parameter, rules);
+        final Result result = Calculator.getResult(_parameter, _rules);
         final Table table = new Table();
         table.addRow().addColumn(CIPayroll.PositionPayment.getType().getLabel())
                         .getCurrentColumn().setStyle("font-weight: bold;");
@@ -1484,6 +1244,12 @@ public abstract class Payslip_Base
         return table.toHtml();
     }
 
+    /**
+     * Gets the rule inst from ui.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the rule inst from ui
+     */
     protected Map<Instance, Integer> getRuleInstFromUI(final Parameter _parameter)
     {
         final Map<Instance, Integer> ret = new LinkedHashMap<>();
@@ -1586,6 +1352,13 @@ public abstract class Payslip_Base
         return report.execute(_parameter);
     }
 
+    /**
+     * Gets the action report data source.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the action report data source
+     * @throws EFapsException on error
+     */
     protected JRDataSource getActionReportDataSource(final Parameter _parameter)
         throws EFapsException
     {
@@ -1617,371 +1390,7 @@ public abstract class Payslip_Base
         return ret;
     }
 
-    /**
-     * @param _parameter Parameter as passed from the eFaps API
-     * @return Return containing Snipplet
-     * @throws EFapsException on error
-     */
-    @SuppressWarnings("unchecked")
-    public Return getSelection4EditMassiveUIFieldValue(final Parameter _parameter)
-        throws EFapsException
-    {
-        final Return ret = new Return();
-        final List<DropDownPosition> values = new ArrayList<DropDownPosition>();
-        List<Instance> insts = getSelectedInstances(_parameter);
-        if (!insts.isEmpty()) {
-            final MultiPrintQuery multi = new MultiPrintQuery(insts);
-            multi.addAttribute(CIPayroll.DocumentAbstract.StatusAbstract);
-            multi.execute();
-            insts = new ArrayList<>();
-            while (multi.next()) {
-                final Status status = Status.get(multi.<Long>getAttribute(CIPayroll.DocumentAbstract.StatusAbstract));
-                if (status.equals(Status.find(CIPayroll.PayslipStatus.Draft))
-                                || status.equals(Status.find(CIPayroll.AdvanceStatus.Draft))
-                                || status.equals(Status.find(CIPayroll.SettlementStatus.Draft))) {
-                    insts.add(multi.getCurrentInstance());
-                }
-            }
-            Context.getThreadContext().setSessionAttribute(Payslip.SESSIONKEY, insts);
-        } else {
-            insts = (List<Instance>) Context.getThreadContext().getSessionAttribute(Payslip.SESSIONKEY);
-        }
 
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.RuleInput);
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIPayroll.RuleInput.Key, CIPayroll.RuleInput.Description);
-        multi.execute();
-        while (multi.next()) {
-            final String option = multi.getAttribute(CIPayroll.RuleInput.Key) + " - "
-                            + multi.getAttribute(CIPayroll.RuleInput.Description);
-            final DropDownPosition position = new org.efaps.esjp.common.uiform.Field().getDropDownPosition(
-                            _parameter, multi.getCurrentInstance().getOid(), option);
-            values.add(position);
-        }
-
-        values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
-                        "HolidayLaborTime", DBProperties.getProperty("Payroll_Payslip/HolidayLaborTime.Label")));
-        values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
-                        "NightLaborTime", DBProperties.getProperty("Payroll_Payslip/NightLaborTime.Label")));
-        values.add(0, new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
-                        "ExtraLaborTime", DBProperties.getProperty("Payroll_Payslip/ExtraLaborTime.Label")));
-        final DropDownPosition labeOp = new org.efaps.esjp.common.uiform.Field().getDropDownPosition(_parameter,
-                        "LaborTime", DBProperties.getProperty("Payroll_Payslip/LaborTime.Label"));
-        labeOp.setSelected(true);
-        values.add(0, labeOp);
-
-        ret.put(ReturnValues.VALUES, values);
-        return ret;
-    }
-
-    /**
-     * @param _parameter Parameter as passed from the eFaps API
-     * @return Return containing Snipplet
-     * @throws EFapsException on error
-     */
-    public Return getValues4EditMassiveUIFieldValue(final Parameter _parameter)
-        throws EFapsException
-    {
-        final Return ret = new Return();
-        final Table table = new Table();
-        @SuppressWarnings("unchecked")
-        final List<Instance> insts = (List<Instance>) Context.getThreadContext()
-                        .getSessionAttribute(Payslip.SESSIONKEY);
-
-        if (insts != null && !insts.isEmpty()) {
-            final String selected = _parameter
-                            .getParameterValue(CIFormPayroll.Payroll_PayslipEditMassiveSelectForm.select.name);
-            final Map<String, String> map = new HashMap<>();
-            switch (selected) {
-                case "HolidayLaborTime":
-                case "ExtraLaborTime":
-                case "NightLaborTime":
-                case "LaborTime":
-                    table.addRow().addColumn(DBProperties.getProperty("Payroll_Payslip/" + selected + ".Label")
-                                    + "<span id=\"btn\"><span>")
-                        .getCurrentColumn().setStyle("font-weight: bold;");
-                    final MultiPrintQuery multi = new MultiPrintQuery(insts);
-                    final SelectBuilder selEmp = SelectBuilder.get()
-                                    .linkto(CIPayroll.Payslip.EmployeeAbstractLink);
-                    final SelectBuilder selEmpFirstName = new SelectBuilder(selEmp)
-                                    .attribute(CIHumanResource.Employee.FirstName);
-                    final SelectBuilder selEmpLastName = new SelectBuilder(selEmp)
-                                    .attribute(CIHumanResource.Employee.LastName);
-                    final SelectBuilder selEmpSecLastName = new SelectBuilder(selEmp)
-                                    .attribute(CIHumanResource.Employee.SecondLastName);
-                    final SelectBuilder selUoM = SelectBuilder.get().attribute(selected).label();
-                    final SelectBuilder selTime = SelectBuilder.get().attribute(selected).value();
-                    multi.addSelect(selEmpFirstName, selEmpLastName, selEmpSecLastName, selTime, selUoM);
-                    multi.addAttribute(CIPayroll.Payslip.Name);
-                    multi.setEnforceSorted(true);
-                    multi.execute();
-                    while (multi.next()) {
-                        final String employee = multi.getSelect(selEmpLastName) + " "
-                                        + multi.getSelect(selEmpSecLastName) + ", " + multi.getSelect(selEmpFirstName);
-                        final String id1 = RandomStringUtils.randomAlphanumeric(8);
-                        final String id2 = RandomStringUtils.randomAlphanumeric(8);
-                        map.put(id1, id2);
-                        table.addRow().addColumn("<input type=\"checkbox\" name=\"oid\" value=\""
-                                            + multi.getCurrentInstance().getOid() + "\" id=\"" + id1 + "\" >")
-                            .addColumn(multi.<String>getAttribute(CIPayroll.Payslip.Name))
-                            .addColumn(employee)
-                            .addColumn("<input disabled=\"disabled\" name=\"newValue\" value=\""
-                                            + multi.getSelect(selTime) + "\" id=\"" + id2 + "\"></input>")
-                            .addColumn(multi.<String>getSelect(selUoM));
-                    }
-                    break;
-                default:
-                    final PrintQuery print = new PrintQuery(selected);
-                    print.addAttribute(CIPayroll.RuleAbstract.Key, CIPayroll.RuleAbstract.Description);
-                    print.execute();
-                    final String key = print.getAttribute(CIPayroll.RuleAbstract.Key);
-                    table.addRow().addColumn(key + " - " + print.getAttribute(CIPayroll.RuleAbstract.Description)
-                                    + "<span id=\"btn\"><span>")
-                        .getCurrentColumn().setStyle("font-weight: bold;");
-
-                    final MultiPrintQuery paySlipMulti = new MultiPrintQuery(insts);
-                    final SelectBuilder selEmp2 = SelectBuilder.get()
-                                    .linkto(CIPayroll.Payslip.EmployeeAbstractLink);
-                    final SelectBuilder selEmpFirstName2 = new SelectBuilder(selEmp2)
-                                    .attribute(CIHumanResource.Employee.FirstName);
-                    final SelectBuilder selEmpLastName2 = new SelectBuilder(selEmp2)
-                                    .attribute(CIHumanResource.Employee.LastName);
-                    final SelectBuilder selEmpSecLastName2 = new SelectBuilder(selEmp2)
-                                    .attribute(CIHumanResource.Employee.SecondLastName);
-                    final SelectBuilder selCurrSymb =  SelectBuilder.get()
-                                    .linkto(CIPayroll.Payslip.RateCurrencyId)
-                                    .attribute(CIERP.Currency.Symbol);
-                    paySlipMulti.addSelect(selCurrSymb, selEmpFirstName2, selEmpLastName2, selEmpSecLastName2);
-                    paySlipMulti.addAttribute(CIPayroll.DocumentAbstract.Name);
-                    paySlipMulti.setEnforceSorted(true);
-                    paySlipMulti.execute();
-
-                    while (paySlipMulti.next()) {
-                        final String employee = paySlipMulti.getSelect(selEmpLastName2) + " "
-                                        + paySlipMulti.getSelect(selEmpSecLastName2) + ", "
-                                        + paySlipMulti.getSelect(selEmpFirstName2);
-
-                        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
-                        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.Key, key);
-                        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink,
-                                        paySlipMulti.getCurrentInstance());
-
-                        final MultiPrintQuery multi2 = queryBldr.getPrint();
-                        multi2.addAttribute(CIPayroll.PositionAbstract.RateAmount);
-                        multi2.execute();
-                        BigDecimal rateAmount;
-                        String oid;
-                        if (multi2.next()) {
-                            rateAmount = multi2.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.RateAmount);
-                            oid = multi2.getCurrentInstance().getOid();
-
-                        } else {
-                            rateAmount = BigDecimal.ZERO;
-                            oid = paySlipMulti.getCurrentInstance().getOid();
-                        }
-
-                        final String id1 = RandomStringUtils.randomAlphanumeric(8);
-                        final String id2 = RandomStringUtils.randomAlphanumeric(8);
-                        map.put(id1, id2);
-
-                        table.addRow().addColumn("<input type=\"checkbox\" name=\"oid\" value=\""
-                                        + oid + "\" id=\"" + id1 + "\" >")
-                            .addColumn(paySlipMulti.<String>getAttribute(CIPayroll.DocumentAbstract.Name))
-                            .addColumn(employee)
-                            .addColumn("<input disabled=\"disabled\" name=\"newValue\" value=\""
-                                            + rateAmount + "\" id=\"" + id2 + "\"></input>")
-                            .addColumn(paySlipMulti.<String>getSelect(selCurrSymb));
-                    }
-                    break;
-            }
-            final StringBuilder js = new StringBuilder();
-
-            for (final Entry<String, String> entry  :map.entrySet()) {
-                js.append("on(dom.byId(\"").append(entry.getKey()).append("\"), \"click\", function(evt){")
-                    .append("dom.byId(\"").append(entry.getValue())
-                    .append("\").disabled = evt.currentTarget.checked ? '' : 'disabled';")
-                    .append("});\n");
-            }
-            js.append( "  new ToggleButton({\n" +
-                            "    showLabel: true,\n" +
-                            "    label: 'activar todos',\n" +
-                            "    checked: false,\n" +
-                            "    onChange: function (val) {\n" +
-                            "      this.set('label', val ? 'desactivar todos' : 'activar todos' );\n" +
-                            "      query('input[type=checkbox]').forEach(function (node) {\n" +
-                            "        node.checked = val;\n" +
-                            "      });\n" +
-                            "      query('[name=\\'newValue\\']').forEach(function (node) {\n" +
-                            "        node.disabled = !val;\n" +
-                            "      })\n" +
-                            "    }\n" +
-                            "  }, 'btn').startup();\n" +
-                            "\n" +
-                            "");
-
-            final StringBuilder html = InterfaceUtils.wrappInScriptTag(_parameter,
-                            InterfaceUtils.wrapInDojoRequire(_parameter, js, DojoLibs.ON, DojoLibs.DOM, DojoLibs.QUERY,
-                                            DojoLibs.TOGGLEBUTTON), true, 1500);
-            html.insert(0, table.toHtml()).append("<input type=\"hidden\" name=\"selected\" value=\"")
-                .append(selected).append("\">");
-            ret.put(ReturnValues.SNIPLETT, html);
-        }
-
-        return ret;
-    }
-
-    /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @return edit
-     * @throws EFapsException on error
-     */
-    public Return edit4Massive(final Parameter _parameter)
-        throws EFapsException
-    {
-        final String selected = _parameter.getParameterValue("selected");
-        final String[] oids = _parameter.getParameterValues("oid");
-        final String[] values = _parameter.getParameterValues("newValue");
-        if (oids != null && values != null && oids.length == values.length) {
-            for (int i = 0; i < values.length; i++) {
-                final Instance tmpInst = Instance.get(oids[i]);
-                final Instance docInst;
-                final Map<Instance, BigDecimal> mapping = new HashMap<>();
-                if (tmpInst.getType().isKindOf(CIPayroll.PositionAbstract)) {
-                    final PrintQuery print = new PrintQuery(tmpInst);
-                    final SelectBuilder selDocInst = SelectBuilder.get()
-                                    .linkto(CIPayroll.PositionAbstract.DocumentAbstractLink).instance();
-                    print.addSelect(selDocInst);
-                    print.execute();
-                    docInst = print.getSelect(selDocInst);
-                    try {
-                        final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
-                                        .parse(values[i]);
-                        mapping.put(tmpInst, amount);
-                    } catch (final ParseException e) {
-                        LOG.error("Catched ParserException", e);
-                    }
-                } else {
-                    docInst = tmpInst;
-                    try {
-                        final BigDecimal amount = (BigDecimal) NumberFormatter.get().getTwoDigitsFormatter()
-                                        .parse(values[i]);
-                        mapping.put(Instance.get(selected), amount);
-                    } catch (final ParseException e) {
-                        LOG.error("Catched ParserException", e);
-                    }
-                }
-                final PrintQuery print = new PrintQuery(docInst);
-                final SelectBuilder selRateCurInst = SelectBuilder.get().linkto(CIPayroll.Payslip.RateCurrencyId)
-                                .instance();
-                print.addSelect(selRateCurInst);
-                print.addAttribute(CIPayroll.Payslip.Rate, CIPayroll.Payslip.Date,
-                                CIPayroll.Payslip.LaborTime, CIPayroll.Payslip.HolidayLaborTime,
-                                CIPayroll.Payslip.ExtraLaborTime, CIPayroll.Payslip.NightLaborTime);
-                print.execute();
-
-                final Instance rateCurrInst = print.getSelect(selRateCurInst);
-                final Object[] rateObj = print.getAttribute(CIPayroll.Payslip.Rate);
-                final Object[] laborTime = print.getAttribute(CIPayroll.Payslip.LaborTime);
-                final Object[] extraLaborTime = print.getAttribute(CIPayroll.Payslip.ExtraLaborTime);
-                final Object[] holidayLaborTime = print.getAttribute(CIPayroll.Payslip.HolidayLaborTime);
-                final Object[] nightLaborTime = print.getAttribute(CIPayroll.Payslip.NightLaborTime);
-
-                final Update update = new Update(docInst);
-                if (selected.equals("LaborTime")) {
-                    update.add(CIPayroll.Payslip.LaborTime, new Object[] { values[i], laborTime[1] });
-                }
-                if (selected.equals("ExtraLaborTime")) {
-                    update.add(CIPayroll.Payslip.ExtraLaborTime, new Object[] { values[i], extraLaborTime[1] });
-                }
-                if (selected.equals("HolidayLaborTime")) {
-                    update.add(CIPayroll.Payslip.HolidayLaborTime, new Object[] { values[i], holidayLaborTime[1] });
-                }
-                if (selected.equals("NightLaborTime")) {
-                    update.add(CIPayroll.Payslip.NightLaborTime, new Object[] { values[i], nightLaborTime[1] });
-                }
-                update.add(CIPayroll.Advance.Basis, BasisAttribute.getValueList4Inst(_parameter, docInst));
-                update.execute();
-
-                final List<? extends AbstractRule<?>> rules = analyseRulesFomDoc(_parameter, docInst, mapping);
-                final Result result = Calculator.getResult(_parameter, rules);
-                updateTotals(_parameter, docInst, result, rateCurrInst, rateObj);
-                updatePositions(_parameter, docInst, result, rateCurrInst, rateObj);
-
-                final EditedDoc editedDoc = new EditedDoc(docInst);
-                createReport(_parameter, editedDoc);
-            }
-        }
-        return new Return();
-    }
-
-    /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _docInst      Instance of the document
-     * @return list of rules
-     * @throws EFapsException on error
-     */
-    protected List<? extends AbstractRule<?>> analyseRulesFomDoc(final Parameter _parameter,
-                                                                 final Instance _docInst)
-        throws EFapsException
-    {
-        return analyseRulesFomDoc(_parameter, _docInst, new HashMap<Instance, BigDecimal>());
-    }
-
-    /**
-     * @param _parameter    Parameter as passed by the eFaps API
-     * @param _docInst       Instance of the document
-     * @param _mapping      Map values
-     * @return list of rules
-     * @throws EFapsException on error
-     */
-    protected List<? extends AbstractRule<?>> analyseRulesFomDoc(final Parameter _parameter,
-                                                                 final Instance _docInst,
-                                                                 final Map<Instance, BigDecimal> _mapping)
-        throws EFapsException
-    {
-        final PrintQuery print = new PrintQuery(_docInst);
-        final SelectBuilder selTmplInst = SelectBuilder.get().linkto(CIPayroll.DocumentAbstract.TemplateLinkAbstract)
-                        .instance();
-        print.addSelect(selTmplInst);
-        print.execute();
-
-        final List<? extends AbstractRule<?>> ret = Template.getRules4Template(_parameter,
-                        print.<Instance>getSelect(selTmplInst));
-
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
-        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        final SelectBuilder selRulsInst = SelectBuilder.get().linkto(CIPayroll.PositionAbstract.RuleAbstractLink)
-                        .instance();
-        multi.addSelect(selRulsInst);
-        multi.addAttribute(CIPayroll.PositionAbstract.RateAmount);
-        multi.execute();
-        final Map<Instance, BigDecimal> map = new HashMap<>();
-        while (multi.next()) {
-            final BigDecimal amount;
-            if (_mapping.containsKey(multi.getCurrentInstance())) {
-                amount = _mapping.get(multi.getCurrentInstance());
-            } else {
-                amount = multi.<BigDecimal>getAttribute(CIPayroll.PositionAbstract.RateAmount);
-            }
-            map.put(multi.<Instance>getSelect(selRulsInst), amount);
-        }
-
-        for (final AbstractRule<?> rule : ret) {
-            if (rule instanceof InputRule) {
-                BigDecimal amount = BigDecimal.ZERO;
-                if (map.containsKey(rule.getInstance())) {
-                    amount = map.get(rule.getInstance());
-                }
-                if (_mapping.containsKey(rule.getInstance())) {
-                    amount = _mapping.get(rule.getInstance());
-                }
-                rule.setExpression(Calculator.toJexlBigDecimal(_parameter, amount));
-            }
-        }
-        Calculator.evaluate(_parameter, ret, _docInst);
-        return ret;
-    }
 
     /**
      * Gets the attribute query 4 employees.
@@ -1990,7 +1399,7 @@ public abstract class Payslip_Base
      * @param _parameter Parameter as passed by the eFaps API
      * @param _minDate the min date
      * @param _maxDate the max date
-     * @return the att query4 employees
+     * @return the AttributeQuery for employees
      * @throws EFapsException on error
      */
     protected AttributeQuery getAttrQuery4Employees(final Parameter _parameter,
@@ -2020,5 +1429,41 @@ public abstract class Payslip_Base
                             queryBldr2.getAttributeQuery(CIHumanResource.Employee.ID));
         }
         return queryBldr.getAttributeQuery(CIHumanResource.Employee.ID);
+    }
+
+    /**
+     * Warning for existing name.
+     *
+     * @author The eFaps Team
+     */
+    public static class PayslipNoSelection4EditMassiveWarning
+        extends AbstractWarning
+    {
+
+        /**
+         * Instantiates a new payslip no selection4 edit massive warning.
+         */
+        public PayslipNoSelection4EditMassiveWarning()
+        {
+            setError(true);
+        }
+    }
+
+    /**
+     * Warning for existing name.
+     *
+     * @author The eFaps Team
+     */
+    public static class PayslipSelectionQuantity4EditMassiveWarning
+        extends AbstractWarning
+    {
+
+        /**
+         * Instantiates a new payslip selection quantity4 edit massive warning.
+         */
+        public PayslipSelectionQuantity4EditMassiveWarning()
+        {
+            setError(true);
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 <!--
 
-  Copyright 2003 - 2010 The eFaps Team
+  Copyright 2003 - 2015 The eFaps Team
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,18 +16,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-  Author:          The eFaps Team
-  Revision:        $Rev$
-  Last Changed:    $Date$
-  Last Changed By: $Author$
-
 -->
-<common-systemconfiguration xmlns="http://www.efaps.org/xsd"
-                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<common-systemconfiguration xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                             xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>6f21b777-3c7d-4792-b3c0-8bfb6af0bf5e</uuid>
     <file-application>eFapsApp-Payroll</file-application>
-    <file-revision>$Rev$</file-revision>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll-Configuration</name>
@@ -50,6 +43,14 @@ java.util.HashMap</value>
             <key>org.efaps.payroll.StaticMethodMapping</key>
             <value><![CDATA[Period=org.joda.time.Period
 PeriodType=org.joda.time.PeriodType]]></value>
+        </attribute>
+        <attribute>
+            <key>org.efaps.payroll.Payslip.RuleQuantity4EditMassive</key>
+            <value>5</value>
+        </attribute>
+         <attribute>
+            <key>org.efaps.payroll.Advance.RuleQuantity4EditMassive</key>
+            <value>5</value>
         </attribute>
     </definition>
 </common-systemconfiguration>
