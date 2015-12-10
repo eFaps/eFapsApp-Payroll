@@ -505,7 +505,7 @@ public abstract class AbstractDocument_Base
             multi.addMsgPhrase(selEmployee, msgPhrase);
             multi.addSelect(selCurrSymb);
             multi.addAttribute(CIPayroll.DocumentAbstract.Name);
-
+            multi.setEnforceSorted(true);
             // add the first row and some selects
             for (final String selected : selectedArr) {
                 switch (selected) {
