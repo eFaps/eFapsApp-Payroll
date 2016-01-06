@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2015 The eFaps Team
+ * Copyright 2003 - 2016 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,13 @@ public abstract class Settlement_Base
         return ret;
     }
 
+    /**
+     * Connect2 payslip.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @param _createdDoc the created doc
+     * @throws EFapsException on error
+     */
     protected void connect2Payslip(final Parameter _parameter,
                                    final CreatedDoc _createdDoc)
         throws EFapsException
@@ -102,7 +109,7 @@ public abstract class Settlement_Base
         queryBldr.addWhereAttrNotInQuery(CIPayroll.Payslip.ID,
                         attrQueryBldr.getAttributeQuery(CIPayroll.Settlement2Payslip.ToLink));
         queryBldr.addWhereAttrEqValue(CIPayroll.Payslip.EmployeeAbstractLink,
-                        print.getAttribute(CIPayroll.DocumentAbstract.EmployeeAbstractLink));
+                        print.<Long>getAttribute(CIPayroll.DocumentAbstract.EmployeeAbstractLink));
         queryBldr.addWhereAttrLessValue(CIPayroll.Payslip.Date, print.getAttribute(CIPayroll.Settlement.EndDate));
         final InstanceQuery query = queryBldr.getQuery();
         query.execute();
@@ -139,6 +146,13 @@ public abstract class Settlement_Base
         _insert.add(CIPayroll.Settlement.Basis, BasisAttribute.getValueList4Inst(_parameter, employeeInst));
     }
 
+    /**
+     * Edits the.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the return
+     * @throws EFapsException on error
+     */
     public Return edit(final Parameter _parameter)
         throws EFapsException
     {

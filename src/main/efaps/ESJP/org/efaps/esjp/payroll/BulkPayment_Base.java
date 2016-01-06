@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2015 The eFaps Team
+ * Copyright 2003 - 2016 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.efaps.esjp.payroll;
@@ -30,13 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
-import net.sf.dynamicreports.report.builder.subtotal.AggregationSubtotalBuilder;
-import net.sf.dynamicreports.report.datasource.DRDataSource;
-import net.sf.jasperreports.engine.JRDataSource;
-
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.datamodel.ui.RateUI;
 import org.efaps.admin.dbproperty.DBProperties;
@@ -44,6 +34,8 @@ import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
+import org.efaps.admin.program.esjp.EFapsApplication;
+import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.AttributeQuery;
 import org.efaps.db.Context;
 import org.efaps.db.Insert;
@@ -67,12 +59,20 @@ import org.efaps.esjp.sales.payment.PaymentDeposit;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.subtotal.AggregationSubtotalBuilder;
+import net.sf.dynamicreports.report.datasource.DRDataSource;
+import net.sf.jasperreports.engine.JRDataSource;
+
 /**
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id: $
  */
+@EFapsUUID("0cf2139d-669d-4605-967a-997bf97fe6e2")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class BulkPayment_Base
     extends AbstractDocument
 {
@@ -283,6 +283,13 @@ public abstract class BulkPayment_Base
         return ret;
     }
 
+    /**
+     * Export report4 detail.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the return
+     * @throws EFapsException on error
+     */
     public Return exportReport4Detail(final Parameter _parameter)
         throws EFapsException
     {
@@ -302,6 +309,12 @@ public abstract class BulkPayment_Base
         return ret;
     }
 
+    /**
+     * Gets the report.
+     *
+     * @param _parameter Parameter as passed by the eFaps API
+     * @return the report
+     */
     protected AbstractDynamicReport getReport(final Parameter _parameter)
     {
         return new Report4Detail();
@@ -326,7 +339,7 @@ public abstract class BulkPayment_Base
 
             final QueryBuilder queryBldrCont = new QueryBuilder(CIPayroll.Employee2BulkPaymentDefinition);
             queryBldrCont.addWhereAttrEqValue(CIPayroll.Employee2BulkPaymentDefinition.ToLink,
-                            print.getAttribute(CIPayroll.BulkPayment.BulkDefinitionLink));
+                            print.<Long>getAttribute(CIPayroll.BulkPayment.BulkDefinitionLink));
             final MultiPrintQuery multiCont = queryBldrCont.getPrint();
             multiCont.addAttribute(CIPayroll.Employee2BulkPaymentDefinition.AccountNumber,
                             CIPayroll.Employee2BulkPaymentDefinition.Bank);

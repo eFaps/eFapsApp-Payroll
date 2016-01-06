@@ -9,6 +9,7 @@
         <parameter name="regex4FieldLabelExclude" value="^HumanResource_"/>
         <packages>
             <package name="org.efaps.tests.ci.*"></package>
+            <package name="org.efaps.tests.others.*"></package>
         </packages>
     </test>
 </suite>
