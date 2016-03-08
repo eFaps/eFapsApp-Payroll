@@ -46,16 +46,18 @@ public abstract class OnDocumentInfo_Base
         throws EFapsException
     {
         final Map<String, BigDecimal> ret = new HashMap<>();
-        final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
-        queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
-        final MultiPrintQuery multi = queryBldr.getPrint();
-        multi.addAttribute(CIPayroll.PositionAbstract.Key, CIPayroll.PositionAbstract.Amount);
-        multi.execute();
-        while (multi.next()) {
-            final String key = multi.getAttribute(CIPayroll.PositionAbstract.Key);
-            final BigDecimal amount = multi.getAttribute(CIPayroll.PositionAbstract.Amount);
-            final BigDecimal current = ret.containsKey(key) ? ret.get(key) : BigDecimal.ZERO;
-            ret.put(key, current.add(amount));
+        if (_docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
+            final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
+            queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
+            final MultiPrintQuery multi = queryBldr.getPrint();
+            multi.addAttribute(CIPayroll.PositionAbstract.Key, CIPayroll.PositionAbstract.Amount);
+            multi.execute();
+            while (multi.next()) {
+                final String key = multi.getAttribute(CIPayroll.PositionAbstract.Key);
+                final BigDecimal amount = multi.getAttribute(CIPayroll.PositionAbstract.Amount);
+                final BigDecimal current = ret.containsKey(key) ? ret.get(key) : BigDecimal.ZERO;
+                ret.put(key, current.add(amount));
+            }
         }
         return ret;
     }
