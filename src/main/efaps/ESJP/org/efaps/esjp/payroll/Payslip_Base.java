@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.efaps.admin.datamodel.Dimension;
 import org.efaps.admin.datamodel.Dimension.UoM;
 import org.efaps.admin.datamodel.Status;
-import org.efaps.admin.datamodel.ui.FieldValue;
+import org.efaps.admin.datamodel.ui.IUIValue;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Parameter.ParameterValues;
 import org.efaps.admin.event.Return;
@@ -823,16 +823,16 @@ public abstract class Payslip_Base
         throws EFapsException
     {
         final Return ret = new Return();
-        final FieldValue fValue = (FieldValue) _parameter.get(ParameterValues.UIOBJECT);
+        final IUIValue fValue = (IUIValue) _parameter.get(ParameterValues.UIOBJECT);
         final DateTime value;
-        if (fValue.getTargetMode().equals(TargetMode.CREATE)) {
+        if (TargetMode.CREATE.equals(_parameter.get(ParameterValues.ACCESSMODE))) {
             if (fValue.getField().getName().equals("date")) {
                 value = new DateTime().dayOfMonth().withMinimumValue();
             } else {
                 value = new DateTime().dayOfMonth().withMaximumValue();
             }
         } else {
-            value = (DateTime) fValue.getValue();
+            value = (DateTime) fValue.getObject();
         }
         ret.put(ReturnValues.VALUES, value);
         return ret;
