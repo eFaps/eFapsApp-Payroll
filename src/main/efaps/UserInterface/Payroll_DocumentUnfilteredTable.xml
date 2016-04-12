@@ -47,7 +47,7 @@
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
          </field>
         <field name="laborTime">
             <property name="Attribute">LaborTime</property>
@@ -153,7 +153,7 @@
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Phrase">$&lt;linkto[EmployeeAbstractLink].attribute[Number]&gt; - $&lt;linkto[EmployeeAbstractLink].attribute[LastName]&gt; $&lt;linkto[EmployeeAbstractLink].attribute[SecondLastName]&gt;</property>
             <property name="Label">Payroll_Payslip/employee.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="laborTime">
             <property name="Attribute">LaborTime</property>
@@ -229,7 +229,7 @@
             <property name="Phrase">$&lt;linkfrom[PayRoll_Projects_ProjectService2PayrollDocument#ToAbstract].linkto[FromAbstract].attribute[Name]&gt; - $&lt;linkfrom[PayRoll_Projects_ProjectService2PayrollDocument#ToAbstract].linkto[FromAbstract].attribute[Description]&gt;</property>
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="Label">Payroll_PayslipForm.project.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="buttonOpenInNewWindow">
             <icon>eFapsActionNewWindow</icon>

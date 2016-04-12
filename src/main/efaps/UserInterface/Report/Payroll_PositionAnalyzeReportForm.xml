@@ -27,7 +27,7 @@
         <name>Payroll_PositionAnalyzeReportForm</name>
         <field name="filter">
             <property name="HideLabel">true</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger event="UI_FIELD_VALUE" index="1" method="setDefaultFilter"
                 name="Payroll_PositionAnalyzeReportForm.filter.UI_FIELD_VALUE.1"
                 program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
@@ -81,7 +81,7 @@
         </field>
         <field name="report">
             <property name="HideLabel">true</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger event="UI_FIELD_VALUE" method="generateReport"
                 name="Payroll_PositionAnalyzeReportForm.report.UI_FIELD_VALUE"
                 program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
@@ -97,7 +97,7 @@
         <name>Payroll_PositionAnalyzeReportForm</name>
         <field name="filter">
             <property name="HideLabel">true</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger event="UI_FIELD_VALUE" index="1" method="setDefaultFilter"
                 name="Payroll_PositionAnalyzeReportForm.filter.UI_FIELD_VALUE.1"
                 program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">
@@ -158,7 +158,7 @@
         </field>
         <field name="report">
             <property name="HideLabel">true</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger event="UI_FIELD_VALUE" method="generateReport"
                 name="Payroll_PositionAnalyzeReportForm.report.UI_FIELD_VALUE"
                 program="org.efaps.esjp.payroll.reports.PositionAnalyzeReport">

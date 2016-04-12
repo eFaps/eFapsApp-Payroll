@@ -27,7 +27,7 @@
         <field name="date">
             <property name="Label">Payroll_ReportPrintForm.dateFrom.Label</property>
             <property name="ModeCreate">EDITABLE</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.DateUI</property>
             <trigger program="org.efaps.esjp.payroll.Payslip"
                      method="dateValueUI"
                      name="Payroll_PayslipForm.date.UI_FIELD_VALUE"
@@ -36,7 +36,7 @@
         <field name="dateTo">
             <property name="Label">Payroll_ReportPrintForm.dateTo.Label</property>
             <property name="ModeCreate">EDITABLE</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.DateUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.DateUI</property>
             <trigger program="org.efaps.esjp.payroll.Payslip"
                      method="dateValueUI"
                      name="Payroll_PayslipForm.duedate.UI_FIELD_VALUE"

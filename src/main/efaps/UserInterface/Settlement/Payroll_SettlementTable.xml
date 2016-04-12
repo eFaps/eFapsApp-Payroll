@@ -46,7 +46,7 @@
             <property name="HRef">${COMMONURL}/MenuTree.jsp</property>
             <property name="MsgPhrase">HumanResource_EmployeeMsgPhrase</property>
             <property name="Label">Payroll_Settlement/employee.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
             <field name="rateCrossTotal4View">
             <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>

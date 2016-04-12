@@ -87,7 +87,7 @@
             <property name="ModeEdit">READONLY</property>
             <property name="ModeView">READONLY</property>
             <property name="Required">true</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"
                 method="autoComplete4Employee"
                 name="Payroll_PayslipForm.number.UI_FIELD_AUTOCOMPLETE"
@@ -107,7 +107,7 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeCreate">READONLY</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="createGroup" character="Group">
             <property name="GroupCount">2</property>
@@ -166,7 +166,7 @@
             <property name="Required">true</property>
         </field>
         <field name="rateCrossTotal">
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
             <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
@@ -183,7 +183,7 @@
                 event="UI_FIELD_VALUE" />
         </field>
         <field name="amountCost">
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Phrase">$&lt;attribute[AmountCost]&gt; $&lt;linkto[CurrencyId].attribute[Symbol]&gt;</property>
             <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
@@ -267,7 +267,7 @@
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">READONLY</property>
             <property name="Label">Payroll_PayslipForm.Sums.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="basis">
             <property name="ModeCreate">NONE</property>
@@ -281,7 +281,7 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="ModePrint">NONE</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.payroll.Payslip"
                     method="getJavaScriptUIValue"
                     name="Payroll_PayslipForm.javaScript.UI_FIELD_VALUE"
@@ -362,7 +362,7 @@
             <property name="ModeEdit">READONLY</property>
             <property name="ModeView">READONLY</property>
             <property name="Required">true</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"
                 method="autoComplete4Employee"
                 name="Payroll_PayslipForm.number.UI_FIELD_AUTOCOMPLETE"
@@ -387,14 +387,14 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeCreate">READONLY</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="additionalInfo">
             <property name="HideLabel">true</property>
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeCreate">READONLY</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="createGroup" character="Group">
             <property name="GroupCount">2</property>
@@ -453,7 +453,7 @@
             <property name="Required">true</property>
         </field>
         <field name="rateCrossTotal">
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Phrase">$&lt;attribute[RateCrossTotal]&gt; $&lt;linkto[RateCurrencyId].attribute[Symbol]&gt;</property>
             <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
@@ -470,7 +470,7 @@
                 event="UI_FIELD_VALUE" />
         </field>
         <field name="amountCost">
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Phrase">$&lt;attribute[AmountCost]&gt; $&lt;linkto[CurrencyId].attribute[Symbol]&gt;</property>
             <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
@@ -536,7 +536,7 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="Columns">100</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.projects.Project"
                 method="autoComplete4Project"
                 name="Payroll_PayslipForm.project.UI_FIELD_AUTOCOMPLETE"
@@ -556,7 +556,7 @@
             <property name="ModeCreate">READONLY</property>
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="project4View">
             <property name="SelectAlternateOID">linkfrom[PayRoll_Projects_ProjectService2Payslip#ToLink].linkto[FromLink].oid</property>
@@ -566,7 +566,7 @@
             <property name="ModeCreate">NONE</property>
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">READONLY</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Columns">50</property>
         </field>
 
@@ -599,7 +599,7 @@
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">READONLY</property>
             <property name="Label">Payroll_PayslipForm.Sums.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="basis">
             <property name="ModeCreate">NONE</property>
@@ -613,7 +613,7 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="ModePrint">NONE</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.payroll.Payslip"
                     method="getJavaScriptUIValue"
                     name="Payroll_PayslipForm.javaScript.UI_FIELD_VALUE"

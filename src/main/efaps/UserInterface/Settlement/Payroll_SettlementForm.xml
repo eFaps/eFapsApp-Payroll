@@ -94,7 +94,7 @@
             <property name="ModeEdit">READONLY</property>
             <property name="ModeView">READONLY</property>
             <property name="Required">true</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <trigger program="org.efaps.esjp.humanresource.Employee"
                 method="autoComplete4Employee"
                 name="Payroll_PayslipForm.number.UI_FIELD_AUTOCOMPLETE"
@@ -114,7 +114,7 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="ModeCreate">READONLY</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field character="Group" name="dateGroup">
             <property name="GroupCount">1</property>
@@ -244,7 +244,7 @@
             <property name="ModeView">NONE</property>
             <property name="ModeEdit">READONLY</property>
             <property name="Label">Payroll_PayslipForm.Sums.Label</property>
-            <property name="ClassNameUI">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="basis">
             <property name="ModeCreate">NONE</property>
