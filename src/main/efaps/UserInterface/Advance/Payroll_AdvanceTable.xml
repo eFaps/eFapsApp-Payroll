@@ -82,6 +82,7 @@
             <property name="ModeEdit">NONE</property>
             <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
             <property name="Align">right</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="rateCurrencyId">
             <property name="Attribute">RateCurrencyId</property>
@@ -211,6 +212,7 @@
             <property name="ModeEdit">NONE</property>
             <property name="Label">Payroll_Payslip/RateCrossTotal.Label</property>
             <property name="Align">right</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="rateCurrencyId">
             <property name="Attribute">RateCurrencyId</property>
