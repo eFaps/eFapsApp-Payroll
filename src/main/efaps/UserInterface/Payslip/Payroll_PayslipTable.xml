@@ -84,6 +84,7 @@
             <property name="Label">Payroll_Payslip/LaborTime.Label</property>
             <property name="ModeView">NONE</property>
             <property name="Align">right</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="rateCrossTotal">
             <property name="Attribute">RateCrossTotal</property>
@@ -248,6 +249,7 @@
             <property name="Label">Payroll_Payslip/LaborTime.Label</property>
             <property name="ModeView">NONE</property>
             <property name="Align">right</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="rateCrossTotal">
             <property name="Attribute">RateCrossTotal</property>

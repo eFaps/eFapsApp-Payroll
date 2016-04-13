@@ -26,7 +26,6 @@
             <application exclude="true" name="eFapsApp-Projects" />
         </application-dependencies>
         <name>Payroll_DocumentUnfilteredTable</name>
-        <!-- fields -->
         <field name="type">
             <property name="FilterType">PICKLIST</property>
             <property name="Attribute">Type</property>
@@ -61,6 +60,7 @@
             <property name="Label">Payroll_Payslip/LaborTime.Label</property>
             <property name="ModeView">NONE</property>
             <property name="Align">right</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="rateCrossTotal">
             <property name="Attribute">RateCrossTotal</property>
@@ -167,6 +167,7 @@
             <property name="Label">Payroll_Payslip/LaborTime.Label</property>
             <property name="ModeView">NONE</property>
             <property name="Align">right</property>
+            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
         </field>
         <field name="rateCrossTotal">
             <property name="Attribute">RateCrossTotal</property>
