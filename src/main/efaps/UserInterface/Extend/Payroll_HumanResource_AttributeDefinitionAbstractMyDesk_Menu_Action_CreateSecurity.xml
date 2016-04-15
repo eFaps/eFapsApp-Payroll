@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
 
- Copyright 2003 - 2013 The eFaps Team
+ Copyright 2003 - 2016 The eFaps Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -13,16 +13,13 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+$
 
- Author:          The eFaps Team
- Revision:        $Rev: 8533 $
- Last Changed:    $Date: 2013-01-16 11:22:09 -0500 (mié, 16 ene 2013) $
- Last Changed By: $Author: jan@moxter.net $
-
---><ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
+-->
+<ui-command xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>30e3b85e-5b32-45d3-998e-bf7729a57eeb</uuid>
-    <file-application>eFapsApp-HumanResource</file-application>
-    <file-revision>$Rev: 8533 $</file-revision>
+    <file-application>eFapsApp-Payroll</file-application>
     <definition>
         <version-expression>(version==latest)</version-expression>
         <name>Payroll_HumanResource_AttributeDefinitionAbstractMyDesk_Menu_Action_CreateSecurity</name>
@@ -32,7 +29,7 @@
         </access>
         <target>
             <form>ERP_AttributeDefinitionForm</form>
-            <execute program="org.efaps.esjp.common.uiform.Create"/>
+            <execute program="org.efaps.esjp.common.uiform.Create" />
         </target>
         <!-- properties -->
         <property name="Target">modal</property>

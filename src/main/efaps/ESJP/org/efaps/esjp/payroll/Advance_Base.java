@@ -427,7 +427,7 @@ public abstract class Advance_Base
         }
 
         try {
-            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+            if (AppDependency.getAppDependency("eFapsApp-Payroll").isMet()) {
                 final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.Projects_ProjectService2Advance);
                 queryBldr2.addWhereAttrEqValue(CIPayroll.Projects_ProjectService2Advance.ToDocument,
                                 _parameter.getInstance());
@@ -457,7 +457,7 @@ public abstract class Advance_Base
         throws EFapsException
     {
         try {
-            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+            if (AppDependency.getAppDependency("eFapsApp-Payroll").isMet()) {
                 final QueryBuilder queryBldr = new QueryBuilder(CIProjects.ProjectService2Employee);
                 queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, _emplInst);
                 queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.Status,

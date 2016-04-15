@@ -187,7 +187,7 @@ public abstract class Payslip_Base
         }
 
         try {
-            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+            if (AppDependency.getAppDependency("eFapsApp-Payroll").isMet()) {
                 final QueryBuilder queryBldr2 = new QueryBuilder(CIPayroll.Projects_ProjectService2Payslip);
                 queryBldr2.addWhereAttrEqValue(CIPayroll.Projects_ProjectService2Payslip.ToDocument,
                                 _parameter.getInstance());
@@ -501,7 +501,7 @@ public abstract class Payslip_Base
         throws EFapsException
     {
         try {
-            if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+            if (AppDependency.getAppDependency("eFapsApp-Payroll").isMet()) {
                 final QueryBuilder queryBldr = new QueryBuilder(CIProjects.ProjectService2Employee);
                 queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, _emplInst);
                 queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.Status,
@@ -944,7 +944,7 @@ public abstract class Payslip_Base
             if (emplInst.isValid()) {
                 map.put("employeeData", getFieldValue4Employee(emplInst));
                 try {
-                    if (AppDependency.getAppDependency("eFapsApp-Projects").isMet()) {
+                    if (AppDependency.getAppDependency("eFapsApp-Payroll").isMet()) {
                         final QueryBuilder queryBldr = new QueryBuilder(CIProjects.ProjectService2Employee);
                         queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.ToLink, emplInst);
                         queryBldr.addWhereAttrEqValue(CIProjects.ProjectService2Employee.Status,
