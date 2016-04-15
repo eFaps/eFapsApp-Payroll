@@ -3,6 +3,7 @@
 <suite name="Suite" parallel="false">
     <test name="CITests">
         <parameter name="baseFolder" value="../../../main/efaps"></parameter>
+        <parameter name="application" value="eFapsApp-Payroll"/>
         <parameter name="ciClass" value="org.efaps.esjp.ci.CIPayroll"/>
         <parameter name="regex4TypeLabelExclude" value=".*\/Company.Label$|.*\/Group.Label$|.*\/Flag.Label$"/>
         <parameter name="regex4MenuLabelExclude" value=".*_Menu.Label$"/>
