@@ -40,12 +40,11 @@
         </field>
         <field name="type">
             <property name="ModeEdit">EDITABLE</property>
-            <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
+            <property name="UIType">CHECKBOX</property>
             <property name="Label">org.efaps.esjp.payroll.reports.CashOutReport.type</property>
             <trigger event="UI_FIELD_VALUE" method="getTypeFieldValue"
                 name="Payroll_PositionAnalyzeReportFilterForm.type.UI_FIELD_VALUE"
                 program="org.efaps.esjp.payroll.reports.CashOutReport" >
-                <property name="ListType">CHECKBOX</property>
                 <property name="Type01">Payroll_Advance</property>
                 <property name="Type02">Payroll_Payslip</property>
                 <property name="Type03">Payroll_Settlement</property>
