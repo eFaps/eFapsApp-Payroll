@@ -2,139 +2,140 @@
 <!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.5.1  -->
 <!-- 2014-11-12T13:07:27 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_Rules" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="042fb9ec-85f1-44d9-9425-945223938cd6">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
-	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
-	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
-	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
-	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
-	<property name="net.sf.jasperreports.export.xls.ignore.cell.border" value="true"/>
-	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
-	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="pageHeader"/>
-	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.3" value="pageFooter"/>
-	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.4" value="lastPageFooter"/>
-	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.5" value="columnFooter"/>
-	<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
-	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
-	<import value="org.joda.time.DateTime"/>
-	<queryString language="eFaps">
-		<![CDATA[query type Payroll_RuleAbstract select type.name as typeName, attribute[Key] as key,
+    <property name="org.efaps.admin.program.jasper.EFapsApplication" value="eFapsApp-Payroll"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
+    <property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+    <property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.ignore.cell.border" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+    <property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="pageHeader"/>
+    <property name="net.sf.jasperreports.export.xls.exclude.origin.band.3" value="pageFooter"/>
+    <property name="net.sf.jasperreports.export.xls.exclude.origin.band.4" value="lastPageFooter"/>
+    <property name="net.sf.jasperreports.export.xls.exclude.origin.band.5" value="columnFooter"/>
+    <property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+    <property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+    <import value="org.joda.time.DateTime"/>
+    <queryString language="eFaps">
+        <![CDATA[query type Payroll_RuleAbstract select type.name as typeName, attribute[Key] as key,
 attribute[Expression] as expression, attribute[Description] as description, attribute[Note] as note, attribute[RuleType] as ruleType]]>
-	</queryString>
-	<field name="typeName" class="java.lang.String"/>
-	<field name="key" class="java.lang.String"/>
-	<field name="expression" class="java.lang.String"/>
-	<field name="description" class="java.lang.String"/>
-	<field name="note" class="java.lang.String"/>
-	<field name="ruleType" class="java.lang.Object"/>
-	<columnHeader>
-		<band height="12" splitType="Stretch">
-			<property name="local_mesure_unitheight" value="pixel"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<staticText>
-				<reportElement x="0" y="0" width="137" height="12" uuid="807cef53-f7fa-4a8c-b429-ce2965a6f9ce">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[typeName]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="137" y="0" width="133" height="12" uuid="f0b37ba7-c68b-4170-88a5-3fe70f5ace27">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[key]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="270" y="0" width="133" height="12" uuid="4efe6281-748f-4ba9-82f2-08b3b460b020">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[expression]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="403" y="0" width="133" height="12" uuid="017c3058-5ace-486c-8555-c1d10aed5651">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[description]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="536" y="0" width="133" height="12" uuid="1a8647cc-5804-41eb-a569-ceafbb2f035d">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[note]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="669" y="0" width="133" height="12" uuid="3013fe2c-813a-41f8-9167-26fa887fb27d">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[ruleType]]></text>
-			</staticText>
-		</band>
-	</columnHeader>
-	<detail>
-		<band height="12" splitType="Stretch">
-			<property name="local_mesure_unitheight" value="pixel"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<textField>
-				<reportElement x="0" y="0" width="137" height="12" uuid="7f581318-5137-4fc7-b21f-dab720faed72">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{typeName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="137" y="0" width="133" height="12" uuid="4bf1f16f-0036-4b15-b3c6-cfe31769c60c">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{key}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="270" y="0" width="133" height="12" uuid="81e014ad-4ad6-4e9d-95a3-a86e50bf5756">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{expression}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="403" y="0" width="133" height="12" uuid="2006b0b9-f292-41ea-b0ad-8cf8c6d76690">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="536" y="0" width="133" height="12" uuid="a098810c-308f-4c1e-8011-b9f01c4cca96">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{note}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="669" y="0" width="133" height="12" uuid="17fcc705-c7d9-4bd7-9fc7-e0c7c77567c7">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{ruleType}]]></textFieldExpression>
-			</textField>
-		</band>
-	</detail>
+    </queryString>
+    <field name="typeName" class="java.lang.String"/>
+    <field name="key" class="java.lang.String"/>
+    <field name="expression" class="java.lang.String"/>
+    <field name="description" class="java.lang.String"/>
+    <field name="note" class="java.lang.String"/>
+    <field name="ruleType" class="java.lang.Object"/>
+    <columnHeader>
+        <band height="12" splitType="Stretch">
+            <property name="local_mesure_unitheight" value="pixel"/>
+            <property name="com.jaspersoft.studio.unit.height" value="px"/>
+            <staticText>
+                <reportElement x="0" y="0" width="137" height="12" uuid="807cef53-f7fa-4a8c-b429-ce2965a6f9ce">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement>
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[typeName]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="137" y="0" width="133" height="12" uuid="f0b37ba7-c68b-4170-88a5-3fe70f5ace27">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement>
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[key]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="270" y="0" width="133" height="12" uuid="4efe6281-748f-4ba9-82f2-08b3b460b020">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement>
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[expression]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="403" y="0" width="133" height="12" uuid="017c3058-5ace-486c-8555-c1d10aed5651">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement>
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[description]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="536" y="0" width="133" height="12" uuid="1a8647cc-5804-41eb-a569-ceafbb2f035d">
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement>
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[note]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="669" y="0" width="133" height="12" uuid="3013fe2c-813a-41f8-9167-26fa887fb27d">
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textElement>
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[ruleType]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="12" splitType="Stretch">
+            <property name="local_mesure_unitheight" value="pixel"/>
+            <property name="com.jaspersoft.studio.unit.height" value="px"/>
+            <textField>
+                <reportElement x="0" y="0" width="137" height="12" uuid="7f581318-5137-4fc7-b21f-dab720faed72">
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{typeName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="137" y="0" width="133" height="12" uuid="4bf1f16f-0036-4b15-b3c6-cfe31769c60c">
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{key}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="270" y="0" width="133" height="12" uuid="81e014ad-4ad6-4e9d-95a3-a86e50bf5756">
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{expression}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="403" y="0" width="133" height="12" uuid="2006b0b9-f292-41ea-b0ad-8cf8c6d76690">
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="536" y="0" width="133" height="12" uuid="a098810c-308f-4c1e-8011-b9f01c4cca96">
+                    <property name="local_mesure_unity" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="local_mesure_unitheight" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{note}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="669" y="0" width="133" height="12" uuid="17fcc705-c7d9-4bd7-9fc7-e0c7c77567c7">
+                    <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.height" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{ruleType}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
 </jasperReport>

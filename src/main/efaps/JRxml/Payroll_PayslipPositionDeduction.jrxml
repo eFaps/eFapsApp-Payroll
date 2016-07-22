@@ -2,113 +2,114 @@
 <!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.0.2  -->
 <!-- 2015-07-18T11:35:02 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll_PayslipPositionDeduction" language="groovy" pageWidth="525" pageHeight="407" orientation="Landscape" columnWidth="525" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isFloatColumnFooter="true" uuid="160bd3fb-950d-49a7-ace3-c9e752e7b59b">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
-	<parameter name="INSTANCE" class="java.lang.Object">
-		<defaultValueExpression><![CDATA[14106.697]]></defaultValueExpression>
-	</parameter>
-	<queryString language="eFaps">
-		<![CDATA[query type Payroll_PositionDeduction where PayslipLink == $P!{INSTANCE} select attribute[RateAmount] as amount,
+    <property name="org.efaps.admin.program.jasper.EFapsApplication" value="eFapsApp-Payroll"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>
+    <parameter name="INSTANCE" class="java.lang.Object">
+        <defaultValueExpression><![CDATA[14106.697]]></defaultValueExpression>
+    </parameter>
+    <queryString language="eFaps">
+        <![CDATA[query type Payroll_PositionDeduction where PayslipLink == $P!{INSTANCE} select attribute[RateAmount] as amount,
        linkto[RateCurrencyLink].attribute[Symbol] as currency, attribute[Description] as description, attribute[Key] as key, attribute[PositionNumber] as positionNumber]]>
-	</queryString>
-	<field name="key" class="java.lang.String"/>
-	<field name="description" class="java.lang.String"/>
-	<field name="amount" class="java.math.BigDecimal"/>
-	<field name="currency" class="java.lang.String"/>
-	<field name="positionNumber" class="java.lang.Integer"/>
-	<sortField name="positionNumber"/>
-	<variable name="sum" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
-		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
-	</variable>
-	<detail>
-		<band height="15" splitType="Stretch">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="80" y="0" width="327" height="15" isPrintWhenDetailOverflows="true" uuid="850ec2bb-6546-4a7f-b8af-d824b77a9b88"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00#;(#,##0.00#-)" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="439" y="0" width="86" height="15" isPrintWhenDetailOverflows="true" uuid="b206bd6a-9a28-4260-b6ae-e42d94bbffc9"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="15" isPrintWhenDetailOverflows="true" uuid="a024f6fe-f952-4118-a7ca-60038d9f415a">
-					<property name="local_mesure_unitwidth" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{key}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true" uuid="ba4e8542-d276-4b62-bd48-232377b662dc"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{currency}]]></textFieldExpression>
-			</textField>
-		</band>
-	</detail>
-	<columnFooter>
-		<band height="25">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true" uuid="5185842c-f3e2-4d34-a2e2-1ad51b57f0db"/>
-				<box leftPadding="2" rightPadding="2">
-					<pen lineWidth="0.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{currency}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00#" isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="440" y="0" width="85" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="b9dbc17d-2781-47d6-835e-c4b89e5f097f"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$V{sum}]]></textFieldExpression>
-			</textField>
-		</band>
-	</columnFooter>
+    </queryString>
+    <field name="key" class="java.lang.String"/>
+    <field name="description" class="java.lang.String"/>
+    <field name="amount" class="java.math.BigDecimal"/>
+    <field name="currency" class="java.lang.String"/>
+    <field name="positionNumber" class="java.lang.Integer"/>
+    <sortField name="positionNumber"/>
+    <variable name="sum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{amount}]]></variableExpression>
+        <initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <detail>
+        <band height="15" splitType="Stretch">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="80" y="0" width="327" height="15" isPrintWhenDetailOverflows="true" uuid="850ec2bb-6546-4a7f-b8af-d824b77a9b88"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00#;(#,##0.00#-)" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="439" y="0" width="86" height="15" isPrintWhenDetailOverflows="true" uuid="b206bd6a-9a28-4260-b6ae-e42d94bbffc9"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="15" isPrintWhenDetailOverflows="true" uuid="a024f6fe-f952-4118-a7ca-60038d9f415a">
+                    <property name="local_mesure_unitwidth" value="pixel"/>
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{key}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true" uuid="ba4e8542-d276-4b62-bd48-232377b662dc"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{currency}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band height="25">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true" uuid="5185842c-f3e2-4d34-a2e2-1ad51b57f0db"/>
+                <box leftPadding="2" rightPadding="2">
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="1.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{currency}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00#" isBlankWhenNull="true">
+                <reportElement mode="Transparent" x="440" y="0" width="85" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="b9dbc17d-2781-47d6-835e-c4b89e5f097f"/>
+                <box>
+                    <topPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+                    <font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{sum}]]></textFieldExpression>
+            </textField>
+        </band>
+    </columnFooter>
 </jasperReport>
