@@ -21,7 +21,7 @@
 
 package org.efaps.esjp.payroll.reports;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -34,7 +34,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * @version $Id: PayslipCalculator.java 8514 2013-01-15 16:28:07Z jan@moxter.net $
  */
 @EFapsUUID("2857ae54-8c14-4cfa-bd33-c0d166e23978")
-@EFapsRevision("$Rev: 8514 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class AbstractReports
     extends AbstractReports_Base
 {

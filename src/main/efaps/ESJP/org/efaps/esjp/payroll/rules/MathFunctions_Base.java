@@ -23,17 +23,17 @@ package org.efaps.esjp.payroll.rules;
 import java.math.BigDecimal;
 
 import org.apache.commons.jexl2.JexlContext;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 /**
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("d58cdd40-4039-4e59-b4b0-0514508a61dc")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class MathFunctions_Base
 {
 

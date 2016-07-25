@@ -24,7 +24,7 @@ import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlException;
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.util.EFapsException;
 
@@ -36,7 +36,7 @@ import org.efaps.util.EFapsException;
  *          jan@moxter.net $
  */
 @EFapsUUID("e1c6f718-a232-47ed-beda-fa2cc87e985d")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class ExpressionRule_Base
     extends AbstractRule<ExpressionRule>
 {

@@ -23,7 +23,7 @@ package org.efaps.esjp.payroll.rules;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.PrintQuery;
 import org.efaps.util.EFapsException;
@@ -32,10 +32,10 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("5484ee93-661d-4e82-8187-3d653bbb2a63")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class InputRule_Base
     extends AbstractRule<InputRule>
 {

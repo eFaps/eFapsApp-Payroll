@@ -21,7 +21,7 @@ package org.efaps.esjp.payroll.reports;
 
 import java.math.BigDecimal;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.esjp.erp.util.ERP;
 import org.efaps.util.EFapsException;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z Jorge Cueva $
  */
 @EFapsUUID("275b47ff-d9ac-4c68-a809-f2f7b2d165f7")
-@EFapsRevision("$Rev: 295 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class AbstractReports_Base
 {
     /**

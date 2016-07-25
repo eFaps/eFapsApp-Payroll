@@ -41,7 +41,7 @@ import org.joda.time.DateTime;
  * @author The eFaps Team
  */
 @EFapsUUID("891e0b40-53e7-419e-ae42-8942fbb4c0ce")
-@EFapsApplication("eFaspApp-Payroll")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class DataFunctions_Base
 {
 

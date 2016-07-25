@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.program.esjp.IEsjpListener;
 import org.efaps.db.Instance;
@@ -38,7 +38,7 @@ import org.joda.time.DateTime;
  * @version $Id: IOnQuery.java 13342 2014-07-16 17:27:59Z jan@moxter.net $
  */
 @EFapsUUID("ddb6a4d9-9226-4131-825c-eddce5120163")
-@EFapsRevision("$Rev: 13342 $")
+@EFapsApplication("eFapsApp-Payroll")
 public interface IOnPayslip
     extends IEsjpListener
 {

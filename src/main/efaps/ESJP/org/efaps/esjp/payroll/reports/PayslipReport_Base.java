@@ -33,7 +33,7 @@ import java.util.Map;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
 import org.efaps.admin.event.Return.ReturnValues;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.AttributeQuery;
 import org.efaps.db.MultiPrintQuery;
@@ -53,7 +53,7 @@ import org.joda.time.DateTime;
  * @version $Id: WorkOrderCalibrateDataSource.java 268 2011-04-29 17:10:40Z Jorge Cueva $
  */
 @EFapsUUID("382d554b-7372-4b6a-a89d-1affcae5e333")
-@EFapsRevision("$Rev: 295 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class PayslipReport_Base
     extends AbstractReports
 {
@@ -201,7 +201,7 @@ public abstract class PayslipReport_Base
         throws EFapsException
     {
         AbstractReports_Base.LOG.debug("dateFrom: '{}' dateTo: '{}'", _dateFrom, _dateTo);
-        final List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+        final List<Map<String, Object>> values = new ArrayList<>();
 
         final QueryBuilder attrQueryBldr = new QueryBuilder(CIPayroll.DocumentAbstract);
         attrQueryBldr.addWhereAttrGreaterValue(CIPayroll.DocumentAbstract.Date, _dateFrom.minusMinutes(1));
@@ -234,7 +234,7 @@ public abstract class PayslipReport_Base
             multi2.addSelect(selRuleConfig);
             multi2.execute();
             while (multi2.next()) {
-                final Map<String, Object> value = new HashMap<String, Object>();
+                final Map<String, Object> value = new HashMap<>();
                 final BigDecimal amount = multi2.getAttribute(CIPayroll.PositionAbstract.Amount);
                 final String key = multi2.getAttribute(CIPayroll.PositionAbstract.Key);
                 final List<RuleConfig> ruleConfig =  multi2.getSelect(selRuleConfig);

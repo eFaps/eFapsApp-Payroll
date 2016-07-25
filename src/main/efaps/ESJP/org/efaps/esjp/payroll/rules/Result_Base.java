@@ -26,7 +26,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.util.EFapsException;
@@ -35,10 +35,10 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("796fbef5-22f2-42a2-99f8-9d0b0699d6f7")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class Result_Base
 {
 

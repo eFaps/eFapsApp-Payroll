@@ -21,7 +21,7 @@
 
 package org.efaps.esjp.payroll.rules;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -31,10 +31,10 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("43a4646c-906d-4d28-b15e-ef2e3b60f2ab")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public class FixParameter
     extends FixParameter_Base
 {

@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
@@ -43,7 +43,7 @@ import org.efaps.util.EFapsException;
  * @version $Id: $
  */
 @EFapsUUID("87300c22-90b2-4997-8953-e4b451731751")
-@EFapsRevision("$Rev: 14839 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class Abatement_Base
     extends AbstractAlteration
 {

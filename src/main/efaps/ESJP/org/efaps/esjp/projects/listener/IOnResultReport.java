@@ -23,8 +23,8 @@ package org.efaps.esjp.projects.listener;
 import java.math.BigDecimal;
 
 import org.efaps.admin.event.Parameter;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsNoUpdate;
-import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.admin.program.esjp.IEsjpListener;
 import org.efaps.db.Instance;
@@ -38,7 +38,7 @@ import org.efaps.util.EFapsException;
  * @version $Id: Project.java 5526 2010-09-10 14:17:54Z miguel.a.aranya $
  */
 @EFapsUUID("73964b75-c83a-4548-8a08-27093857601d")
-@EFapsRevision("$Rev: 13342 $")
+@EFapsApplication("eFapsApp-Payroll")
 @EFapsNoUpdate
 public interface IOnResultReport
     extends IEsjpListener

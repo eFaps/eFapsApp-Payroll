@@ -20,7 +20,7 @@
 
 package org.efaps.esjp.payroll.rules;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 /**
@@ -29,10 +29,10 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("a019d893-0def-4eaa-86f3-eea118aea96a")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public class MessageLog
     extends MessageLog_Base
 {

@@ -35,7 +35,7 @@ import org.efaps.util.EFapsException;
  * @version $Id: Project.java 5526 2010-09-10 14:17:54Z miguel.a.aranya $
  */
 @EFapsUUID("0261a998-4e71-4c73-8f4d-e83bdc70fcd2")
-@EFapsApplication("efapsApp-Payroll")
+@EFapsApplication("eFapsApp-Payroll")
 @EFapsNoUpdate
 public interface IOnDocumentInfo
     extends IEsjpListener

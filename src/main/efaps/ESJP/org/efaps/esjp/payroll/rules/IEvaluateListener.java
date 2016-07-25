@@ -21,7 +21,7 @@
 package org.efaps.esjp.payroll.rules;
 
 import org.apache.commons.jexl2.JexlContext;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.util.EFapsException;
 
@@ -32,7 +32,7 @@ import org.efaps.util.EFapsException;
  * @version $Id: $
  */
 @EFapsUUID("e0c7696e-0cec-45b0-a43e-c578b9d2fea7")
-@EFapsRevision("$Rev: 13971 $")
+@EFapsApplication("eFapsApp-Payroll")
 public interface IEvaluateListener
     extends IRuleListener
 {

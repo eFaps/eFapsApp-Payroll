@@ -21,7 +21,7 @@
 
 package org.efaps.esjp.payroll.rules;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -31,10 +31,10 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("de6a7b50-9d5b-4eee-93e4-918c124309c0")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public class ExpressionRule
     extends ExpressionRule_Base
 {

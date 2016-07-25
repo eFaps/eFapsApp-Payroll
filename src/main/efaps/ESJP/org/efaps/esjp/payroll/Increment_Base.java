@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
@@ -43,7 +43,7 @@ import org.efaps.util.EFapsException;
  * @version $Id: $
  */
 @EFapsUUID("0be695da-f37e-4b84-89d9-e59fcd326a18")
-@EFapsRevision("$Rev: 14839 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class Increment_Base
     extends AbstractAlteration
 {

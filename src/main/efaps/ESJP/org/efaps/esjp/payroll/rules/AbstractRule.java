@@ -22,7 +22,7 @@ package org.efaps.esjp.payroll.rules;
 
 import java.util.List;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 
@@ -32,10 +32,10 @@ import org.efaps.db.Instance;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("0d7ba4f6-d645-4951-9ba2-a6f5e0df4634")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class AbstractRule<T extends AbstractRule_Base<T>>
     extends AbstractRule_Base<T>
 {

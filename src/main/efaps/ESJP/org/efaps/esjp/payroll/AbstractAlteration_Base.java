@@ -28,7 +28,7 @@ import org.apache.commons.jexl2.JexlContext;
 import org.efaps.admin.datamodel.Status;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.event.Return;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Insert;
 import org.efaps.db.Instance;
@@ -57,7 +57,7 @@ import org.joda.time.DateTime;
  * @version $Id: $
  */
 @EFapsUUID("fdb65459-1f6c-4c55-892f-f71f2e14cf53")
-@EFapsRevision("$Rev: 14839 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class AbstractAlteration_Base
     extends AbstractDocument
 {

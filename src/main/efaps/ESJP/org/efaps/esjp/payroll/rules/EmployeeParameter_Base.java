@@ -30,7 +30,7 @@ import org.efaps.util.EFapsException;
  * @author The eFaps Team
  */
 @EFapsUUID("b9d07114-c113-4992-becc-95e319181259")
-@EFapsApplication("eFaspApp-Payroll")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class EmployeeParameter_Base
     extends AbstractParameter<EmployeeParameter>
 {

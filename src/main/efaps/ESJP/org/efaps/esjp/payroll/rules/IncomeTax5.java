@@ -21,7 +21,7 @@
 
 package org.efaps.esjp.payroll.rules;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -31,10 +31,10 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("92b96ec0-a0c7-4303-b529-123784d8651b")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public class IncomeTax5
     extends IncomeTax5_Base
 {

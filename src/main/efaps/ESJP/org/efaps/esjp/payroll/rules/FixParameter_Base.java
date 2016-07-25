@@ -22,7 +22,7 @@ package org.efaps.esjp.payroll.rules;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.MapContext;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.util.EFapsException;
 
@@ -34,7 +34,7 @@ import org.efaps.util.EFapsException;
  *          jan@moxter.net $
  */
 @EFapsUUID("6f768e9c-b423-46f9-8e32-cfcdc774dee5")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class FixParameter_Base
     extends AbstractParameter<FixParameter>
 {

@@ -22,6 +22,6 @@
  * Rule Package.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 package org.efaps.esjp.payroll.rules;

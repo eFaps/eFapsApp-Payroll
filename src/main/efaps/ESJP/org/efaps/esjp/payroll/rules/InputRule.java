@@ -21,7 +21,7 @@
 
 package org.efaps.esjp.payroll.rules;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -31,10 +31,10 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("63479809-b05e-4761-b1f4-bc959b9b98f5")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public class InputRule
     extends InputRule_Base
 {

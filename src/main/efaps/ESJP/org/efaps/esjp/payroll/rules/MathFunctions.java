@@ -22,7 +22,7 @@
 package org.efaps.esjp.payroll.rules;
 
 import org.apache.commons.jexl2.JexlContext;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -32,10 +32,10 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("8b9c9a4a-39ef-41c7-a80c-03cb2176ddfc")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public class MathFunctions
     extends MathFunctions_Base
 {

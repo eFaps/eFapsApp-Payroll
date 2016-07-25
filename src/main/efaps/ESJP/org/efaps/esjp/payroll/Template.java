@@ -23,7 +23,7 @@ package org.efaps.esjp.payroll;
 import java.util.List;
 
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.esjp.payroll.rules.AbstractRule;
@@ -35,10 +35,10 @@ import org.efaps.util.EFapsException;
  * class.
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("8062bfaa-828f-4cba-8e20-cba70a3c4804")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public class Template
     extends Template_Base
 {

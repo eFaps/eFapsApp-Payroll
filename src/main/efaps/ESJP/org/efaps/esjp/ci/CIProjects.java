@@ -1,7 +1,9 @@
 //CHECKSTYLE:OFF
 package org.efaps.esjp.ci;
 
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsNoUpdate;
+import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.ci.CIAttribute;
 import org.efaps.ci.CIStatus;
 import org.efaps.ci.CIType;
@@ -12,6 +14,8 @@ import org.efaps.ci.CIType;
  *
  * @author The eFaps Team
  */
+@EFapsUUID("99663e97-4235-4a0f-9272-64596b8492b0")
+@EFapsApplication("eFapsApp-Payroll")
 @EFapsNoUpdate
 public final class CIProjects
 {

@@ -20,8 +20,8 @@
 
 package org.efaps.esjp.payroll.listener;
 
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsListener;
-import org.efaps.admin.program.esjp.EFapsRevision;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 /**
@@ -33,7 +33,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * @version $Id: Settlement.java 14129 2014-09-26 03:29:31Z jan@moxter.net $
  */
 @EFapsUUID("4b8de701-393b-4bf7-b229-26f3ebff5e31")
-@EFapsRevision("$Rev: 14129 $")
+@EFapsApplication("eFapsApp-Payroll")
 @EFapsListener
 public class OnProjectResultReport
     extends OnProjectResultReport_Base

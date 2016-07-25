@@ -29,7 +29,7 @@ import java.util.Set;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.PrintQuery;
@@ -43,11 +43,11 @@ import org.efaps.util.EFapsException;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  * @param <T> extension class
  */
 @EFapsUUID("d31dd0ee-9396-4233-a4fe-bad8780cc931")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class AbstractRule_Base<T extends AbstractRule_Base<T>>
 {
 

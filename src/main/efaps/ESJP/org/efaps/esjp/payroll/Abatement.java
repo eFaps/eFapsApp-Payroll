@@ -21,7 +21,7 @@
 
 package org.efaps.esjp.payroll;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -34,7 +34,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * @version $Id: Payslip.java 14839 2015-02-11 01:49:12Z jan@moxter.net $
  */
 @EFapsUUID("64048b76-213d-466c-ab3d-3ff1a701fff7")
-@EFapsRevision("$Rev: 14839 $")
+@EFapsApplication("eFapsApp-Payroll")
 public class Abatement
     extends Abatement_Base
 {

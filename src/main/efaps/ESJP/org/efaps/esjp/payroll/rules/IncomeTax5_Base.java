@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.jexl2.JexlContext;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.util.EFapsException;
@@ -39,17 +39,17 @@ import org.joda.time.DateTime;
  * TODO comment!
  *
  * @author The eFaps Team
- * @version $Id$
+ * 
  */
 @EFapsUUID("0fbe877d-a876-41d6-9882-a072a680e023")
-@EFapsRevision("$Rev$")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class IncomeTax5_Base
 {
     protected final static String KEYS4PAYMENT = "IncomeTax5PaymentKeys";
     protected final static String KEYS4EXTRA = "IncomeTax5ExtraKeys";
     protected final static String KEYS4TAX = "IncomeTax5TaxKeys";
 
-    public final static Map<Integer, Integer> MONTH2DIVID = new HashMap<Integer, Integer>();
+    public final static Map<Integer, Integer> MONTH2DIVID = new HashMap<>();
     static {
         IncomeTax5_Base.MONTH2DIVID.put(1, 12);
         IncomeTax5_Base.MONTH2DIVID.put(2, 12);
@@ -64,7 +64,7 @@ public abstract class IncomeTax5_Base
         IncomeTax5_Base.MONTH2DIVID.put(11, 4);
         IncomeTax5_Base.MONTH2DIVID.put(12, 1);
     }
-    public final static Map<Integer, Integer> MONTH2SUBSTRACT = new HashMap<Integer, Integer>();
+    public final static Map<Integer, Integer> MONTH2SUBSTRACT = new HashMap<>();
     static {
         IncomeTax5_Base.MONTH2SUBSTRACT.put(4, 3);
         IncomeTax5_Base.MONTH2SUBSTRACT.put(5, 4);
@@ -77,7 +77,7 @@ public abstract class IncomeTax5_Base
         IncomeTax5_Base.MONTH2SUBSTRACT.put(12, 11);
     }
 
-    public final static Map<Integer, Integer> MONTH2MULITPLY = new HashMap<Integer, Integer>();
+    public final static Map<Integer, Integer> MONTH2MULITPLY = new HashMap<>();
     static {
         IncomeTax5_Base.MONTH2MULITPLY.put(1, 14);
         IncomeTax5_Base.MONTH2MULITPLY.put(2, 13);

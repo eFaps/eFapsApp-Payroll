@@ -36,7 +36,7 @@ import org.efaps.util.EFapsException;
  * @author The eFaps Team
  */
 @EFapsUUID("057895b4-cde8-477f-8d78-1479109aeb5c")
-@EFapsApplication("efapsApp-Payroll")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class OnDocumentInfo_Base
     implements IOnDocumentInfo
 {

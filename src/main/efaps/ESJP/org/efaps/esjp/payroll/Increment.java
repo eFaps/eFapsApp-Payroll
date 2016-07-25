@@ -21,7 +21,7 @@
 
 package org.efaps.esjp.payroll;
 
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 
 
@@ -34,7 +34,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * @version $Id: Payslip.java 14839 2015-02-11 01:49:12Z jan@moxter.net $
  */
 @EFapsUUID("ef7f78c8-33dd-401c-a562-b2520358d7ff")
-@EFapsRevision("$Rev: 14839 $")
+@EFapsApplication("eFapsApp-Payroll")
 public class Increment
     extends Increment_Base
 {

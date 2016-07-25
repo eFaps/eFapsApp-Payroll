@@ -32,7 +32,7 @@ import org.efaps.admin.program.esjp.EFapsUUID;
  * @version $Id: Settlement.java 14129 2014-09-26 03:29:31Z jan@moxter.net $
  */
 @EFapsUUID("a4948b6f-ec19-4b73-8910-2750dd93cf2a")
-@EFapsApplication("efapsApp-Payroll")
+@EFapsApplication("eFapsApp-Payroll")
 @EFapsListener
 public class OnDocumentInfo
     extends OnDocumentInfo_Base

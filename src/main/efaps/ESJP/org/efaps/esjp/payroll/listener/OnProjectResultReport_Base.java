@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 
 import org.efaps.admin.event.Parameter;
-import org.efaps.admin.program.esjp.EFapsRevision;
+import org.efaps.admin.program.esjp.EFapsApplication;
 import org.efaps.admin.program.esjp.EFapsUUID;
 import org.efaps.db.Instance;
 import org.efaps.db.PrintQuery;
@@ -39,7 +39,7 @@ import org.efaps.util.EFapsException;
  * @version $Id: $
  */
 @EFapsUUID("2e8cba43-cd3a-4738-932d-59ba42186b4b")
-@EFapsRevision("$Rev: 14129 $")
+@EFapsApplication("eFapsApp-Payroll")
 public abstract class OnProjectResultReport_Base
     implements IOnResultReport
 {
