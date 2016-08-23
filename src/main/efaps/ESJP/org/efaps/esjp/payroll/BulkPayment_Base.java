@@ -156,16 +156,16 @@ public abstract class BulkPayment_Base
             docPrint.execute();
 
             final Parameter parameter = ParameterUtil.clone(_parameter);
-            ParameterUtil.setParmeterValue(parameter, "account", String.valueOf(accInst.getId()));
-            ParameterUtil.setParmeterValue(parameter, "name", name);
-            ParameterUtil.setParmeterValue(parameter, "amount",
+            ParameterUtil.setParameterValues(parameter, "account", String.valueOf(accInst.getId()));
+            ParameterUtil.setParameterValues(parameter, "name", name);
+            ParameterUtil.setParameterValues(parameter, "amount",
                             String.valueOf(docPrint.getAttribute(CIPayroll.DocumentAbstract.CrossTotal)));
-            ParameterUtil.setParmeterValue(parameter, "paymentAmount",
+            ParameterUtil.setParameterValues(parameter, "paymentAmount",
                             String.valueOf(docPrint.getAttribute(CIPayroll.DocumentAbstract.CrossTotal)));
-            ParameterUtil.setParmeterValue(parameter, getFieldName4Attribute(_parameter,
+            ParameterUtil.setParameterValues(parameter, getFieldName4Attribute(_parameter,
                             CISales.Payment.CreateDocument.name), inst.getOid());
-            ParameterUtil.setParmeterValue(parameter, "paymentRate", "1");
-            ParameterUtil.setParmeterValue(parameter, "paymentRate" + RateUI.INVERTEDSUFFIX, "false");
+            ParameterUtil.setParameterValues(parameter, "paymentRate", "1");
+            ParameterUtil.setParameterValues(parameter, "paymentRate" + RateUI.INVERTEDSUFFIX, "false");
 
             final PaymentDeposit deposit = new PaymentDeposit()
             {

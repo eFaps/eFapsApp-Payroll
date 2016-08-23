@@ -388,7 +388,7 @@ public abstract class Payslip_Base
             timecardOids.add(timecardInst.getOid());
         }
         if (!timecardOids.isEmpty()) {
-            ParameterUtil.setParmeterValue(_parameter, "TimeReport_EmployeeTimeCard",
+            ParameterUtil.setParameterValues(_parameter, "TimeReport_EmployeeTimeCard",
                             timecardOids.toArray(new String[timecardOids.size()]));
         }
         final CreatedDoc createdDoc = new CreatedDoc();

@@ -154,7 +154,7 @@ public abstract class AbstractAlteration_Base
 
         for (int i = 0; i < repeats; i++) {
             final Parameter parameter = ParameterUtil.clone(_parameter);
-            ParameterUtil.setParmeterValue(parameter, CIFormPayroll.Payroll_AlterationCreateMultipleForm.date.name,
+            ParameterUtil.setParameterValues(parameter, CIFormPayroll.Payroll_AlterationCreateMultipleForm.date.name,
                             date.toString());
             createDetail(parameter);
             date = date.plusMonths(1);
