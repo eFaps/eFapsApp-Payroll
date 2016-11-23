@@ -81,7 +81,7 @@ public abstract class AbstractReports_Base
         final String month = _date.getMonthOfYear() < 10
                         ? "0" + _date.getMonthOfYear() : "" + _date.getMonthOfYear();
 
-        final String ruc = ERP.COMPANYTAX.get();
+        final String ruc = ERP.COMPANY_TAX.get();
         final String name = _format.concat(year).concat(month).concat(ruc);
         return name;
     }
