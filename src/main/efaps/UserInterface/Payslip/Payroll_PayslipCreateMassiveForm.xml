@@ -73,7 +73,7 @@
             <property name="ModeEdit">NONE</property>
             <table>Payroll_PayslipTable</table>
             <evaluate program="org.efaps.esjp.common.uitable.MultiPrint">
-                <property name="Types">Payroll_Payslip</property>
+                <property name="Type">Payroll_Payslip</property>
             </evaluate>
         </field>
 
