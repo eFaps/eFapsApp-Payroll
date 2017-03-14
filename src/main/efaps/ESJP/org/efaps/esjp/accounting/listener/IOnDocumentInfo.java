@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 - 2015 The eFaps Team
+ * Copyright 2003 - 2017 The eFaps Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,13 @@ public interface IOnDocumentInfo
 {
 
     /**
-     * @param _instance
-     * @return
+     * Gets the key two amount.
+     *
+     * @param _docInst the doc inst
+     * @return the key two amount
+     * @throws EFapsException on error
      */
-    Map<String, BigDecimal> getKey2Amount(final Instance _docInst)
+    Map<String, Map<String, BigDecimal>> getKey2Amount(Instance _docInst)
         throws EFapsException;
 
 }

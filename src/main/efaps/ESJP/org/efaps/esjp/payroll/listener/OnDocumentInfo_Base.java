@@ -42,10 +42,10 @@ public abstract class OnDocumentInfo_Base
 {
 
     @Override
-    public Map<String, BigDecimal> getKey2Amount(final Instance _docInst)
+    public Map<String, Map<String,BigDecimal>> getKey2Amount(final Instance _docInst)
         throws EFapsException
     {
-        final Map<String, BigDecimal> ret = new HashMap<>();
+        final Map<String, Map<String, BigDecimal>> ret = new HashMap<>();
         if (_docInst.getType().isKindOf(CIPayroll.DocumentAbstract)) {
             final QueryBuilder queryBldr = new QueryBuilder(CIPayroll.PositionAbstract);
             queryBldr.addWhereAttrEqValue(CIPayroll.PositionAbstract.DocumentAbstractLink, _docInst);
@@ -55,8 +55,13 @@ public abstract class OnDocumentInfo_Base
             while (multi.next()) {
                 final String key = multi.getAttribute(CIPayroll.PositionAbstract.Key);
                 final BigDecimal amount = multi.getAttribute(CIPayroll.PositionAbstract.Amount);
-                final BigDecimal current = ret.containsKey(key) ? ret.get(key) : BigDecimal.ZERO;
-                ret.put(key, current.add(amount));
+                final Map<String, BigDecimal> current = ret.containsKey(key) ? ret.get(key) : new HashMap<>();;
+                if (current.containsKey("NET")) {
+                    current.put(key, current.get("NET").add(amount));
+                } else {
+                    current.put(key, amount);
+                }
+                ret.put(key, current);
             }
         }
         return ret;
