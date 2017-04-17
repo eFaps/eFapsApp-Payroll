@@ -186,8 +186,8 @@ public abstract class BulkPayment_Base
                 }
 
                 @Override
-                protected void executeAutomation(final Parameter _parameter,
-                                                 final CreatedDoc _createdDoc)
+                public void executeAutomation(final Parameter _parameter,
+                                              final CreatedDoc _createdDoc)
                     throws EFapsException
                 {
                     final Insert insert = new Insert(CIPayroll.BulkPayment2PaymentDocument);
@@ -330,7 +330,7 @@ public abstract class BulkPayment_Base
         {
             final DRDataSource ret = new DRDataSource("employeeNumber", "employeeLastName", "employeeSecondLastName",
                             "employeeFirstName", "bank", "accountNumber", "docName", "amount");
-            final List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+            final List<Map<String, Object>> values = new ArrayList<>();
 
             final Map<Instance, String[]> employee2Acc = new HashMap<>();
             final PrintQuery print = new PrintQuery(_parameter.getInstance());
@@ -391,7 +391,7 @@ public abstract class BulkPayment_Base
             multi.addAttribute(CISales.Payment.Amount);
             multi.execute();
             while (multi.next()) {
-                final Map<String, Object> map = new HashMap<String, Object>();
+                final Map<String, Object> map = new HashMap<>();
                 final Instance docInst = multi.getSelect(selDocInst);
                 final PrintQuery docPrint = new PrintQuery(docInst);
                 docPrint.addSelect(selEmployeeInst2, selEmployeeNumber, selEmployeeFirstName, selEmployeeLastName,
