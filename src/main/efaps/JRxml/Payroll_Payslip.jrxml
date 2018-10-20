@@ -43,7 +43,8 @@
         <defaultValueExpression><![CDATA["Miraflores"]]></defaultValueExpression>
     </parameter>
     <queryString language="eFaps">
-        <![CDATA[print $P!{INSTANCE} select attribute[Name] as name,
+        <![CDATA[print obj $P!{INSTANCE}
+    select attribute[Name] as name,
     linkto[EmployeeAbstractLink].attribute[FirstName] as firstName,
     linkto[EmployeeAbstractLink].attribute[LastName] as lastName,
     linkto[EmployeeAbstractLink].attribute[SecondLastName] as secondLastName,

@@ -8,8 +8,13 @@
         <defaultValueExpression><![CDATA[14106.697]]></defaultValueExpression>
     </parameter>
     <queryString language="eFaps">
-        <![CDATA[query type Payroll_PositionPayment where PayslipLink == $P!{INSTANCE} select attribute[RateAmount] as amount,
-        linkto[RateCurrencyLink].attribute[Symbol] as currency, attribute[Description] as description, attribute[Key] as key, attribute[PositionNumber] as positionNumber]]>
+        <![CDATA[print query type Payroll_PositionPayment
+        where PayslipLink == "$P!{INSTANCE}"
+        select attribute[RateAmount] as amount,
+        linkto[RateCurrencyLink].attribute[Symbol] as currency,
+        attribute[Description] as description,
+        attribute[Key] as key,
+        attribute[PositionNumber] as positionNumber]]>
     </queryString>
     <field name="key" class="java.lang.String"/>
     <field name="description" class="java.lang.String"/>
