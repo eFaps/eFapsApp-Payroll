@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 
-  Copyright 2003 - 2016 The eFaps Team
+  Copyright 2003 - 2018 The eFaps Team
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,7 +16,6 @@
   limitations under the License.
 
 -->
-
 <ui-form xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <uuid>e461bf61-5cb4-4f3e-b83d-41832b1fba81</uuid>
@@ -527,6 +525,14 @@
             <property name="Level">2</property>
             <property name="Label">Payroll_PayslipForm.headingProject.Heading</property>
             <property name="ModeCreate">EDITABLE</property>
+            <trigger program="org.efaps.esjp.admin.access.AccessCheck4UI"
+                method="configCheck"
+                name="Payroll_PayslipForm.headingProject.UI_ACCESSCHECK"
+                event="UI_ACCESSCHECK">
+                <!-- Project-Configuration -->
+                <property name="SystemConfig">7536a95f-c2bb-4e97-beb1-58ef3e75b80a</property>
+                <property name="Attribute">org.efaps.projects.Activate</property>
+           </trigger>
         </field>
         <field name="project">
             <property name="Label">Payroll_PayslipForm.project.Label</property>
@@ -548,6 +554,14 @@
                 name="Payroll_PayslipForm.project.UI_FIELD_UPDATE"
                 event="UI_FIELD_UPDATE">
             </trigger>
+            <trigger program="org.efaps.esjp.admin.access.AccessCheck4UI"
+                method="configCheck"
+                name="Payroll_PayslipForm.project.UI_ACCESSCHECK"
+                event="UI_ACCESSCHECK">
+                <!-- Project-Configuration -->
+                <property name="SystemConfig">7536a95f-c2bb-4e97-beb1-58ef3e75b80a</property>
+                <property name="Attribute">org.efaps.projects.Activate</property>
+           </trigger>
         </field>
         <field name="projectData">
             <property name="Label">Payroll_PayslipForm.projectData.Label</property>
@@ -555,6 +569,14 @@
             <property name="ModeEdit">NONE</property>
             <property name="ModeView">NONE</property>
             <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
+            <trigger program="org.efaps.esjp.admin.access.AccessCheck4UI"
+                method="configCheck"
+                name="Payroll_PayslipForm.projectData.UI_ACCESSCHECK"
+                event="UI_ACCESSCHECK">
+                <!-- Project-Configuration -->
+                <property name="SystemConfig">7536a95f-c2bb-4e97-beb1-58ef3e75b80a</property>
+                <property name="Attribute">org.efaps.projects.Activate</property>
+           </trigger>
         </field>
         <field name="project4View">
             <property name="SelectAlternateOID">linkfrom[PayRoll_Projects_ProjectService2Payslip#ToLink].linkto[FromLink].oid</property>
@@ -566,8 +588,15 @@
             <property name="ModeView">READONLY</property>
             <property name="UIProvider">org.efaps.admin.datamodel.ui.StringUI</property>
             <property name="Columns">50</property>
+            <trigger program="org.efaps.esjp.admin.access.AccessCheck4UI"
+                method="configCheck"
+                name="Payroll_PayslipForm.project4View.UI_ACCESSCHECK"
+                event="UI_ACCESSCHECK">
+                <!-- Project-Configuration -->
+                <property name="SystemConfig">7536a95f-c2bb-4e97-beb1-58ef3e75b80a</property>
+                <property name="Attribute">org.efaps.projects.Activate</property>
+           </trigger>
         </field>
-
         <field name="ruleHeading" character="Heading">
             <property name="ModeCreate">READONLY</property>
             <property name="ModeEdit">READONLY</property>
