@@ -28,7 +28,7 @@
     </variable>
     <detail>
         <band height="15" splitType="Stretch">
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToTallestObject" x="80" y="0" width="327" height="15" isPrintWhenDetailOverflows="true" uuid="850ec2bb-6546-4a7f-b8af-d824b77a9b88"/>
                 <box leftPadding="2" rightPadding="2">
                     <pen lineWidth="0.0"/>
@@ -56,7 +56,7 @@
                 </textElement>
                 <textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="15" isPrintWhenDetailOverflows="true" uuid="a024f6fe-f952-4118-a7ca-60038d9f415a">
                     <property name="local_mesure_unitwidth" value="pixel"/>
                     <property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -73,7 +73,7 @@
                 </textElement>
                 <textFieldExpression><![CDATA[$F{key}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true" uuid="ba4e8542-d276-4b62-bd48-232377b662dc"/>
                 <box leftPadding="2" rightPadding="2">
                     <pen lineWidth="0.0"/>
@@ -91,7 +91,7 @@
     </detail>
     <columnFooter>
         <band height="25">
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToTallestObject" x="407" y="0" width="32" height="15" isPrintWhenDetailOverflows="true" uuid="5185842c-f3e2-4d34-a2e2-1ad51b57f0db"/>
                 <box leftPadding="2" rightPadding="2">
                     <pen lineWidth="0.0"/>

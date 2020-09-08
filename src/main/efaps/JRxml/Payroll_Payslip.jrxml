@@ -355,7 +355,7 @@
                 </textElement>
                 <text><![CDATA[Remuneración Básica:]]></text>
             </staticText>
-            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement mode="Transparent" x="160" y="43" width="120" height="12" uuid="b32ed266-7a1e-4aa7-9cda-4a8f3ff0134e">
                     <property name="com.jaspersoft.studio.unit.height" value="px"/>
                 </reportElement>
@@ -606,7 +606,7 @@
                     </textElement>
                     <text><![CDATA[Regimen pensionario:]]></text>
                 </staticText>
-                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <textField textAdjust="StretchHeight" isBlankWhenNull="true">
                     <reportElement mode="Transparent" x="160" y="0" width="120" height="12" uuid="57422e77-126d-4341-a0f0-abe7101d7f7a">
                         <property name="com.jaspersoft.studio.unit.height" value="px"/>
                     </reportElement>
