@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.5.1  -->
-<!-- 2014-11-12T13:02:17 -->
+
+
+
+
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PayRoll_Parameters" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f8cae22f-1a5e-457d-8b18-aae575af1894">
     <property name="org.efaps.admin.program.jasper.EFapsApplication" value="eFapsApp-Payroll"/>
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="eFaps"/>

@@ -1,27 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
 
-  Copyright 2003 - 2013 The eFaps Team
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-  Author:          The eFaps Team
-  Revision:        $Rev$
-  Last Changed:    $Date$
-  Last Changed By: $Author$
-
--->
 <install xmlns="http://www.efaps.org/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.efaps.org/xsd http://www.efaps.org/xsd/eFaps_1.0.xsd">
     <application>eFapsApp-Payroll</application>
@@ -92,30 +72,39 @@
             if (query.next()) {
                 EFAPS_LOGGER.info("Detected Accounting. Check for updates in relation to Payroll");
 
-                <!-- connect the Accounting_Sales_DocumentSumTree_Transaction Menu to the Payroll_PayslipTree  menu -->
+                
+
                 update.add2Menu("06018fca-1ee8-40df-8030-460f57acb447", "89f26b99-0066-4173-aee8-325bd27d70f1", -1);
 
-                <!-- connect the Accounting_Sales_DocumentSumTree_Transaction Menu to the Payroll_AdvanceTree  menu -->
+                
+
                 update.add2Menu("06018fca-1ee8-40df-8030-460f57acb447", "4224d4a4-1d4e-4515-972b-4b5845415af2", -1);
 
-                <!-- connect the Accounting_Payroll_PayslipTree_Menu_Action_CreateTransaction to  Payroll_PayslipTree_Menu_Action -->
+                
+
                 update.add2Menu("3654c7e3-af29-44e8-bdf3-593f8f538584", "b9114815-0d1b-4e21-b1b3-20398c69d1f9", -1);
 
-                 <!-- Accounting_Payroll_PayslipMyDesk_Menu_Action_CreateTransaction,  Payroll_PayslipMyDesk_Menu_Action-->
+                 
+
                 update.add2Menu("8505bbb2-e9d0-45f6-afff-56d2dd2c45b9", "0c8f7631-6d7c-479c-a01c-0d308c976431", -1);
 
             }
 
-            <!-- connect Payroll_ActionDefinitionMyDesk_Menu_Action  to  ERP_ActionDefinitionMyDesk_Menu-->
+            
+
             update.add2Menu("4ee3b35b-3212-4c50-b497-438850723d88", "7432b23b-a2b7-4f2f-aed9-d0ceef9c9a89", -1);
 
-            <!-- connect the Payroll_MyDesk Menu to the main menu from efaps -->
+            
+
             update.add2Menu("cf354312-fb84-4cf7-9d57-81a8426420e1", "87001cc3-c45c-44de-b8f1-776df507f268", 2);
-            <!-- connect the Payroll_HumanResource_EmployeeTree_Payslip to the main menu from HumanResource_EmployeeTree -->
+            
+
             update.add2Menu("e8cbbebe-2a81-4979-bcb3-e8cb6f6b3ecd", "136a5437-7642-4e09-8182-23fc97fedbab", 2);
-            <!-- connect the Payroll_HumanResource_AttributeDefinitionAbstractMyDesk_Menu_Action_CreateSecurity to the main menu from HumanResource_AttributeDefinitionAbstractMyDesk_Menu_Action -->
+            
+
             update.add2Menu("30e3b85e-5b32-45d3-998e-bf7729a57eeb", "e02c020f-6418-4f22-a5b7-49459212cc27", 0);
-            <!-- Payroll_Payroll, Admin_Help_MainMenu -->
+            
+
             update.add2Help("68acacc0-cf4f-4260-bf16-2a0dfb2edbe0", "dead549e-5cc6-49f9-9a79-8e33aa139f6d", -1);
 
             // Payroll_Sales_BulkPaymentDefinitionMyDesk_Menu_Action_Create Sales_BulkPaymentDefinitionMyDesk_Menu_Action
@@ -124,13 +113,17 @@
             // Payroll_Sales_BulkPaymentMyDesk_Menu_Action_Create Sales_BulkPaymentMyDesk_Menu_Action
             update.add2Menu("d28912a0-ce85-49f2-8f90-23c31192b8c5", "192bbee8-e234-4442-8991-0605313ed3af", 1);
 
-            <!-- Define attribute definition -->
-            <!-- Payroll_AttributeDefinitionAbstractMyDesk_Menu_Action, ERP_AttributeDefinitionMyDesk_Menu-->
+            
+
+            
+
             update.add2Menu("df804de0-e679-4629-aa0c-660b9f5c8c9d", "69e0b34a-2483-4662-9a45-1ce5d4e420e6", 1);
 
-            <!-- add to Payroll_Admin role -->
+            
+
             RoleUpdate rolUp = new RoleUpdate("57d96363-1728-4bb9-afab-77cfcd1a6618");
-            <!-- ERP_AttributeDefinitionMyDesk -->
+            
+
             rolUp.addUI("1c506850-7e64-439f-ad65-9c82dc762db8");
         </script>
     </version>
