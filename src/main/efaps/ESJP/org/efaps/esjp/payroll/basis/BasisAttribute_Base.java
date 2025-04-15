@@ -21,7 +21,7 @@ import java.util.List;
 import org.efaps.admin.datamodel.Attribute;
 import org.efaps.admin.datamodel.IEnum;
 import org.efaps.admin.datamodel.IJaxb;
-import org.efaps.admin.datamodel.ui.UIValue;
+import org.efaps.admin.datamodel.ui.IUIValue;
 import org.efaps.admin.dbproperty.DBProperties;
 import org.efaps.admin.event.Parameter;
 import org.efaps.admin.program.esjp.EFapsApplication;
@@ -63,9 +63,9 @@ public abstract class BasisAttribute_Base
 
     @Override
     public String getUISnipplet(final TargetMode _mode,
-                                final UIValue _value)
+                                final IUIValue _value)
     {
-        final ValueList val = (ValueList) _value.getDbValue();
+        final ValueList val = (ValueList) _value.getObject();
         final StringBuilder ret = new StringBuilder();
         if (val != null) {
             final Table table = new Table();
@@ -200,7 +200,7 @@ public abstract class BasisAttribute_Base
                                            final Object _aternativeValue)
     {
         Object ret = _aternativeValue;
-        if ((_valueList != null && !_valueList.getValues().isEmpty())) {
+        if (_valueList != null && !_valueList.getValues().isEmpty()) {
             final String attr = _attribute.ciType.getType().getAttribute(_attribute.name).getKey();
             for (final AbstractValue<?> value : _valueList.getValues()) {
                 if (value.getAttribute().equals(attr)) {
