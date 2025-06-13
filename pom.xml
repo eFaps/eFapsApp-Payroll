@@ -26,7 +26,7 @@
     </parent>
     <packaging>jar</packaging>
     <groupId>org.efaps.apps</groupId>
-    <artifactId>payroll</artifactId>
+    <artifactId>efaps-app-payroll</artifactId>
     <name>eFaps ERP PayRoll Module</name>
     <description>
     </description>
@@ -66,41 +66,6 @@
         <url>http://www.efaps.org</url>
     </organization>
 
-    <!-- Environment Settings -->
-    <issueManagement>
-        <system>eFaps Issues on Google Code</system>
-        <url>http://issues.efaps.org</url>
-    </issueManagement>
-
-    <!-- SubVersion Repository -->
-    <scm>
-        <connection>scm:svn:http://efaps.googlecode.com/svn/eFaps-WebApp-Install</connection>
-        <developerConnection>scm:svn:https://efaps.googlecode.com/svn/eFaps-WebApp-Install</developerConnection>
-        <url>http://efaps.googlecode.com/svn/eFaps-WebApp-Install</url>
-    </scm>
-
-    <!-- Distribution Repository -->
-    <distributionManagement>
-        <site>
-            <id>efaps</id>
-            <name>Maven eFaps Plug-In Site</name>
-            <url>svn:https://eFaps.googlecode.com/svn/site/eFaps-WebApp-Install</url>
-        </site>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <!-- ************************************************************************
-  * Project itself
-  ************************************************************************* -->
     <build>
         <plugins>
             <plugin>
@@ -164,12 +129,12 @@
         <!-- eFaps ERP Human Resource Module -->
         <dependency>
             <groupId>org.efaps.apps</groupId>
-            <artifactId>humanresource</artifactId>
+            <artifactId>efaps-app-humanresource</artifactId>
             <version>${efaps.app.dependencies}</version>
         </dependency>
         <dependency>
             <groupId>org.efaps.apps</groupId>
-            <artifactId>sales</artifactId>
+            <artifactId>efaps-app-sales</artifactId>
             <version>${efaps.app.dependencies}</version>
         </dependency>
         <dependency>
