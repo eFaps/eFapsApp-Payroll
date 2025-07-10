@@ -80,7 +80,6 @@ import org.efaps.esjp.projects.Project;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.ui.html.Table;
 import org.efaps.ui.wicket.util.DateUtil;
-import org.efaps.ui.wicket.util.EFapsKey;
 import org.efaps.update.AppDependency;
 import org.efaps.update.util.InstallationException;
 import org.efaps.util.EFapsException;
@@ -147,9 +146,9 @@ public abstract class Payslip_Base
             final String oid = multi.getCurrentInstance().getOid();
             final Map<String, Object> map = new HashMap<>();
             final String choice = key + " - " + descr;
-            map.put(EFapsKey.AUTOCOMPLETE_KEY.getKey(), oid);
-            map.put(EFapsKey.AUTOCOMPLETE_VALUE.getKey(), key);
-            map.put(EFapsKey.AUTOCOMPLETE_CHOICE.getKey(), choice);
+            map.put("eFapsAutoCompleteKEY", oid);
+            map.put("eFapsAutoCompleteVALUE", key);
+            map.put("eFapsAutoCompleteCHOICE", choice);
             sortMap.put(choice, map);
         }
 
@@ -1136,13 +1135,13 @@ public abstract class Payslip_Base
         final StringBuilder js = new StringBuilder().append("document.getElementsByName('sums')[0].innerHTML='")
                         .append(StringEscapeUtils.escapeEcmaScript(html)).append("';")
                         .append("positionTableColumns(eFapsTable100);");
-        map.put(EFapsKey.FIELDUPDATE_JAVASCRIPT.getKey(), js.toString());
+        map.put("eFapsFieldUpdateJS", js.toString());
         list.add(map);
 
         for (final AbstractRule<?> rule : rules) {
             final Map<String, Object> map2 = new HashMap<>();
             list.add(map2);
-            map2.put(EFapsKey.FIELDUPDATE_USEIDX.getKey(), ruleInsts.get(rule.getInstance()));
+            map2.put("eFapsFieldUseIndex", ruleInsts.get(rule.getInstance()));
             map2.put(CITablePayroll.Payroll_PositionRuleTable.ruleAmount.name, rule.getResult());
         }
 
