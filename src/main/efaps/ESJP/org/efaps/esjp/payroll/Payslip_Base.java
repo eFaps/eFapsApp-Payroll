@@ -1066,9 +1066,9 @@ public abstract class Payslip_Base
         final Instance emplInst = Instance.get(_parameter
                         .getParameterValue(CIFormPayroll.Payroll_PayslipForm.employee.name));
         if (emplInst.isValid()) {
-            final DateTime date = DateUtil.getDateFromParameter(_parameter.getParameterValue(
+            final DateTime date = JodaTimeUtils.getDateFromParameter(_parameter.getParameterValue(
                             CIFormPayroll.Payroll_PayslipForm.date.name + "_eFapsDate"));
-            final DateTime dueDate = DateUtil.getDateFromParameter(_parameter.getParameterValue(
+            final DateTime dueDate = JodaTimeUtils.getDateFromParameter(_parameter.getParameterValue(
                             CIFormPayroll.Payroll_PayslipCreateMultipleForm.dueDate.name + "_eFapsDate"));
             final DecimalFormat formatter = NumberFormatter.get().getFormatter();
 
