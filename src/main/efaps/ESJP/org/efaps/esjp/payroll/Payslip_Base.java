@@ -63,6 +63,7 @@ import org.efaps.esjp.ci.CIHumanResource;
 import org.efaps.esjp.ci.CIPayroll;
 import org.efaps.esjp.ci.CIProjects;
 import org.efaps.esjp.ci.CITablePayroll;
+import org.efaps.esjp.common.datetime.JodaTimeUtils;
 import org.efaps.esjp.common.jasperreport.StandartReport;
 import org.efaps.esjp.common.parameter.ParameterUtil;
 import org.efaps.esjp.common.util.InterfaceUtils;
@@ -79,7 +80,6 @@ import org.efaps.esjp.payroll.rules.Result;
 import org.efaps.esjp.projects.Project;
 import org.efaps.esjp.sales.PriceUtil;
 import org.efaps.esjp.ui.html.Table;
-import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.update.AppDependency;
 import org.efaps.update.util.InstallationException;
 import org.efaps.util.EFapsException;
@@ -966,8 +966,8 @@ public abstract class Payslip_Base
                 for (final IOnPayslip listener : Listener.get().<IOnPayslip>invoke(IOnPayslip.class)) {
                     listener.add2UpdateMap4Employee(_parameter, emplInst, map);
                 }
-                final DateTime date = DateUtil.getDateFromParameter(_parameter.getParameterValue("date_eFapsDate"));
-                map.put("date_eFapsDate", DateUtil.getDate4Parameter(getStartDate(_parameter, date, emplInst)));
+                final DateTime date = JodaTimeUtils.getDateFromParameter(_parameter.getParameterValue("date_eFapsDate"));
+                map.put("date_eFapsDate", getStartDate(_parameter, date, emplInst));
             } else {
                 map.put("employeeData", "????");
             }

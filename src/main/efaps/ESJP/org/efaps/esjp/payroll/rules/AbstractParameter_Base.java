@@ -36,9 +36,9 @@ import org.efaps.db.QueryBuilder;
 import org.efaps.db.SelectBuilder;
 import org.efaps.esjp.ci.CIFormPayroll;
 import org.efaps.esjp.ci.CIPayroll;
+import org.efaps.esjp.common.datetime.JodaTimeUtils;
 import org.efaps.esjp.erp.NumberFormatter;
 import org.efaps.esjp.payroll.util.Payroll;
-import org.efaps.ui.wicket.util.DateUtil;
 import org.efaps.util.EFapsException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -506,7 +506,7 @@ public abstract class AbstractParameter_Base<T>
         if (dateStr != null && !dateStr.isEmpty()) {
             ret = new DateTime(dateStr);
         } else if (dateStr == null  && _parameter.getParameters().containsKey(_field.name + "_eFapsDate")) {
-            ret = DateUtil.getDateFromParameter(_parameter
+            ret = JodaTimeUtils.getDateFromParameter(_parameter
                             .getParameterValue(_field.name + "_eFapsDate"));
         } else if (_docInst != null && _docInst.isValid()) {
             final PrintQuery print = CachedPrintQuery.get4Request(_docInst);
